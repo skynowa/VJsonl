@@ -1,0 +1,6 @@
+{"timestamp":"2026-06-12T19:10:01+03:00","level":"info","service":"sync","request_id":"rq-001","message":"started"}
+{"timestamp":"2026-06-12T19:10:02+03:00","level":"debug","service":"sync","request_id":"rq-001","message":"loaded items","items":42}
+{"timestamp":"2026-06-12T19:10:03+03:00","level":"error","service":"sync","request_id":"rq-002","message":"parse failed","code":500,"details":{"file":"input.jsonl","line":77}}
+this is not json
+{"timestamp":"2026-06-12T19:10:03+03:00","ts":"2026-06-12T19:10:03+03:00","level":"info","service":"sync","request_id":"rq-html","message":"html preview case","msg":"<section><h2>HTML Preview Case</h2><p>Select this <b>msg</b> cell and enable <code>HTML preview</code>.</p><ul><li>JSONL sample</li><li>Qt QTextBrowser preview</li></ul></section>"}
+{"timestamp":"2026-06-12T19:10:04+03:00","level":"info","service":"sync","request_id":"rq-003","message":"finished","ok":true}
