@@ -22,12 +22,15 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPainter>
 #include <QProgressBar>
 #include <QSettings>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
+#include <QStyledItemDelegate>
+#include <QStyleOptionViewItem>
 #include <QTableView>
 #include <QTextBrowser>
 #include <QTextCursor>
@@ -35,6 +38,43 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QUrl>
+
+class ActiveCellDelegate final : public QStyledItemDelegate
+{
+public:
+    explicit ActiveCellDelegate(QTableView *table, QObject *parent = nullptr) :
+        QStyledItemDelegate(parent),
+        _table(table)
+    {
+    }
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+    {
+        QStyleOptionViewItem activeOption(option);
+
+        if (_table != nullptr && index == _table->currentIndex()) {
+            activeOption.state |= QStyle::State_Selected;
+            activeOption.palette.setColor(QPalette::Highlight, QColor(255, 193, 7));
+            activeOption.palette.setColor(QPalette::HighlightedText, Qt::black);
+        }
+
+        QStyledItemDelegate::paint(painter, activeOption, index);
+
+        if (_table == nullptr || index != _table->currentIndex()) {
+            return;
+        }
+
+        painter->save();
+        QPen pen(QColor(255, 109, 0));
+        pen.setWidth(2);
+        painter->setPen(pen);
+        painter->drawRect(option.rect.adjusted(1, 1, -2, -2));
+        painter->restore();
+    }
+
+private:
+    QTableView *_table {};
+};
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -65,6 +105,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _table->setSelectionBehavior(QAbstractItemView::SelectRows);
     _table->setSelectionMode(QAbstractItemView::SingleSelection);
     _table->setAlternatingRowColors(true);
+    _table->setItemDelegate(new ActiveCellDelegate(_table, _table));
     _table->horizontalHeader()->setStretchLastSection(false);
 
     _cellView = new QTextEdit(this);
@@ -177,9 +218,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(aboutAction, &QAction::triggered, this, [this] {
         QMessageBox::about(
             this,
-            QStringLiteral("About JSONL Viewer"),
+            QStringLiteral("About VJson"),
             QStringLiteral(
-                "<b>JSONL Viewer</b><br>"
+                "<b>VJson</b><br>"
                 "Qt Widgets viewer for JSONL and log files.<br><br>"
                 "Features: filtering, level highlights, formatting for SQL/JSON/XML, and large-file load progress.<br><br>"
                 "Qt version: %1"
@@ -204,6 +245,13 @@ MainWindow::MainWindow(QWidget *parent) :
         &MainWindow::onCurrentChanged
     );
 
+    connect(
+        _table->selectionModel(),
+        &QItemSelectionModel::currentChanged,
+        _table->viewport(),
+        qOverload<>(&QWidget::update)
+    );
+
     connect(_format, &QCheckBox::toggled, this, [this] {
         updateCellView(_table->currentIndex());
     });
@@ -225,7 +273,7 @@ MainWindow::MainWindow(QWidget *parent) :
         _filter->selectAll();
     });
 
-    setWindowTitle(QStringLiteral("JSONL Viewer"));
+    setWindowTitle(QStringLiteral("VJson"));
     resize(1300, 850);
     updateStatus();
 }
@@ -294,7 +342,7 @@ void MainWindow::openFile(const QString &fileName)
 
     addRecentFile(fileName);
     _openOriginalFileAction->setEnabled(true);
-    setWindowTitle(QStringLiteral("JSONL Viewer - %1").arg(QFileInfo(fileName).fileName()));
+    setWindowTitle(QStringLiteral("VJson - %1").arg(QFileInfo(fileName).fileName()));
     updateStatus();
 }
 

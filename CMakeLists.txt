@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(jsonl_viewer_qt LANGUAGES CXX)
+project(VJson LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,7 +12,7 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
-add_executable(jsonl_viewer
+add_executable(VJson
     src/main.cpp
     src/MainWindow.h
     src/MainWindow.cpp
@@ -33,4 +33,4 @@ add_executable(jsonl_viewer
     src/JsonUtils.cpp
 )
 
-target_link_libraries(jsonl_viewer PRIVATE Qt6::Widgets)
+target_link_libraries(VJson PRIVATE Qt6::Widgets)

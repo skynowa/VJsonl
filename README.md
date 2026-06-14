@@ -1,4 +1,4 @@
-# JSONL Viewer Qt
+# VJson
 
 Minimal Qt 6 Widgets JSONL viewer.
 
@@ -33,7 +33,7 @@ Tested target: Qt 6.x Widgets, C++20.
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
-./build/jsonl_viewer
+./build/VJson
 ```
 
 ## Notes
