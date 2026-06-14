@@ -129,9 +129,9 @@ MainWindow::MainWindow(QWidget *parent) :
     auto *filterPanel = new QWidget(this);
     auto *filterLayout = new QHBoxLayout(filterPanel);
     filterLayout->setContentsMargins(0, 0, 0, 0);
-    filterLayout->addWidget(_filter, 1);
-    filterLayout->addWidget(_levelFilter);
     filterLayout->addWidget(_logNameFilter);
+    filterLayout->addWidget(_levelFilter);
+    filterLayout->addWidget(_filter, 1);
 
     layout->addWidget(filterPanel);
     layout->addWidget(splitter);
