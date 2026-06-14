@@ -36,17 +36,18 @@ public:
 private:
     QVector<JsonlRecord> _records;
     QStringList          _columns {
-        QStringLiteral("line"),
+        // QStringLiteral("line"),
         QStringLiteral("valid"),
+        QStringLiteral("project"),
+        QStringLiteral("proc_name"),
+        QStringLiteral("log_name"),
         QStringLiteral("ts"), // timestamp
         QStringLiteral("level"),
         QStringLiteral("error"),
-        QStringLiteral("log_name"),
         QStringLiteral("msg"),
         QStringLiteral("query"),
         // QStringLiteral("message"),
-        QStringLiteral("proc_name"),
-        QStringLiteral("service"),
+        // QStringLiteral("service"),
         QStringLiteral("mem_usage_kb"),
         QStringLiteral("request_id"),
         QStringLiteral("backtrace"),

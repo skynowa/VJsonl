@@ -10,6 +10,7 @@ public:
 
     void setTextFilter(const QString &text);
     void setLevelFilter(const QString &level);
+    void setLogNameFilter(const QString &logName);
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
@@ -17,10 +18,13 @@ protected:
 
 private:
     QString columnName(int column) const;
-    int levelColumn() const;
+    int columnByName(const QString &name) const;
     bool levelMatches(int sourceRow, const QModelIndex &sourceParent) const;
+    bool logNameMatches(int sourceRow, const QModelIndex &sourceParent) const;
+    bool columnMatches(int sourceRow, const QModelIndex &sourceParent, const QString &columnName, const QString &value) const;
 
 private:
     QString _textFilter;
     QString _levelFilter;
+    QString _logNameFilter;
 };

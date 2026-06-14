@@ -1,5 +1,6 @@
 #include "Delegates.h"
 
+#include <QAbstractItemModel>
 #include <QColor>
 #include <QPainter>
 #include <QPalette>
@@ -8,10 +9,30 @@
 #include <QStyleOptionViewItem>
 #include <QTableView>
 
+namespace
+{
+
+bool isLevelColumn(const QModelIndex &index)
+{
+    return index.model()->headerData(index.column(), Qt::Horizontal, Qt::DisplayRole).toString()
+        == QStringLiteral("level");
+}
+
+}
+
 ActiveCellDelegate::ActiveCellDelegate(QTableView *table, QObject *parent) :
     QStyledItemDelegate(parent),
     _table(table)
 {
+}
+
+void ActiveCellDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const
+{
+    QStyledItemDelegate::initStyleOption(option, index);
+
+    if (isLevelColumn(index)) {
+        option->text.clear();
+    }
 }
 
 void ActiveCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const

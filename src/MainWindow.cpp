@@ -29,6 +29,7 @@
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
+#include <QSignalBlocker>
 #include <QTableView>
 #include <QTextBrowser>
 #include <QTextCursor>
@@ -59,6 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _levelFilter->addItem(LogLevelStyle::iconForLevel(QStringLiteral("debug")), QStringLiteral("Debug"), QStringLiteral("debug"));
     _levelFilter->addItem(LogLevelStyle::iconForLevel(QStringLiteral("info")), QStringLiteral("Info"), QStringLiteral("info"));
     _levelFilter->addItem(LogLevelStyle::iconForLevel(QStringLiteral("trace")), QStringLiteral("Trace"), QStringLiteral("trace"));
+
+    _logNameFilter = new QComboBox(this);
+    _logNameFilter->addItem(QStringLiteral("All log names"), QString());
+    _logNameFilter->setMinimumWidth(160);
 
     _table = new QTableView(this);
     _table->setModel(_proxy);
@@ -124,8 +129,9 @@ MainWindow::MainWindow(QWidget *parent) :
     auto *filterPanel = new QWidget(this);
     auto *filterLayout = new QHBoxLayout(filterPanel);
     filterLayout->setContentsMargins(0, 0, 0, 0);
-    filterLayout->addWidget(_filter, 1);
+    filterLayout->addWidget(_logNameFilter);
     filterLayout->addWidget(_levelFilter);
+    filterLayout->addWidget(_filter, 1);
 
     layout->addWidget(filterPanel);
     layout->addWidget(splitter);
@@ -196,6 +202,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(_levelFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
         _proxy->setLevelFilter(_levelFilter->itemData(index).toString());
+        updateStatus();
+    });
+
+    connect(_logNameFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
+        _proxy->setLogNameFilter(_logNameFilter->itemData(index).toString());
         updateStatus();
     });
 
@@ -288,6 +299,7 @@ void MainWindow::openFile(const QString &fileName)
     _htmlPreviewView->clear();
     _format->setEnabled(false);
     _htmlPreview->setEnabled(false);
+    updateLogNameFilterItems();
     _table->sortByColumn(0, Qt::AscendingOrder);
     _table->resizeColumnsToContents();
 
@@ -420,6 +432,40 @@ void MainWindow::updateRecentFilesMenu()
         settings.setValue(QStringLiteral("recentFiles"), _recentFiles);
         updateRecentFilesMenu();
     });
+}
+
+void MainWindow::updateLogNameFilterItems()
+{
+    const QString selectedLogName = _logNameFilter->currentData().toString();
+    QStringList logNames;
+
+    for (int row = 0; row < _model->rowCount(); ++row) {
+        const auto *record = _model->recordAt(row);
+
+        if (record == nullptr) {
+            continue;
+        }
+
+        const QString logName = record->value(QStringLiteral("log_name"));
+
+        if (!logName.isEmpty() && !logNames.contains(logName, Qt::CaseInsensitive)) {
+            logNames.push_back(logName);
+        }
+    }
+
+    logNames.sort(Qt::CaseInsensitive);
+
+    QSignalBlocker blocker(_logNameFilter);
+    _logNameFilter->clear();
+    _logNameFilter->addItem(QStringLiteral("All log names"), QString());
+
+    for (const QString &logName : logNames) {
+        _logNameFilter->addItem(logName, logName);
+    }
+
+    const int selectedIndex = _logNameFilter->findData(selectedLogName);
+    _logNameFilter->setCurrentIndex(selectedIndex >= 0 ? selectedIndex : 0);
+    _proxy->setLogNameFilter(_logNameFilter->currentData().toString());
 }
 
 void MainWindow::updateStatus()
