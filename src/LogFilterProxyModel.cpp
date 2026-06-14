@@ -27,9 +27,23 @@ void LogFilterProxyModel::setLevelFilter(const QString &level)
     invalidateFilter();
 }
 
+void LogFilterProxyModel::setLogNameFilter(const QString &logName)
+{
+    if (_logNameFilter == logName) {
+        return;
+    }
+
+    _logNameFilter = logName;
+    invalidateFilter();
+}
+
 bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
     if (!levelMatches(sourceRow, sourceParent)) {
+        return false;
+    }
+
+    if (!logNameMatches(sourceRow, sourceParent)) {
         return false;
     }
 
@@ -66,12 +80,12 @@ QString LogFilterProxyModel::columnName(int column) const
     return sourceModel()->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
 }
 
-int LogFilterProxyModel::levelColumn() const
+int LogFilterProxyModel::columnByName(const QString &name) const
 {
     const int columns = sourceModel()->columnCount();
 
     for (int column = 0; column < columns; ++column) {
-        if (columnName(column) == QStringLiteral("level")) {
+        if (columnName(column) == name) {
             return column;
         }
     }
@@ -81,17 +95,32 @@ int LogFilterProxyModel::levelColumn() const
 
 bool LogFilterProxyModel::levelMatches(int sourceRow, const QModelIndex &sourceParent) const
 {
-    if (_levelFilter.isEmpty()) {
+    return columnMatches(sourceRow, sourceParent, QStringLiteral("level"), _levelFilter);
+}
+
+bool LogFilterProxyModel::logNameMatches(int sourceRow, const QModelIndex &sourceParent) const
+{
+    return columnMatches(sourceRow, sourceParent, QStringLiteral("log_name"), _logNameFilter);
+}
+
+bool LogFilterProxyModel::columnMatches(
+    int sourceRow,
+    const QModelIndex &sourceParent,
+    const QString &columnName,
+    const QString &value
+) const
+{
+    if (value.isEmpty()) {
         return true;
     }
 
-    const int column = levelColumn();
+    const int column = columnByName(columnName);
 
     if (column < 0) {
         return false;
     }
 
     const QModelIndex index = sourceModel()->index(sourceRow, column, sourceParent);
-    const QString level = sourceModel()->data(index, Qt::DisplayRole).toString();
-    return level.compare(_levelFilter, Qt::CaseInsensitive) == 0;
+    const QString text = sourceModel()->data(index, Qt::DisplayRole).toString();
+    return text.compare(value, Qt::CaseInsensitive) == 0;
 }

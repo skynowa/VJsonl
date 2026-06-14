@@ -35,6 +35,7 @@ private:
     void addRecentFile(const QString &fileName);
     void loadRecentFiles();
     void updateRecentFilesMenu();
+    void updateLogNameFilterItems();
     void updateStatus();
 
 private:
@@ -50,6 +51,7 @@ private:
     QLineEdit             *_filter {};
     QLineEdit             *_cellSearch {};
     QComboBox             *_levelFilter {};
+    QComboBox             *_logNameFilter {};
     QMenu                 *_recentFilesMenu {};
     QAction               *_openOriginalFileAction {};
     QStringList            _recentFiles;
