@@ -42,12 +42,12 @@ private:
         QStringLiteral("level"),
         QStringLiteral("error"),
         QStringLiteral("log_name"),
-        QStringLiteral("mem_usage_kb"),
         QStringLiteral("msg"),
         QStringLiteral("query"),
         // QStringLiteral("message"),
         QStringLiteral("proc_name"),
         QStringLiteral("service"),
+        QStringLiteral("mem_usage_kb"),
         QStringLiteral("request_id"),
         QStringLiteral("backtrace"),
         QStringLiteral("raw")
