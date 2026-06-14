@@ -16,6 +16,8 @@ add_executable(VJson
     src/main.cpp
     src/MainWindow.h
     src/MainWindow.cpp
+    src/Delegates.h
+    src/Delegates.cpp
     src/LogFilterProxyModel.h
     src/LogFilterProxyModel.cpp
     src/CodeFormatter.h

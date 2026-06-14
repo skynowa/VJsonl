@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 
 #include "CodeFormatter.h"
+#include "Delegates.h"
 #include "FileUtils.h"
 #include "HtmlUtils.h"
 #include "LogFilterProxyModel.h"
@@ -22,15 +23,12 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QPainter>
 #include <QProgressBar>
 #include <QSettings>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
-#include <QStyledItemDelegate>
-#include <QStyleOptionViewItem>
 #include <QTableView>
 #include <QTextBrowser>
 #include <QTextCursor>
@@ -38,43 +36,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QUrl>
-
-class ActiveCellDelegate final : public QStyledItemDelegate
-{
-public:
-    explicit ActiveCellDelegate(QTableView *table, QObject *parent = nullptr) :
-        QStyledItemDelegate(parent),
-        _table(table)
-    {
-    }
-
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
-    {
-        QStyleOptionViewItem activeOption(option);
-
-        if (_table != nullptr && index == _table->currentIndex()) {
-            activeOption.state |= QStyle::State_Selected;
-            activeOption.palette.setColor(QPalette::Highlight, QColor(255, 193, 7));
-            activeOption.palette.setColor(QPalette::HighlightedText, Qt::black);
-        }
-
-        QStyledItemDelegate::paint(painter, activeOption, index);
-
-        if (_table == nullptr || index != _table->currentIndex()) {
-            return;
-        }
-
-        painter->save();
-        QPen pen(QColor(255, 109, 0));
-        pen.setWidth(2);
-        painter->setPen(pen);
-        painter->drawRect(option.rect.adjusted(1, 1, -2, -2));
-        painter->restore();
-    }
-
-private:
-    QTableView *_table {};
-};
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
