@@ -7,6 +7,7 @@
 #include "MainWindow.h"
 
 #include "AppSettings.h"
+#include "BuildInfo.h"
 #include "CodeFormatter.h"
 #include "Delegates.h"
 #include "DemangleUtils.h"
@@ -226,8 +227,17 @@ MainWindow::MainWindow(QWidget *parent) :
                 "Qt Widgets viewer for JSONL and log files.<br><br>"
                 "Features: filtering, level highlights, formatting for SQL/JSON/XML, and large-file load progress.<br><br>"
                 "GitHub: <a href=\"https://github.com/skynowa/VJsonl\">https://github.com/skynowa/VJsonl</a><br><br>"
-                "Qt version: %1"
-            ).arg(QString::fromLatin1(qVersion()))
+                "C++ standard: %1<br>"
+                "Build date: %2<br>"
+                "Build type: %3<br>"
+                "OS: %4<br>"
+                "Qt version: %5"
+            )
+                .arg(BuildInfo::cxxStandard())
+                .arg(BuildInfo::buildDate())
+                .arg(BuildInfo::buildType())
+                .arg(BuildInfo::osInfo())
+                .arg(QString::fromLatin1(qVersion()))
         );
     });
 

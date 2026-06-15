@@ -16,6 +16,8 @@ add_executable(VJson
     src/main.cpp
     src/AppSettings.h
     src/AppSettings.cpp
+    src/BuildInfo.h
+    src/BuildInfo.cpp
     src/DemangleUtils.h
     src/DemangleUtils.cpp
     src/MainWindow.h
@@ -41,4 +43,5 @@ add_executable(VJson
     src/JsonUtils.cpp
 )
 
+target_compile_definitions(VJson PRIVATE VJSON_BUILD_TYPE="$<CONFIG>")
 target_link_libraries(VJson PRIVATE Qt6::Widgets)
