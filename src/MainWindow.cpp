@@ -457,7 +457,7 @@ void MainWindow::addRecentFile(const QString &fileName)
     _recentFiles.removeAll(fileName);
     _recentFiles.prepend(fileName);
 
-    constexpr int maxRecentFiles = 10;
+    constexpr int maxRecentFiles = 50;
 
     while (_recentFiles.size() > maxRecentFiles) {
         _recentFiles.removeLast();
