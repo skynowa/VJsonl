@@ -34,6 +34,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QShortcut>
 #include <QSizePolicy>
@@ -49,6 +50,9 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QUrl>
+
+#include <cxxabi.h>
+#include <cstdlib>
 //-------------------------------------------------------------------------------------------------
 namespace
 {
@@ -56,6 +60,43 @@ namespace
 QString settingsFileName()
 {
     return QCoreApplication::applicationDirPath() + QStringLiteral("/VJson.ini");
+}
+
+QString demangleSymbol(const QString &symbol)
+{
+    const QByteArray symbolBytes = symbol.toUtf8();
+    int status = 0;
+    char *demangled = abi::__cxa_demangle(symbolBytes.constData(), nullptr, nullptr, &status);
+
+    if (status != 0 || demangled == nullptr) {
+        std::free(demangled);
+        return symbol;
+    }
+
+    const QString result = QString::fromUtf8(demangled);
+    std::free(demangled);
+    return result;
+}
+
+QString demangleSymbols(const QString &text)
+{
+    static const QRegularExpression mangledSymbol(QStringLiteral(R"(_Z[A-Za-z0-9_]+)"));
+    QString result;
+    qsizetype lastEnd = 0;
+    QRegularExpressionMatchIterator matches = mangledSymbol.globalMatch(text);
+
+    while (matches.hasNext()) {
+        const QRegularExpressionMatch match = matches.next();
+        const QString symbol = match.captured(0);
+        const QString demangled = demangleSymbol(symbol);
+
+        result += text.mid(lastEnd, match.capturedStart() - lastEnd);
+        result += demangled;
+        lastEnd = match.capturedEnd();
+    }
+
+    result += text.mid(lastEnd);
+    return result;
 }
 
 }
@@ -416,11 +457,13 @@ void MainWindow::updateCellView(const QModelIndex &current)
 
     const QModelIndex sourceIndex = _proxy->mapToSource(current);
     const auto *record = _model->recordAt(sourceIndex.row());
+    const QString columnName = current.model()->headerData(current.column(), Qt::Horizontal, Qt::DisplayRole).toString();
     const QString text = current.data(Qt::DisplayRole).toString();
+    const QString previewText = columnName == QStringLiteral("backtrace") ? demangleSymbols(text) : text;
     bool canFormat = false;
-    const QString formatted = CodeFormatter::formatFragments(text, &canFormat);
-    const QString displayText = canFormat && _format->isChecked() ? formatted : text;
-    const bool canPreviewHtml = HtmlUtils::looksLikeHtml(text);
+    const QString formatted = CodeFormatter::formatFragments(previewText, &canFormat);
+    const QString displayText = canFormat && _format->isChecked() ? formatted : previewText;
+    const bool canPreviewHtml = HtmlUtils::looksLikeHtml(previewText);
     bool canFormatRaw = false;
     const QString rawText = record != nullptr ? record->raw : QString();
     const QString formattedRaw = CodeFormatter::formatFragments(rawText, &canFormatRaw);
@@ -429,7 +472,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
     _htmlPreview->setEnabled(canPreviewHtml);
 
     _cellView->setPlainText(displayText);
-    _htmlPreviewView->setHtml(text);
+    _htmlPreviewView->setHtml(previewText);
     _rawView->setPlainText(canFormatRaw ? formattedRaw : rawText);
     _cellStack->setCurrentWidget(canPreviewHtml && _htmlPreview->isChecked() ? _htmlPreviewView : _cellView);
     findInCellView();
