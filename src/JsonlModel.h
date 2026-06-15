@@ -43,7 +43,7 @@ private:
         QStringLiteral("log_name"),
         QStringLiteral("ts"), // timestamp
         QStringLiteral("level"),
-        QStringLiteral("error"),
+        // QStringLiteral("error"),
         QStringLiteral("msg"),
         QStringLiteral("query"),
         // QStringLiteral("message"),
