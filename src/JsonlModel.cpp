@@ -107,11 +107,13 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
 
     auto cellText = [&record, &column]() -> QString {
         if (column == QStringLiteral("error")) {
-            return record.valid ? record.value(column) : record.error;
+            return record.value(column);
         }
 
         if (column == QStringLiteral("valid")) {
-            return record.valid ? QStringLiteral("yes") : record.error;
+            return record.valid
+                ? QStringLiteral("yes")
+                : QStringLiteral("no: %1").arg(record.error);
         }
 
         if (column == QStringLiteral("raw")) {
