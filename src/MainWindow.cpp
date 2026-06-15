@@ -21,6 +21,7 @@
 #include <QComboBox>
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFont>
@@ -316,7 +317,7 @@ void MainWindow::openFile()
     const QString fileName = QFileDialog::getOpenFileName(
         this,
         "Open JSONL",
-        {},
+        openDirectory(),
         "JSONL files (*.jsonl *.log *.txt);;All files (*)"
     );
 
@@ -380,6 +381,7 @@ void MainWindow::openFile(const QString &fileName)
     restoreColumnWidths();
 
     addRecentFile(fileName);
+    saveOpenDirectory(fileName);
     _openOriginalFileAction->setEnabled(true);
     setWindowTitle(QStringLiteral("VJson - %1").arg(QFileInfo(fileName).fileName()));
     updateStatus();
@@ -540,6 +542,21 @@ void MainWindow::updateLogNameFilterItems()
     const int selectedIndex = _logNameFilter->findData(selectedLogName);
     _logNameFilter->setCurrentIndex(selectedIndex >= 0 ? selectedIndex : 0);
     _proxy->setLogNameFilter(_logNameFilter->currentData().toString());
+}
+//-------------------------------------------------------------------------------------------------
+QString MainWindow::openDirectory() const
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    const QString defaultDirectory = QDir::homePath() + QStringLiteral("/tmp");
+    const QString directory = settings.value(QStringLiteral("open/directory"), defaultDirectory).toString();
+
+    return QDir(directory).exists() ? directory : defaultDirectory;
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::saveOpenDirectory(const QString &fileName) const
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    settings.setValue(QStringLiteral("open/directory"), QFileInfo(fileName).absolutePath());
 }
 //-------------------------------------------------------------------------------------------------
 void MainWindow::saveColumnWidths() const

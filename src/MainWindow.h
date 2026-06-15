@@ -47,6 +47,8 @@ private:
     void loadRecentFiles();
     void updateRecentFilesMenu();
     void updateLogNameFilterItems();
+    QString openDirectory() const;
+    void saveOpenDirectory(const QString &fileName) const;
     void saveColumnWidths() const;
     void restoreColumnWidths();
     void savePanelLayout() const;
