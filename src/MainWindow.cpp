@@ -223,6 +223,7 @@ MainWindow::MainWindow(QWidget *parent) :
                 "<b>VJson</b><br>"
                 "Qt Widgets viewer for JSONL and log files.<br><br>"
                 "Features: filtering, level highlights, formatting for SQL/JSON/XML, and large-file load progress.<br><br>"
+                "GitHub: <a href=\"https://github.com/skynowa/VJsonl\">https://github.com/skynowa/VJsonl</a><br><br>"
                 "Qt version: %1"
             ).arg(QString::fromLatin1(qVersion()))
         );
