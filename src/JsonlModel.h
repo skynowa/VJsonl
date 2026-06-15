@@ -49,7 +49,7 @@ private:
         // QStringLiteral("message"),
         // QStringLiteral("service"),
         QStringLiteral("mem_usage_kb"),
-        QStringLiteral("request_id"),
+        // QStringLiteral("request_id"),
         QStringLiteral("backtrace"),
         // QStringLiteral("raw")
     };
