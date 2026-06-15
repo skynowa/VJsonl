@@ -20,7 +20,8 @@ public:
         Json,
         Sql,
         Xml,
-        Html
+        Html,
+        Backtrace
     };
 
     explicit JsonSyntaxHighlighter(QTextDocument *parent = nullptr);
@@ -35,6 +36,7 @@ private:
     void highlightSql(const QString &text);
     void highlightXml(const QString &text);
     void highlightHtml(const QString &text);
+    void highlightBacktrace(const QString &text);
 
 private:
     Mode            _mode { Mode::None };
@@ -46,6 +48,9 @@ private:
     QTextCharFormat _commentFormat;
     QTextCharFormat _tagFormat;
     QTextCharFormat _attributeFormat;
+    QTextCharFormat _addressFormat;
+    QTextCharFormat _frameFormat;
+    QTextCharFormat _pathFormat;
     QTextCharFormat _punctuationFormat;
     QRegularExpression _keyPattern;
     QRegularExpression _stringPattern;
@@ -59,6 +64,10 @@ private:
     QRegularExpression _xmlTagPattern;
     QRegularExpression _xmlAttributePattern;
     QRegularExpression _xmlStringPattern;
+    QRegularExpression _backtraceFramePattern;
+    QRegularExpression _backtraceAddressPattern;
+    QRegularExpression _backtracePathPattern;
+    QRegularExpression _backtraceFunctionPattern;
     QRegularExpression _punctuationPattern;
 };
 //-------------------------------------------------------------------------------------------------

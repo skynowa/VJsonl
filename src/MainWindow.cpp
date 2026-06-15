@@ -445,6 +445,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
     const auto cellHighlightMode =
         _cellStack->currentWidget() != _cellView
             ? JsonSyntaxHighlighter::Mode::None
+            : columnName == QStringLiteral("backtrace") ? JsonSyntaxHighlighter::Mode::Backtrace
             : CodeFormatter::looksLikeJson(displayText) ? JsonSyntaxHighlighter::Mode::Json
             : CodeFormatter::looksLikeSql(displayText)  ? JsonSyntaxHighlighter::Mode::Sql
             : HtmlUtils::looksLikeHtml(displayText)     ? JsonSyntaxHighlighter::Mode::Html

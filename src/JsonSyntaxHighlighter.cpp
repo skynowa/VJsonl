@@ -27,6 +27,10 @@ JsonSyntaxHighlighter::JsonSyntaxHighlighter(QTextDocument *parent) :
     _xmlTagPattern(QStringLiteral(R"(</?\s*[A-Za-z_][A-Za-z0-9_.:-]*|/?>)")),
     _xmlAttributePattern(QStringLiteral(R"(\b[A-Za-z_][A-Za-z0-9_.:-]*(?=\s*=))")),
     _xmlStringPattern(QStringLiteral(R"("([^"\\]|\\.)*"|'([^'\\]|\\.)*')")),
+    _backtraceFramePattern(QStringLiteral(R"(^\s*(#?\d+|\[\d+\]))")),
+    _backtraceAddressPattern(QStringLiteral(R"(0x[0-9A-Fa-f]+)")),
+    _backtracePathPattern(QStringLiteral(R"((/[^:\s\)]+)+(:\d+)?)")),
+    _backtraceFunctionPattern(QStringLiteral(R"([A-Za-z_~][A-Za-z0-9_:~<>]*\s*\([^)]*\))")),
     _punctuationPattern(QStringLiteral(R"([{}\[\],:])"))
 {
     _keyFormat.setForeground(QColor(20, 85, 170));
@@ -43,6 +47,10 @@ JsonSyntaxHighlighter::JsonSyntaxHighlighter(QTextDocument *parent) :
     _tagFormat.setForeground(QColor(170, 65, 120));
     _tagFormat.setFontWeight(QFont::Bold);
     _attributeFormat.setForeground(QColor(20, 85, 170));
+    _addressFormat.setForeground(QColor(145, 75, 170));
+    _frameFormat.setForeground(QColor(190, 95, 0));
+    _frameFormat.setFontWeight(QFont::Bold);
+    _pathFormat.setForeground(QColor(100, 100, 100));
     _punctuationFormat.setForeground(QColor(100, 100, 100));
 }
 //-------------------------------------------------------------------------------------------------
@@ -75,9 +83,30 @@ void JsonSyntaxHighlighter::highlightBlock(const QString &text)
         highlightHtml(text);
         break;
 
+    case Mode::Backtrace:
+        highlightBacktrace(text);
+        break;
+
     case Mode::None:
         break;
     }
+}
+//-------------------------------------------------------------------------------------------------
+void JsonSyntaxHighlighter::highlightBacktrace(const QString &text)
+{
+    const auto applyMatches = [this, &text](const QRegularExpression &pattern, const QTextCharFormat &format) {
+        QRegularExpressionMatchIterator matches = pattern.globalMatch(text);
+
+        while (matches.hasNext()) {
+            const QRegularExpressionMatch match = matches.next();
+            setFormat(match.capturedStart(), match.capturedLength(), format);
+        }
+    };
+
+    applyMatches(_backtraceFramePattern, _frameFormat);
+    applyMatches(_backtraceAddressPattern, _addressFormat);
+    applyMatches(_backtracePathPattern, _pathFormat);
+    applyMatches(_backtraceFunctionPattern, _keywordFormat);
 }
 //-------------------------------------------------------------------------------------------------
 void JsonSyntaxHighlighter::highlightJson(const QString &text)
