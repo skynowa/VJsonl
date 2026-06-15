@@ -299,6 +299,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("window/geometry"), saveGeometry());
+    saveColumnWidths();
     QMainWindow::closeEvent(event);
 }
 
@@ -320,6 +321,8 @@ void MainWindow::openFile()
 
 void MainWindow::openFile(const QString &fileName)
 {
+    saveColumnWidths();
+
     QString error;
     constexpr qint64 progressThresholdBytes = 50LL * 1024 * 1024;
     const qint64 fileSize = QFileInfo(fileName).size();
@@ -365,6 +368,8 @@ void MainWindow::openFile(const QString &fileName)
             _table->setColumnWidth(column, maxColumnWidth);
         }
     }
+
+    restoreColumnWidths();
 
     addRecentFile(fileName);
     _openOriginalFileAction->setEnabled(true);
@@ -527,6 +532,44 @@ void MainWindow::updateLogNameFilterItems()
     const int selectedIndex = _logNameFilter->findData(selectedLogName);
     _logNameFilter->setCurrentIndex(selectedIndex >= 0 ? selectedIndex : 0);
     _proxy->setLogNameFilter(_logNameFilter->currentData().toString());
+}
+
+void MainWindow::saveColumnWidths() const
+{
+    if (_model->fileName().isEmpty()) {
+        return;
+    }
+
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    settings.beginGroup(QStringLiteral("columns"));
+
+    for (int column = 0; column < _table->model()->columnCount(); ++column) {
+        const QString columnName = _table->model()->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
+
+        if (!columnName.isEmpty()) {
+            settings.setValue(columnName, _table->columnWidth(column));
+        }
+    }
+
+    settings.endGroup();
+}
+
+void MainWindow::restoreColumnWidths()
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    settings.beginGroup(QStringLiteral("columns"));
+
+    for (int column = 0; column < _table->model()->columnCount(); ++column) {
+        const QString columnName = _table->model()->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
+        bool ok = false;
+        const int width = settings.value(columnName).toInt(&ok);
+
+        if (ok && width > 0) {
+            _table->setColumnWidth(column, width);
+        }
+    }
+
+    settings.endGroup();
 }
 
 void MainWindow::updateStatus()

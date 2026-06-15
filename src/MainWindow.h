@@ -46,6 +46,8 @@ private:
     void loadRecentFiles();
     void updateRecentFilesMenu();
     void updateLogNameFilterItems();
+    void saveColumnWidths() const;
+    void restoreColumnWidths();
     void updateStatus();
 
 private:
