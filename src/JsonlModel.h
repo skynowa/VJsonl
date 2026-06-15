@@ -1,3 +1,9 @@
+/**
+ * \file  JsonlModel.h
+ * \brief Declares the table model for parsed JSONL/log records.
+ */
+
+
 #pragma once
 
 #include "JsonlRecord.h"

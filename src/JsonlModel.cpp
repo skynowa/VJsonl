@@ -1,3 +1,9 @@
+/**
+ * \file  JsonlModel.cpp
+ * \brief Implements the table model that loads and exposes JSONL/log records.
+ */
+
+
 #include "JsonlModel.h"
 
 #include "FileUtils.h"

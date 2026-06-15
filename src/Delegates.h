@@ -1,3 +1,9 @@
+/**
+ * \file  Delegates.h
+ * \brief Declares custom item delegates used by the log table.
+ */
+
+
 #pragma once
 
 #include <QStyledItemDelegate>

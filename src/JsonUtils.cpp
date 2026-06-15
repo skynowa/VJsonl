@@ -1,3 +1,9 @@
+/**
+ * \file  JsonUtils.cpp
+ * \brief Implements conversion of JSON values to compact display strings.
+ */
+
+
 #include "JsonUtils.h"
 
 #include <QJsonArray>

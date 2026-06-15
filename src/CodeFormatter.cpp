@@ -1,3 +1,9 @@
+/**
+ * \file  CodeFormatter.cpp
+ * \brief Implements lightweight formatting for JSON, XML, SQL, and embedded fragments.
+ */
+
+
 #include "CodeFormatter.h"
 
 #include <QJsonDocument>

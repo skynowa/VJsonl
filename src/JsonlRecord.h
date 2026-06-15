@@ -1,3 +1,9 @@
+/**
+ * \file  JsonlRecord.h
+ * \brief Defines the in-memory representation of one loaded JSONL/log line.
+ */
+
+
 #pragma once
 
 #include "JsonUtils.h"

@@ -1,3 +1,9 @@
+/**
+ * \file  HtmlUtils.cpp
+ * \brief Implements HTML detection helpers for cell previews.
+ */
+
+
 #include "HtmlUtils.h"
 
 #include <QRegularExpression>

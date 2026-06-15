@@ -1,3 +1,9 @@
+/**
+ * \file  FileUtils.cpp
+ * \brief Implements file-related display helpers.
+ */
+
+
 #include "FileUtils.h"
 
 #include <QStringList>

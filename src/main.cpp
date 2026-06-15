@@ -1,3 +1,9 @@
+/**
+ * \file  main.cpp
+ * \brief Starts the VJson Qt application.
+ */
+
+
 #include "MainWindow.h"
 
 #include <QApplication>

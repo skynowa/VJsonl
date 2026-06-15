@@ -1,3 +1,9 @@
+/**
+ * \file  MainWindow.cpp
+ * \brief Implements the main Qt Widgets window and user interactions.
+ */
+
+
 #include "MainWindow.h"
 
 #include "CodeFormatter.h"

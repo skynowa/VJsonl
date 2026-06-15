@@ -1,3 +1,9 @@
+/**
+ * \file  LogLevelStyle.cpp
+ * \brief Implements icons and visual styling helpers for log levels.
+ */
+
+
 #include "LogLevelStyle.h"
 
 #include <QColor>

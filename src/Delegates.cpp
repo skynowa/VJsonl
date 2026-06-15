@@ -1,3 +1,9 @@
+/**
+ * \file  Delegates.cpp
+ * \brief Implements custom table delegates for active-cell highlighting and compact level rendering.
+ */
+
+
 #include "Delegates.h"
 
 #include <QAbstractItemModel>

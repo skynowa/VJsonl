@@ -1,3 +1,9 @@
+/**
+ * \file  LogLevelStyle.h
+ * \brief Declares visual helpers for rendering log levels.
+ */
+
+
 #pragma once
 
 #include <QIcon>

@@ -1,3 +1,9 @@
+/**
+ * \file  LogFilterProxyModel.cpp
+ * \brief Implements filtering and sorting for log table rows.
+ */
+
+
 #include "LogFilterProxyModel.h"
 
 #include <QAbstractItemModel>

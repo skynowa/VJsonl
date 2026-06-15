@@ -1,3 +1,9 @@
+/**
+ * \file  MainWindow.h
+ * \brief Declares the main application window.
+ */
+
+
 #pragma once
 
 #include "JsonlModel.h"

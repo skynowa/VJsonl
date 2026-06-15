@@ -1,3 +1,9 @@
+/**
+ * \file  HtmlUtils.h
+ * \brief Declares HTML detection helpers for preview switching.
+ */
+
+
 #pragma once
 
 #include <QString>

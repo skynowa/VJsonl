@@ -1,3 +1,9 @@
+/**
+ * \file  LogFilterProxyModel.h
+ * \brief Declares the proxy model used for text, level, and log-name filtering.
+ */
+
+
 #pragma once
 
 #include <QSortFilterProxyModel>
