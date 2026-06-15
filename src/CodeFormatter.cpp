@@ -298,6 +298,21 @@ QString formatSqlFragment(const QString &text, bool *changed)
 //-------------------------------------------------------------------------------------------------
 namespace CodeFormatter
 {
+bool looksLikeJson(const QString &text)
+{
+    return isJsonText(text);
+}
+//-------------------------------------------------------------------------------------------------
+bool looksLikeSql(const QString &text)
+{
+    return isSqlText(text);
+}
+//-------------------------------------------------------------------------------------------------
+bool looksLikeXml(const QString &text)
+{
+    return isXmlText(text);
+}
+//-------------------------------------------------------------------------------------------------
 QString formatFragments(QString text, bool *changed)
 {
     *changed = false;

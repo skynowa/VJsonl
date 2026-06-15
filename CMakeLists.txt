@@ -26,6 +26,8 @@ add_executable(VJson
     src/FileUtils.cpp
     src/HtmlUtils.h
     src/HtmlUtils.cpp
+    src/JsonSyntaxHighlighter.h
+    src/JsonSyntaxHighlighter.cpp
     src/LogLevelStyle.h
     src/LogLevelStyle.cpp
     src/JsonlModel.h

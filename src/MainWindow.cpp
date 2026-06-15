@@ -10,6 +10,7 @@
 #include "Delegates.h"
 #include "FileUtils.h"
 #include "HtmlUtils.h"
+#include "JsonSyntaxHighlighter.h"
 #include "LogFilterProxyModel.h"
 #include "LogLevelStyle.h"
 
@@ -145,11 +146,13 @@ MainWindow::MainWindow(QWidget *parent) :
     _cellView->setReadOnly(true);
     _cellView->setLineWrapMode(QTextEdit::NoWrap);
     _cellView->setFontFamily(QStringLiteral("monospace"));
+    _cellJsonHighlighter = new JsonSyntaxHighlighter(_cellView->document());
 
     _rawView = new QTextEdit(this);
     _rawView->setReadOnly(true);
     _rawView->setLineWrapMode(QTextEdit::NoWrap);
     _rawView->setFontFamily(QStringLiteral("monospace"));
+    _rawJsonHighlighter = new JsonSyntaxHighlighter(_rawView->document());
 
     _htmlPreviewView = new QTextBrowser(this);
     _htmlPreviewView->setOpenExternalLinks(false);
@@ -433,6 +436,8 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
     if (!current.isValid()) {
         _cellView->clear();
         _rawView->clear();
+        _cellJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
+        _rawJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
         _htmlPreviewView->clear();
         _format->setEnabled(false);
         _htmlPreview->setEnabled(false);
@@ -449,6 +454,8 @@ void MainWindow::updateCellView(const QModelIndex &current)
     if (!current.isValid()) {
         _cellView->clear();
         _rawView->clear();
+        _cellJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
+        _rawJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
         _htmlPreviewView->clear();
         _format->setEnabled(false);
         _htmlPreview->setEnabled(false);
@@ -475,6 +482,22 @@ void MainWindow::updateCellView(const QModelIndex &current)
     _htmlPreviewView->setHtml(previewText);
     _rawView->setPlainText(canFormatRaw ? formattedRaw : rawText);
     _cellStack->setCurrentWidget(canPreviewHtml && _htmlPreview->isChecked() ? _htmlPreviewView : _cellView);
+    const auto cellHighlightMode =
+        _cellStack->currentWidget() != _cellView
+            ? JsonSyntaxHighlighter::Mode::None
+            : CodeFormatter::looksLikeJson(displayText) ? JsonSyntaxHighlighter::Mode::Json
+            : CodeFormatter::looksLikeSql(displayText)  ? JsonSyntaxHighlighter::Mode::Sql
+            : HtmlUtils::looksLikeHtml(displayText)     ? JsonSyntaxHighlighter::Mode::Html
+            : CodeFormatter::looksLikeXml(displayText)  ? JsonSyntaxHighlighter::Mode::Xml
+                                                        : JsonSyntaxHighlighter::Mode::None;
+    const auto rawHighlightMode =
+        CodeFormatter::looksLikeJson(_rawView->toPlainText()) ? JsonSyntaxHighlighter::Mode::Json
+        : CodeFormatter::looksLikeSql(_rawView->toPlainText())  ? JsonSyntaxHighlighter::Mode::Sql
+        : HtmlUtils::looksLikeHtml(_rawView->toPlainText())     ? JsonSyntaxHighlighter::Mode::Html
+        : CodeFormatter::looksLikeXml(_rawView->toPlainText())  ? JsonSyntaxHighlighter::Mode::Xml
+                                                                : JsonSyntaxHighlighter::Mode::None;
+    _cellJsonHighlighter->setMode(cellHighlightMode);
+    _rawJsonHighlighter->setMode(rawHighlightMode);
     findInCellView();
 }
 //-------------------------------------------------------------------------------------------------

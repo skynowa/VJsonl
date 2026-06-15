@@ -25,6 +25,7 @@ class QMenu;
 class QAction;
 class QCloseEvent;
 class QSplitter;
+class JsonSyntaxHighlighter;
 class LogFilterProxyModel;
 //-------------------------------------------------------------------------------------------------
 class MainWindow final : public QMainWindow
@@ -61,6 +62,8 @@ private:
     QTableView            *_table {};
     QTextEdit             *_cellView {};
     QTextEdit             *_rawView {};
+    JsonSyntaxHighlighter *_cellJsonHighlighter {};
+    JsonSyntaxHighlighter *_rawJsonHighlighter {};
     QTextBrowser          *_htmlPreviewView {};
     QStackedWidget        *_cellStack {};
     QSplitter             *_mainSplitter {};
