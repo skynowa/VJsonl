@@ -51,7 +51,7 @@ private:
         QStringLiteral("mem_usage_kb"),
         QStringLiteral("request_id"),
         QStringLiteral("backtrace"),
-        QStringLiteral("raw")
+        // QStringLiteral("raw")
     };
     QString              _fileName;
     int                  _invalidRowsCount {};

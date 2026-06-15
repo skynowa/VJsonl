@@ -43,6 +43,7 @@ private:
     LogFilterProxyModel   *_proxy {};
     QTableView            *_table {};
     QTextEdit             *_cellView {};
+    QTextEdit             *_rawView {};
     QTextBrowser          *_htmlPreviewView {};
     QStackedWidget        *_cellStack {};
     QCheckBox             *_format {};

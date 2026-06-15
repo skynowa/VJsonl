@@ -79,6 +79,11 @@ MainWindow::MainWindow(QWidget *parent) :
     _cellView->setLineWrapMode(QTextEdit::NoWrap);
     _cellView->setFontFamily(QStringLiteral("monospace"));
 
+    _rawView = new QTextEdit(this);
+    _rawView->setReadOnly(true);
+    _rawView->setLineWrapMode(QTextEdit::NoWrap);
+    _rawView->setFontFamily(QStringLiteral("monospace"));
+
     _htmlPreviewView = new QTextBrowser(this);
     _htmlPreviewView->setOpenExternalLinks(false);
 
@@ -93,6 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _wrapCellLine = new QCheckBox(QStringLiteral("Wrap line"), this);
     _wrapCellLine->setChecked(true);
     _cellView->setLineWrapMode(QTextEdit::WidgetWidth);
+    _rawView->setLineWrapMode(QTextEdit::WidgetWidth);
 
     _htmlPreview = new QCheckBox(QStringLiteral("HTML preview"), this);
     _htmlPreview->setEnabled(false);
@@ -115,7 +121,14 @@ MainWindow::MainWindow(QWidget *parent) :
     auto *cellLayout = new QVBoxLayout(cellPanel);
     cellLayout->setContentsMargins(0, 0, 0, 0);
     cellLayout->addWidget(cellTools);
-    cellLayout->addWidget(_cellStack);
+
+    auto *detailsSplitter = new QSplitter(Qt::Horizontal, this);
+    detailsSplitter->addWidget(_cellStack);
+    detailsSplitter->addWidget(_rawView);
+    detailsSplitter->setStretchFactor(0, 1);
+    detailsSplitter->setStretchFactor(1, 1);
+
+    cellLayout->addWidget(detailsSplitter);
 
     auto *splitter = new QSplitter(Qt::Vertical, this);
     splitter->addWidget(_table);
@@ -230,6 +243,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(_wrapCellLine, &QCheckBox::toggled, this, [this](bool checked) {
         _cellView->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
+        _rawView->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
     });
 
     connect(_htmlPreview, &QCheckBox::toggled, this, [this] {
@@ -296,6 +310,7 @@ void MainWindow::openFile(const QString &fileName)
     }
 
     _cellView->clear();
+    _rawView->clear();
     _htmlPreviewView->clear();
     _format->setEnabled(false);
     _htmlPreview->setEnabled(false);
@@ -323,6 +338,7 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
 {
     if (!current.isValid()) {
         _cellView->clear();
+        _rawView->clear();
         _htmlPreviewView->clear();
         _format->setEnabled(false);
         _htmlPreview->setEnabled(false);
@@ -338,23 +354,30 @@ void MainWindow::updateCellView(const QModelIndex &current)
 {
     if (!current.isValid()) {
         _cellView->clear();
+        _rawView->clear();
         _htmlPreviewView->clear();
         _format->setEnabled(false);
         _htmlPreview->setEnabled(false);
         return;
     }
 
+    const QModelIndex sourceIndex = _proxy->mapToSource(current);
+    const auto *record = _model->recordAt(sourceIndex.row());
     const QString text = current.data(Qt::DisplayRole).toString();
     bool canFormat = false;
     const QString formatted = CodeFormatter::formatFragments(text, &canFormat);
     const QString displayText = canFormat && _format->isChecked() ? formatted : text;
     const bool canPreviewHtml = HtmlUtils::looksLikeHtml(text);
+    bool canFormatRaw = false;
+    const QString rawText = record != nullptr ? record->raw : QString();
+    const QString formattedRaw = CodeFormatter::formatFragments(rawText, &canFormatRaw);
 
     _format->setEnabled(canFormat);
     _htmlPreview->setEnabled(canPreviewHtml);
 
     _cellView->setPlainText(displayText);
     _htmlPreviewView->setHtml(text);
+    _rawView->setPlainText(canFormatRaw ? formattedRaw : rawText);
     _cellStack->setCurrentWidget(canPreviewHtml && _htmlPreview->isChecked() ? _htmlPreviewView : _cellView);
     findInCellView();
 }
