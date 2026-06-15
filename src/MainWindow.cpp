@@ -26,6 +26,7 @@
 #include <QProgressBar>
 #include <QSettings>
 #include <QShortcut>
+#include <QSizePolicy>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
@@ -116,11 +117,13 @@ MainWindow::MainWindow(QWidget *parent) :
     cellToolsLayout->addWidget(_htmlPreview);
     cellToolsLayout->addWidget(_cellSearch, 1);
     cellToolsLayout->addStretch(1);
+    cellTools->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    cellTools->setFixedHeight(cellTools->sizeHint().height());
 
     auto *cellPanel = new QWidget(this);
     auto *cellLayout = new QVBoxLayout(cellPanel);
     cellLayout->setContentsMargins(0, 0, 0, 0);
-    cellLayout->addWidget(cellTools);
+    cellLayout->addWidget(cellTools, 0);
 
     auto *detailsSplitter = new QSplitter(Qt::Horizontal, this);
     detailsSplitter->addWidget(_cellStack);
@@ -128,7 +131,7 @@ MainWindow::MainWindow(QWidget *parent) :
     detailsSplitter->setStretchFactor(0, 1);
     detailsSplitter->setStretchFactor(1, 1);
 
-    cellLayout->addWidget(detailsSplitter);
+    cellLayout->addWidget(detailsSplitter, 1);
 
     auto *splitter = new QSplitter(Qt::Vertical, this);
     splitter->addWidget(_table);
