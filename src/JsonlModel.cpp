@@ -12,7 +12,11 @@
 #include <QBrush>
 #include <QColor>
 #include <QFile>
+#include <QIcon>
 #include <QJsonParseError>
+#include <QPainter>
+#include <QPen>
+#include <QPixmap>
 #include <QRegularExpression>
 
 #include <utility>
@@ -57,6 +61,28 @@ QString formatTimestamp(const QString &text)
 
     return QStringLiteral("%1-%2-%3 %4.%5")
         .arg(match.captured(1), months.at(month - 1), match.captured(3), match.captured(4), milliseconds);
+}
+
+QIcon invalidRowIcon()
+{
+    static const QIcon icon = [] {
+        QPixmap pixmap(14, 14);
+        pixmap.fill(Qt::transparent);
+
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        QPen pen(QColor(210, 0, 0));
+        pen.setWidth(3);
+        pen.setCapStyle(Qt::RoundCap);
+        painter.setPen(pen);
+        painter.drawLine(3, 3, 11, 11);
+        painter.drawLine(11, 3, 3, 11);
+
+        return QIcon(pixmap);
+    }();
+
+    return icon;
 }
 
 }
@@ -111,15 +137,17 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
         return LogLevelStyle::iconForLevel(level);
     }
 
+    if (role == Qt::DecorationRole && column == QStringLiteral("valid") && !record.valid) {
+        return invalidRowIcon();
+    }
+
     auto cellText = [&record, &column]() -> QString {
         if (column == QStringLiteral("error")) {
             return record.value(column);
         }
 
         if (column == QStringLiteral("valid")) {
-            return record.valid
-                ? QStringLiteral("yes")
-                : QStringLiteral("no: %1").arg(record.error);
+            return QStringLiteral("no: %1").arg(record.error);
         }
 
         if (column == QStringLiteral("raw")) {
@@ -153,7 +181,7 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
     }
 
     if (column == QStringLiteral("valid")) {
-        return cellText();
+        return role == Qt::ToolTipRole && !record.valid ? cellText() : QString();
     }
 
     if (column == QStringLiteral("raw")) {
