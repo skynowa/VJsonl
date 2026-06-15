@@ -16,9 +16,11 @@
 #include "JsonSyntaxHighlighter.h"
 #include "LogFilterProxyModel.h"
 #include "LogLevelStyle.h"
+#include "ThemeManager.h"
 
 #include <QAbstractItemView>
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QCheckBox>
 #include <QCloseEvent>
@@ -194,6 +196,27 @@ MainWindow::MainWindow(QWidget *parent) :
     auto *exitAction = fileMenu->addAction(QStringLiteral("Exit"));
     exitAction->setShortcut(QKeySequence::Quit);
 
+    auto *viewMenu = menuBar()->addMenu(QStringLiteral("View"));
+    auto *themeMenu = viewMenu->addMenu(QStringLiteral("Theme"));
+    auto *themeGroup = new QActionGroup(this);
+    themeGroup->setExclusive(true);
+
+    _lightThemeAction = themeMenu->addAction(QStringLiteral("Light"));
+    _lightThemeAction->setCheckable(true);
+    themeGroup->addAction(_lightThemeAction);
+
+    _greyThemeAction = themeMenu->addAction(QStringLiteral("Grey"));
+    _greyThemeAction->setCheckable(true);
+    themeGroup->addAction(_greyThemeAction);
+
+    _darkGreyThemeAction = themeMenu->addAction(QStringLiteral("DarkGrey"));
+    _darkGreyThemeAction->setCheckable(true);
+    themeGroup->addAction(_darkGreyThemeAction);
+
+    _darkThemeAction = themeMenu->addAction(QStringLiteral("Dark"));
+    _darkThemeAction->setCheckable(true);
+    themeGroup->addAction(_darkThemeAction);
+
     auto *helpMenu = menuBar()->addMenu(QStringLiteral("Help"));
     auto *aboutAction = helpMenu->addAction(QStringLiteral("About"));
 
@@ -218,6 +241,26 @@ MainWindow::MainWindow(QWidget *parent) :
         QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(fileName).absolutePath()));
     });
     connect(exitAction, &QAction::triggered, this, &QWidget::close);
+    connect(_lightThemeAction, &QAction::triggered, this, [this] {
+        ThemeManager::applyTheme(qApp, ThemeManager::Theme::Light);
+        QSettings settings(settingsFileName(), QSettings::IniFormat);
+        settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::Light));
+    });
+    connect(_greyThemeAction, &QAction::triggered, this, [this] {
+        ThemeManager::applyTheme(qApp, ThemeManager::Theme::Grey);
+        QSettings settings(settingsFileName(), QSettings::IniFormat);
+        settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::Grey));
+    });
+    connect(_darkGreyThemeAction, &QAction::triggered, this, [this] {
+        ThemeManager::applyTheme(qApp, ThemeManager::Theme::DarkGrey);
+        QSettings settings(settingsFileName(), QSettings::IniFormat);
+        settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::DarkGrey));
+    });
+    connect(_darkThemeAction, &QAction::triggered, this, [this] {
+        ThemeManager::applyTheme(qApp, ThemeManager::Theme::Dark);
+        QSettings settings(settingsFileName(), QSettings::IniFormat);
+        settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::Dark));
+    });
     connect(aboutAction, &QAction::triggered, this, [this] {
         QMessageBox::about(
             this,
@@ -296,6 +339,12 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(1300, 850);
 
     QSettings settings(settingsFileName(), QSettings::IniFormat);
+    const auto theme = ThemeManager::themeFromString(settings.value(QStringLiteral("ui/theme"), QStringLiteral("light")).toString());
+    ThemeManager::applyTheme(qApp, theme);
+    _lightThemeAction->setChecked(theme == ThemeManager::Theme::Light);
+    _greyThemeAction->setChecked(theme == ThemeManager::Theme::Grey);
+    _darkGreyThemeAction->setChecked(theme == ThemeManager::Theme::DarkGrey);
+    _darkThemeAction->setChecked(theme == ThemeManager::Theme::Dark);
     restoreGeometry(settings.value(QStringLiteral("window/geometry")).toByteArray());
     restorePanelLayout();
     restoreColumnWidths();

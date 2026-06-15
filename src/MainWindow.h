@@ -77,6 +77,10 @@ private:
     QComboBox             *_logNameFilter {};
     QMenu                 *_recentFilesMenu {};
     QAction               *_openOriginalFileAction {};
+    QAction               *_lightThemeAction {};
+    QAction               *_greyThemeAction {};
+    QAction               *_darkGreyThemeAction {};
+    QAction               *_darkThemeAction {};
     QStringList            _recentFiles;
     QLabel                *_statusLabel {};
     QProgressBar          *_loadProgress {};
