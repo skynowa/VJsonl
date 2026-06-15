@@ -17,6 +17,7 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFont>
 #include <QHeaderView>
 #include <QHBoxLayout>
 #include <QItemSelectionModel>
@@ -86,6 +87,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _table->setAlternatingRowColors(true);
     _table->setItemDelegate(new ActiveCellDelegate(_table, _table));
     _table->horizontalHeader()->setStretchLastSection(false);
+    QFont headerFont = _table->horizontalHeader()->font();
+    headerFont.setBold(true);
+    _table->horizontalHeader()->setFont(headerFont);
+    _table->verticalHeader()->setFont(headerFont);
 
     _cellView = new QTextEdit(this);
     _cellView->setReadOnly(true);
