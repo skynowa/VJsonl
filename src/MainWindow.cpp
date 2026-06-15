@@ -148,19 +148,19 @@ MainWindow::MainWindow(QWidget *parent) :
     cellLayout->setContentsMargins(0, 0, 0, 0);
     cellLayout->addWidget(cellTools, 0);
 
-    auto *detailsSplitter = new QSplitter(Qt::Horizontal, this);
-    detailsSplitter->addWidget(_cellStack);
-    detailsSplitter->addWidget(_rawView);
-    detailsSplitter->setStretchFactor(0, 1);
-    detailsSplitter->setStretchFactor(1, 1);
+    _detailsSplitter = new QSplitter(Qt::Horizontal, this);
+    _detailsSplitter->addWidget(_cellStack);
+    _detailsSplitter->addWidget(_rawView);
+    _detailsSplitter->setStretchFactor(0, 1);
+    _detailsSplitter->setStretchFactor(1, 1);
 
-    cellLayout->addWidget(detailsSplitter, 1);
+    cellLayout->addWidget(_detailsSplitter, 1);
 
-    auto *splitter = new QSplitter(Qt::Vertical, this);
-    splitter->addWidget(_table);
-    splitter->addWidget(cellPanel);
-    splitter->setStretchFactor(0, 3);
-    splitter->setStretchFactor(1, 1);
+    _mainSplitter = new QSplitter(Qt::Vertical, this);
+    _mainSplitter->addWidget(_table);
+    _mainSplitter->addWidget(cellPanel);
+    _mainSplitter->setStretchFactor(0, 3);
+    _mainSplitter->setStretchFactor(1, 1);
 
     auto *central = new QWidget(this);
     auto *layout = new QVBoxLayout(central);
@@ -173,7 +173,7 @@ MainWindow::MainWindow(QWidget *parent) :
     filterLayout->addWidget(_filter, 1);
 
     layout->addWidget(filterPanel);
-    layout->addWidget(splitter);
+    layout->addWidget(_mainSplitter);
     setCentralWidget(central);
 
     loadRecentFiles();
@@ -291,6 +291,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     restoreGeometry(settings.value(QStringLiteral("window/geometry")).toByteArray());
+    _mainSplitter->restoreState(settings.value(QStringLiteral("splitters/main")).toByteArray());
+    _detailsSplitter->restoreState(settings.value(QStringLiteral("splitters/details")).toByteArray());
 
     updateStatus();
 }
@@ -299,6 +301,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("window/geometry"), saveGeometry());
+    settings.setValue(QStringLiteral("splitters/main"), _mainSplitter->saveState());
+    settings.setValue(QStringLiteral("splitters/details"), _detailsSplitter->saveState());
     saveColumnWidths();
     QMainWindow::closeEvent(event);
 }

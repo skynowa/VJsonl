@@ -24,6 +24,7 @@ class QTextBrowser;
 class QMenu;
 class QAction;
 class QCloseEvent;
+class QSplitter;
 class LogFilterProxyModel;
 
 class MainWindow final : public QMainWindow
@@ -58,6 +59,8 @@ private:
     QTextEdit             *_rawView {};
     QTextBrowser          *_htmlPreviewView {};
     QStackedWidget        *_cellStack {};
+    QSplitter             *_mainSplitter {};
+    QSplitter             *_detailsSplitter {};
     QCheckBox             *_format {};
     QCheckBox             *_wrapCellLine {};
     QCheckBox             *_htmlPreview {};
