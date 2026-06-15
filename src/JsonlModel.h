@@ -14,6 +14,7 @@
 
 #include <functional>
 
+//-------------------------------------------------------------------------------------------------
 class JsonlModel final : public QAbstractTableModel
 {
     Q_OBJECT
@@ -63,3 +64,4 @@ private:
     QString              _fileName;
     int                  _invalidRowsCount {};
 };
+//-------------------------------------------------------------------------------------------------

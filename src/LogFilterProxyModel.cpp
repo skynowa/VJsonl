@@ -8,11 +8,13 @@
 
 #include <QAbstractItemModel>
 
+//-------------------------------------------------------------------------------------------------
 LogFilterProxyModel::LogFilterProxyModel(QObject *parent) :
     QSortFilterProxyModel(parent)
 {
 }
 
+//-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setTextFilter(const QString &text)
 {
     if (_textFilter == text) {
@@ -23,6 +25,7 @@ void LogFilterProxyModel::setTextFilter(const QString &text)
     invalidateFilter();
 }
 
+//-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setLevelFilter(const QString &level)
 {
     if (_levelFilter == level) {
@@ -33,6 +36,7 @@ void LogFilterProxyModel::setLevelFilter(const QString &level)
     invalidateFilter();
 }
 
+//-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setLogNameFilter(const QString &logName)
 {
     if (_logNameFilter == logName) {
@@ -43,6 +47,7 @@ void LogFilterProxyModel::setLogNameFilter(const QString &logName)
     invalidateFilter();
 }
 
+//-------------------------------------------------------------------------------------------------
 bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
     if (!levelMatches(sourceRow, sourceParent)) {
@@ -71,6 +76,7 @@ bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
     return false;
 }
 
+//-------------------------------------------------------------------------------------------------
 bool LogFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
     if (columnName(left.column()) == QStringLiteral("line")) {
@@ -86,11 +92,13 @@ bool LogFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &r
     return QSortFilterProxyModel::lessThan(left, right);
 }
 
+//-------------------------------------------------------------------------------------------------
 QString LogFilterProxyModel::columnName(int column) const
 {
     return sourceModel()->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
 }
 
+//-------------------------------------------------------------------------------------------------
 int LogFilterProxyModel::columnByName(const QString &name) const
 {
     const int columns = sourceModel()->columnCount();
@@ -104,16 +112,19 @@ int LogFilterProxyModel::columnByName(const QString &name) const
     return -1;
 }
 
+//-------------------------------------------------------------------------------------------------
 bool LogFilterProxyModel::levelMatches(int sourceRow, const QModelIndex &sourceParent) const
 {
     return columnMatches(sourceRow, sourceParent, QStringLiteral("level"), _levelFilter);
 }
 
+//-------------------------------------------------------------------------------------------------
 bool LogFilterProxyModel::logNameMatches(int sourceRow, const QModelIndex &sourceParent) const
 {
     return columnMatches(sourceRow, sourceParent, QStringLiteral("log_name"), _logNameFilter);
 }
 
+//-------------------------------------------------------------------------------------------------
 bool LogFilterProxyModel::columnMatches(
     int sourceRow,
     const QModelIndex &sourceParent,
@@ -135,3 +146,4 @@ bool LogFilterProxyModel::columnMatches(
     const QString text = sourceModel()->data(index, Qt::DisplayRole).toString();
     return text.compare(value, Qt::CaseInsensitive) == 0;
 }
+//-------------------------------------------------------------------------------------------------

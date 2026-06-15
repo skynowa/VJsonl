@@ -9,6 +9,7 @@
 #include <QSortFilterProxyModel>
 #include <QString>
 
+//-------------------------------------------------------------------------------------------------
 class LogFilterProxyModel final : public QSortFilterProxyModel
 {
 public:
@@ -34,3 +35,4 @@ private:
     QString _levelFilter;
     QString _logNameFilter;
 };
+//-------------------------------------------------------------------------------------------------

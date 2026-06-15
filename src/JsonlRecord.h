@@ -12,6 +12,7 @@
 #include <QJsonObject>
 #include <QString>
 
+//-------------------------------------------------------------------------------------------------
 struct JsonlRecord final
 {
     int           lineNo {};
@@ -29,3 +30,4 @@ struct JsonlRecord final
         return jsonValueToString(doc.object().value(key));
     }
 };
+//-------------------------------------------------------------------------------------------------

@@ -48,7 +48,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QUrl>
-
+//-------------------------------------------------------------------------------------------------
 namespace
 {
 
@@ -58,7 +58,7 @@ QString settingsFileName()
 }
 
 }
-
+//-------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -301,7 +301,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     updateStatus();
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
@@ -310,7 +310,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     saveColumnWidths();
     QMainWindow::closeEvent(event);
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::openFile()
 {
     const QString fileName = QFileDialog::getOpenFileName(
@@ -326,7 +326,7 @@ void MainWindow::openFile()
 
     openFile(fileName);
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::openFile(const QString &fileName)
 {
     saveColumnWidths();
@@ -384,7 +384,7 @@ void MainWindow::openFile(const QString &fileName)
     setWindowTitle(QStringLiteral("VJson - %1").arg(QFileInfo(fileName).fileName()));
     updateStatus();
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::onCurrentChanged(const QModelIndex &current)
 {
     if (!current.isValid()) {
@@ -400,7 +400,7 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
     updateCellView(current);
     updateStatus();
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::updateCellView(const QModelIndex &current)
 {
     if (!current.isValid()) {
@@ -432,7 +432,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
     _cellStack->setCurrentWidget(canPreviewHtml && _htmlPreview->isChecked() ? _htmlPreviewView : _cellView);
     findInCellView();
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::findInCellView()
 {
     const QString text = _cellSearch->text();
@@ -451,7 +451,7 @@ void MainWindow::findInCellView()
         _cellSearch->setStyleSheet(QStringLiteral("background-color: #ffdede;"));
     }
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::addRecentFile(const QString &fileName)
 {
     _recentFiles.removeAll(fileName);
@@ -467,13 +467,13 @@ void MainWindow::addRecentFile(const QString &fileName)
     settings.setValue(QStringLiteral("recentFiles"), _recentFiles);
     updateRecentFilesMenu();
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::loadRecentFiles()
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     _recentFiles = settings.value(QStringLiteral("recentFiles")).toStringList();
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::updateRecentFilesMenu()
 {
     if (_recentFilesMenu == nullptr) {
@@ -507,7 +507,7 @@ void MainWindow::updateRecentFilesMenu()
         updateRecentFilesMenu();
     });
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::updateLogNameFilterItems()
 {
     const QString selectedLogName = _logNameFilter->currentData().toString();
@@ -541,7 +541,7 @@ void MainWindow::updateLogNameFilterItems()
     _logNameFilter->setCurrentIndex(selectedIndex >= 0 ? selectedIndex : 0);
     _proxy->setLogNameFilter(_logNameFilter->currentData().toString());
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::saveColumnWidths() const
 {
     if (_model->fileName().isEmpty()) {
@@ -561,7 +561,7 @@ void MainWindow::saveColumnWidths() const
 
     settings.endGroup();
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::restoreColumnWidths()
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
@@ -579,21 +579,21 @@ void MainWindow::restoreColumnWidths()
 
     settings.endGroup();
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::savePanelLayout() const
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("splitters/main"), _mainSplitter->saveState());
     settings.setValue(QStringLiteral("splitters/details"), _detailsSplitter->saveState());
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::restorePanelLayout()
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     _mainSplitter->restoreState(settings.value(QStringLiteral("splitters/main")).toByteArray());
     _detailsSplitter->restoreState(settings.value(QStringLiteral("splitters/details")).toByteArray());
 }
-
+//-------------------------------------------------------------------------------------------------
 void MainWindow::updateStatus()
 {
     const QString fileName = _model->fileName();
@@ -620,3 +620,4 @@ void MainWindow::updateStatus()
             .arg(fileSize)
     );
 }
+//-------------------------------------------------------------------------------------------------

@@ -21,6 +21,7 @@
 
 #include <utility>
 
+//-------------------------------------------------------------------------------------------------
 namespace
 {
 
@@ -87,21 +88,25 @@ QIcon invalidRowIcon()
 
 }
 
+//-------------------------------------------------------------------------------------------------
 JsonlModel::JsonlModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
 }
 
+//-------------------------------------------------------------------------------------------------
 int JsonlModel::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : _records.size();
 }
 
+//-------------------------------------------------------------------------------------------------
 int JsonlModel::columnCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : _columns.size();
 }
 
+//-------------------------------------------------------------------------------------------------
 QVariant JsonlModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid()) {
@@ -199,6 +204,7 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
     return record.value(column);
 }
 
+//-------------------------------------------------------------------------------------------------
 QVariant JsonlModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole) {
@@ -212,6 +218,7 @@ QVariant JsonlModel::headerData(int section, Qt::Orientation orientation, int ro
     return section + 1;
 }
 
+//-------------------------------------------------------------------------------------------------
 bool JsonlModel::loadFile(
     const QString &fileName,
     QString *outError,
@@ -303,6 +310,7 @@ bool JsonlModel::loadFile(
     return true;
 }
 
+//-------------------------------------------------------------------------------------------------
 const JsonlRecord *JsonlModel::recordAt(int row) const
 {
     if (row < 0 || row >= _records.size()) {
@@ -312,12 +320,15 @@ const JsonlRecord *JsonlModel::recordAt(int row) const
     return &_records.at(row);
 }
 
+//-------------------------------------------------------------------------------------------------
 QString JsonlModel::fileName() const
 {
     return _fileName;
 }
 
+//-------------------------------------------------------------------------------------------------
 int JsonlModel::invalidRowsCount() const
 {
     return _invalidRowsCount;
 }
+//-------------------------------------------------------------------------------------------------

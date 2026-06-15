@@ -8,6 +8,7 @@
 
 #include <QRegularExpression>
 
+//-------------------------------------------------------------------------------------------------
 namespace HtmlUtils
 {
 bool looksLikeHtml(const QString &text)
@@ -34,3 +35,4 @@ bool looksLikeHtml(const QString &text)
     return commonHtmlTag.match(trimmed).hasMatch();
 }
 }
+//-------------------------------------------------------------------------------------------------

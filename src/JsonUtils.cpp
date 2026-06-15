@@ -10,6 +10,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+//-------------------------------------------------------------------------------------------------
 QString jsonValueToString(const QJsonValue &value)
 {
     if (value.isUndefined() || value.isNull()) {
@@ -54,3 +55,4 @@ QString jsonValueToString(const QJsonValue &value)
 
     return {};
 }
+//-------------------------------------------------------------------------------------------------

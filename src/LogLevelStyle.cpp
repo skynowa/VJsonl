@@ -10,6 +10,7 @@
 #include <QPainter>
 #include <QPixmap>
 
+//-------------------------------------------------------------------------------------------------
 namespace
 {
 QIcon makeIcon(const QColor &color, const QString &label)
@@ -34,6 +35,7 @@ QIcon makeIcon(const QColor &color, const QString &label)
 }
 }
 
+//-------------------------------------------------------------------------------------------------
 namespace LogLevelStyle
 {
 QIcon iconForLevel(const QString &level)
@@ -68,3 +70,4 @@ QIcon iconForLevel(const QString &level)
     return {};
 }
 }
+//-------------------------------------------------------------------------------------------------

@@ -15,6 +15,7 @@
 
 #include <utility>
 
+//-------------------------------------------------------------------------------------------------
 namespace
 {
 QString normalizedSql(QString text)
@@ -294,6 +295,7 @@ QString formatSqlFragment(const QString &text, bool *changed)
 }
 }
 
+//-------------------------------------------------------------------------------------------------
 namespace CodeFormatter
 {
 QString formatFragments(QString text, bool *changed)
@@ -321,3 +323,4 @@ QString formatFragments(QString text, bool *changed)
     return text;
 }
 }
+//-------------------------------------------------------------------------------------------------

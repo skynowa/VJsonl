@@ -10,7 +10,7 @@
 
 #include <QMainWindow>
 #include <QStringList>
-
+//-------------------------------------------------------------------------------------------------
 class QLabel;
 class QLineEdit;
 class QModelIndex;
@@ -26,7 +26,7 @@ class QAction;
 class QCloseEvent;
 class QSplitter;
 class LogFilterProxyModel;
-
+//-------------------------------------------------------------------------------------------------
 class MainWindow final : public QMainWindow
 {
     Q_OBJECT
@@ -76,3 +76,4 @@ private:
     QLabel                *_statusLabel {};
     QProgressBar          *_loadProgress {};
 };
+//-------------------------------------------------------------------------------------------------

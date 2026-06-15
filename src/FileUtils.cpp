@@ -8,6 +8,7 @@
 
 #include <QStringList>
 
+//-------------------------------------------------------------------------------------------------
 QString humanFileSize(qint64 bytes)
 {
     static const QStringList units {
@@ -32,3 +33,4 @@ QString humanFileSize(qint64 bytes)
 
     return QStringLiteral("%1 %2").arg(size, 0, 'f', 1).arg(units.at(unit));
 }
+//-------------------------------------------------------------------------------------------------

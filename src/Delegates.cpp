@@ -15,6 +15,7 @@
 #include <QStyleOptionViewItem>
 #include <QTableView>
 
+//-------------------------------------------------------------------------------------------------
 namespace
 {
 
@@ -26,12 +27,14 @@ bool isLevelColumn(const QModelIndex &index)
 
 }
 
+//-------------------------------------------------------------------------------------------------
 ActiveCellDelegate::ActiveCellDelegate(QTableView *table, QObject *parent) :
     QStyledItemDelegate(parent),
     _table(table)
 {
 }
 
+//-------------------------------------------------------------------------------------------------
 void ActiveCellDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const
 {
     QStyledItemDelegate::initStyleOption(option, index);
@@ -41,6 +44,7 @@ void ActiveCellDelegate::initStyleOption(QStyleOptionViewItem *option, const QMo
     }
 }
 
+//-------------------------------------------------------------------------------------------------
 void ActiveCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QStyleOptionViewItem activeOption(option);
@@ -64,3 +68,4 @@ void ActiveCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     painter->drawRect(option.rect.adjusted(1, 1, -2, -2));
     painter->restore();
 }
+//-------------------------------------------------------------------------------------------------
