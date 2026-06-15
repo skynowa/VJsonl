@@ -6,8 +6,10 @@
 
 #include "MainWindow.h"
 
+#include "AppSettings.h"
 #include "CodeFormatter.h"
 #include "Delegates.h"
+#include "DemangleUtils.h"
 #include "FileUtils.h"
 #include "HtmlUtils.h"
 #include "JsonSyntaxHighlighter.h"
@@ -20,7 +22,6 @@
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
-#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDir>
 #include <QFileDialog>
@@ -35,7 +36,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QProgressBar>
-#include <QRegularExpression>
 #include <QSettings>
 #include <QShortcut>
 #include <QSizePolicy>
@@ -51,56 +51,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QUrl>
-
-#include <cxxabi.h>
-#include <cstdlib>
-//-------------------------------------------------------------------------------------------------
-namespace
-{
-
-QString settingsFileName()
-{
-    return QCoreApplication::applicationDirPath() + QStringLiteral("/VJson.ini");
-}
-
-QString demangleSymbol(const QString &symbol)
-{
-    const QByteArray symbolBytes = symbol.toUtf8();
-    int status = 0;
-    char *demangled = abi::__cxa_demangle(symbolBytes.constData(), nullptr, nullptr, &status);
-
-    if (status != 0 || demangled == nullptr) {
-        std::free(demangled);
-        return symbol;
-    }
-
-    const QString result = QString::fromUtf8(demangled);
-    std::free(demangled);
-    return result;
-}
-
-QString demangleSymbols(const QString &text)
-{
-    static const QRegularExpression mangledSymbol(QStringLiteral(R"(_Z[A-Za-z0-9_]+)"));
-    QString result;
-    qsizetype lastEnd = 0;
-    QRegularExpressionMatchIterator matches = mangledSymbol.globalMatch(text);
-
-    while (matches.hasNext()) {
-        const QRegularExpressionMatch match = matches.next();
-        const QString symbol = match.captured(0);
-        const QString demangled = demangleSymbol(symbol);
-
-        result += text.mid(lastEnd, match.capturedStart() - lastEnd);
-        result += demangled;
-        lastEnd = match.capturedEnd();
-    }
-
-    result += text.mid(lastEnd);
-    return result;
-}
-
-}
 //-------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)

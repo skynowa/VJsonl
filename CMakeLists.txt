@@ -14,6 +14,10 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 add_executable(VJson
     src/main.cpp
+    src/AppSettings.h
+    src/AppSettings.cpp
+    src/DemangleUtils.h
+    src/DemangleUtils.cpp
     src/MainWindow.h
     src/MainWindow.cpp
     src/Delegates.h
