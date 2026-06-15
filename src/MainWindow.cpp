@@ -44,6 +44,7 @@
 #include <QTextBrowser>
 #include <QTextCursor>
 #include <QTextEdit>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QUrl>
@@ -291,8 +292,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     restoreGeometry(settings.value(QStringLiteral("window/geometry")).toByteArray());
-    _mainSplitter->restoreState(settings.value(QStringLiteral("splitters/main")).toByteArray());
-    _detailsSplitter->restoreState(settings.value(QStringLiteral("splitters/details")).toByteArray());
+    restorePanelLayout();
+    restoreColumnWidths();
+    QTimer::singleShot(0, this, [this] {
+        restorePanelLayout();
+        restoreColumnWidths();
+    });
 
     updateStatus();
 }
@@ -301,8 +306,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("window/geometry"), saveGeometry());
-    settings.setValue(QStringLiteral("splitters/main"), _mainSplitter->saveState());
-    settings.setValue(QStringLiteral("splitters/details"), _detailsSplitter->saveState());
+    savePanelLayout();
     saveColumnWidths();
     QMainWindow::closeEvent(event);
 }
@@ -574,6 +578,20 @@ void MainWindow::restoreColumnWidths()
     }
 
     settings.endGroup();
+}
+
+void MainWindow::savePanelLayout() const
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    settings.setValue(QStringLiteral("splitters/main"), _mainSplitter->saveState());
+    settings.setValue(QStringLiteral("splitters/details"), _detailsSplitter->saveState());
+}
+
+void MainWindow::restorePanelLayout()
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    _mainSplitter->restoreState(settings.value(QStringLiteral("splitters/main")).toByteArray());
+    _detailsSplitter->restoreState(settings.value(QStringLiteral("splitters/details")).toByteArray());
 }
 
 void MainWindow::updateStatus()

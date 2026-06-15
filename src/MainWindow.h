@@ -49,6 +49,8 @@ private:
     void updateLogNameFilterItems();
     void saveColumnWidths() const;
     void restoreColumnWidths();
+    void savePanelLayout() const;
+    void restorePanelLayout();
     void updateStatus();
 
 private:
