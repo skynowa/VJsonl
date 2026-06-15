@@ -17,6 +17,7 @@ class QStackedWidget;
 class QTextBrowser;
 class QMenu;
 class QAction;
+class QCloseEvent;
 class LogFilterProxyModel;
 
 class MainWindow final : public QMainWindow
@@ -25,6 +26,9 @@ class MainWindow final : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     void openFile();

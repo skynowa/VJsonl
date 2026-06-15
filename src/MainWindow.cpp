@@ -11,7 +11,9 @@
 #include <QAction>
 #include <QApplication>
 #include <QCheckBox>
+#include <QCloseEvent>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -38,6 +40,16 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QUrl>
+
+namespace
+{
+
+QString settingsFileName()
+{
+    return QCoreApplication::applicationDirPath() + QStringLiteral("/VJson.ini");
+}
+
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -264,7 +276,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setWindowTitle(QStringLiteral("VJson"));
     resize(1300, 850);
+
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    restoreGeometry(settings.value(QStringLiteral("window/geometry")).toByteArray());
+
     updateStatus();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    settings.setValue(QStringLiteral("window/geometry"), saveGeometry());
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::openFile()
@@ -415,14 +438,14 @@ void MainWindow::addRecentFile(const QString &fileName)
         _recentFiles.removeLast();
     }
 
-    QSettings settings;
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("recentFiles"), _recentFiles);
     updateRecentFilesMenu();
 }
 
 void MainWindow::loadRecentFiles()
 {
-    QSettings settings;
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
     _recentFiles = settings.value(QStringLiteral("recentFiles")).toStringList();
 }
 
@@ -454,7 +477,7 @@ void MainWindow::updateRecentFilesMenu()
     auto *clearAction = _recentFilesMenu->addAction(QStringLiteral("Clear recent files"));
     connect(clearAction, &QAction::triggered, this, [this] {
         _recentFiles.clear();
-        QSettings settings;
+        QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("recentFiles"), _recentFiles);
         updateRecentFilesMenu();
     });
