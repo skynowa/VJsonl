@@ -22,6 +22,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QApplication>
+#include <QBuffer>
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
@@ -54,6 +55,39 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QUrl>
+//-------------------------------------------------------------------------------------------------
+namespace
+{
+QString iconHtmlForLevel(const QString &level)
+{
+    const QPixmap pixmap = LogLevelStyle::iconForLevel(level).pixmap(16, 16);
+
+    if (pixmap.isNull()) {
+        return {};
+    }
+
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+    buffer.open(QIODevice::WriteOnly);
+    pixmap.save(&buffer, "PNG");
+
+    return QStringLiteral("<img width=\"16\" height=\"16\" src=\"data:image/png;base64,%1\">")
+        .arg(QString::fromLatin1(bytes.toBase64()));
+}
+
+QString levelCounterHtml(const QString &level, int count)
+{
+    const QString iconHtml = iconHtmlForLevel(level);
+
+    if (iconHtml.isEmpty()) {
+        return {};
+    }
+
+    return QStringLiteral("%1&nbsp;%2").arg(iconHtml).arg(count);
+}
+
+}
+
 //-------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -220,7 +254,12 @@ MainWindow::MainWindow(QWidget *parent) :
     auto *helpMenu = menuBar()->addMenu(QStringLiteral("Help"));
     auto *aboutAction = helpMenu->addAction(QStringLiteral("About"));
 
+    _levelsStatusLabel = new QLabel(this);
+    _levelsStatusLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    statusBar()->addWidget(_levelsStatusLabel, 1);
+
     _statusLabel = new QLabel(this);
+    _statusLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     statusBar()->addPermanentWidget(_statusLabel);
 
     _loadProgress = new QProgressBar(this);
@@ -705,6 +744,45 @@ void MainWindow::updateStatus()
         }
     }
 
+    QString levelsText = QStringLiteral("-");
+    QString levelsHtml;
+    const QMap<QString, int> levelCounts = _model->levelCounts();
+
+    if (!levelCounts.isEmpty()) {
+        QStringList levelParts;
+        QStringList levelHtmlParts;
+        const QStringList orderedLevels {
+            QStringLiteral("fatal"),
+            QStringLiteral("error"),
+            QStringLiteral("warn"),
+            QStringLiteral("warning"),
+            QStringLiteral("debug"),
+            QStringLiteral("info"),
+            QStringLiteral("trace")
+        };
+
+        for (const QString &level : orderedLevels) {
+            const int count = levelCounts.value(level);
+
+            if (count > 0) {
+                levelParts.push_back(QStringLiteral("%1=%2").arg(level).arg(count));
+                levelHtmlParts.push_back(levelCounterHtml(level, count));
+            }
+        }
+
+        for (auto it = levelCounts.cbegin(); it != levelCounts.cend(); ++it) {
+            if (!orderedLevels.contains(it.key())) {
+                levelParts.push_back(QStringLiteral("%1=%2").arg(it.key()).arg(it.value()));
+                levelHtmlParts.push_back(levelCounterHtml(it.key(), it.value()));
+            }
+        }
+
+        levelsText = levelParts.join(QStringLiteral(", "));
+        levelsHtml = levelHtmlParts.join(QStringLiteral("&nbsp;&nbsp;&nbsp;"));
+    }
+
+    _levelsStatusLabel->setText(levelsHtml.isEmpty() ? QStringLiteral("-") : levelsHtml);
+    _levelsStatusLabel->setToolTip(QStringLiteral("levels: %1").arg(levelsText));
     _statusLabel->setText(
         QStringLiteral("current: %1 / %2, invalid: %3, file: %4")
             .arg(currentLine)

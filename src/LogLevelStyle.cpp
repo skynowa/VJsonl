@@ -67,7 +67,9 @@ QIcon iconForLevel(const QString &level)
         return makeIcon(QColor(115, 115, 115), QStringLiteral("T"));
     }
 
-    return {};
+    return level.trimmed().isEmpty()
+        ? QIcon()
+        : makeIcon(QColor(115, 115, 115), level.trimmed());
 }
 }
 //-------------------------------------------------------------------------------------------------

@@ -240,6 +240,7 @@ bool JsonlModel::loadFile(
     _records.clear();
     _fileName = fileName;
     _invalidRowsCount = 0;
+    _levelCounts.clear();
 
     const qint64 totalBytes = file.size();
     qint64 readBytes = 0;
@@ -296,6 +297,12 @@ bool JsonlModel::loadFile(
         if (!record.valid) {
             record.error = parseError.errorString();
             ++_invalidRowsCount;
+        } else {
+            const QString level = record.value(QStringLiteral("level")).trimmed().toLower();
+
+            if (!level.isEmpty()) {
+                ++_levelCounts[level];
+            }
         }
 
         _records.push_back(std::move(record));
@@ -330,5 +337,10 @@ QString JsonlModel::fileName() const
 int JsonlModel::invalidRowsCount() const
 {
     return _invalidRowsCount;
+}
+//-------------------------------------------------------------------------------------------------
+QMap<QString, int> JsonlModel::levelCounts() const
+{
+    return _levelCounts;
 }
 //-------------------------------------------------------------------------------------------------

@@ -9,6 +9,7 @@
 #include "JsonlRecord.h"
 
 #include <QAbstractTableModel>
+#include <QMap>
 #include <QStringList>
 #include <QVector>
 
@@ -39,6 +40,7 @@ public:
     const JsonlRecord *recordAt(int row) const;
     QString fileName() const;
     int invalidRowsCount() const;
+    QMap<QString, int> levelCounts() const;
 
 private:
     QVector<JsonlRecord> _records;
@@ -63,5 +65,6 @@ private:
     };
     QString              _fileName;
     int                  _invalidRowsCount {};
+    QMap<QString, int>   _levelCounts;
 };
 //-------------------------------------------------------------------------------------------------

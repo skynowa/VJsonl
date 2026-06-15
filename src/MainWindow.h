@@ -82,6 +82,7 @@ private:
     QAction               *_darkGreyThemeAction {};
     QAction               *_darkThemeAction {};
     QStringList            _recentFiles;
+    QLabel                *_levelsStatusLabel {};
     QLabel                *_statusLabel {};
     QProgressBar          *_loadProgress {};
 };
