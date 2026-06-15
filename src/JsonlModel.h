@@ -52,6 +52,7 @@ private:
         // QStringLiteral("error"),
         QStringLiteral("msg"),
         QStringLiteral("query"),
+        QStringLiteral("request_time"),
         // QStringLiteral("message"),
         // QStringLiteral("service"),
         QStringLiteral("mem_usage_kb"),
