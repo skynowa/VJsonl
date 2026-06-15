@@ -72,6 +72,11 @@ bool LogFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &r
             < sourceModel()->data(right, Qt::DisplayRole).toInt();
     }
 
+    if (columnName(left.column()) == QStringLiteral("ts")) {
+        return sourceModel()->data(left, Qt::ToolTipRole).toString()
+            < sourceModel()->data(right, Qt::ToolTipRole).toString();
+    }
+
     return QSortFilterProxyModel::lessThan(left, right);
 }
 
