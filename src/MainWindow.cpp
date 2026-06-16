@@ -473,7 +473,7 @@ void MainWindow::openFile(const QString &fileName)
     _htmlPreviewView->clear();
     _format->setEnabled(false);
     _htmlPreview->setEnabled(false);
-    updateLogNameFilterItems();
+    updateColumnFilterItems(_logNameFilter, QStringLiteral("log_name"), QStringLiteral("All log names"));
     updateColumnFilterItems(_projectFilter, QStringLiteral("project"), QStringLiteral("All projects"));
     updateColumnFilterItems(_procNameFilter, QStringLiteral("proc_name"), QStringLiteral("All proc names"));
     updateColumnFilterItems(_moduleFilter, QStringLiteral("module"), QStringLiteral("All modules"));
@@ -645,12 +645,6 @@ void MainWindow::updateRecentFilesMenu()
         updateRecentFilesMenu();
     });
 }
-//-------------------------------------------------------------------------------------------------
-void MainWindow::updateLogNameFilterItems()
-{
-    updateColumnFilterItems(_logNameFilter, QStringLiteral("log_name"), QStringLiteral("All log names"));
-}
-
 //-------------------------------------------------------------------------------------------------
 void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &columnName, const QString &allLabel)
 {
