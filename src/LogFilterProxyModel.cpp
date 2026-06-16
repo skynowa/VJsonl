@@ -48,8 +48,53 @@ void LogFilterProxyModel::setLogNameFilter(const QString &logName)
 }
 
 //-------------------------------------------------------------------------------------------------
+void LogFilterProxyModel::setProjectFilter(const QString &project)
+{
+    if (_projectFilter == project) {
+        return;
+    }
+
+    _projectFilter = project;
+    invalidateFilter();
+}
+
+//-------------------------------------------------------------------------------------------------
+void LogFilterProxyModel::setProcNameFilter(const QString &procName)
+{
+    if (_procNameFilter == procName) {
+        return;
+    }
+
+    _procNameFilter = procName;
+    invalidateFilter();
+}
+
+//-------------------------------------------------------------------------------------------------
+void LogFilterProxyModel::setModuleFilter(const QString &module)
+{
+    if (_moduleFilter == module) {
+        return;
+    }
+
+    _moduleFilter = module;
+    invalidateFilter();
+}
+
+//-------------------------------------------------------------------------------------------------
 bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
+    if (!projectMatches(sourceRow, sourceParent)) {
+        return false;
+    }
+
+    if (!procNameMatches(sourceRow, sourceParent)) {
+        return false;
+    }
+
+    if (!moduleMatches(sourceRow, sourceParent)) {
+        return false;
+    }
+
     if (!levelMatches(sourceRow, sourceParent)) {
         return false;
     }
@@ -122,6 +167,24 @@ bool LogFilterProxyModel::levelMatches(int sourceRow, const QModelIndex &sourceP
 bool LogFilterProxyModel::logNameMatches(int sourceRow, const QModelIndex &sourceParent) const
 {
     return columnMatches(sourceRow, sourceParent, QStringLiteral("log_name"), _logNameFilter);
+}
+
+//-------------------------------------------------------------------------------------------------
+bool LogFilterProxyModel::projectMatches(int sourceRow, const QModelIndex &sourceParent) const
+{
+    return columnMatches(sourceRow, sourceParent, QStringLiteral("project"), _projectFilter);
+}
+
+//-------------------------------------------------------------------------------------------------
+bool LogFilterProxyModel::procNameMatches(int sourceRow, const QModelIndex &sourceParent) const
+{
+    return columnMatches(sourceRow, sourceParent, QStringLiteral("proc_name"), _procNameFilter);
+}
+
+//-------------------------------------------------------------------------------------------------
+bool LogFilterProxyModel::moduleMatches(int sourceRow, const QModelIndex &sourceParent) const
+{
+    return columnMatches(sourceRow, sourceParent, QStringLiteral("module"), _moduleFilter);
 }
 
 //-------------------------------------------------------------------------------------------------

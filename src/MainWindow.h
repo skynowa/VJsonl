@@ -48,6 +48,7 @@ private:
     void loadRecentFiles();
     void updateRecentFilesMenu();
     void updateLogNameFilterItems();
+    void updateColumnFilterItems(QComboBox *filter, const QString &columnName, const QString &allLabel);
     QString openDirectory() const;
     void saveOpenDirectory(const QString &fileName) const;
     void saveColumnWidths() const;
@@ -73,6 +74,9 @@ private:
     QCheckBox             *_htmlPreview {};
     QLineEdit             *_filter {};
     QLineEdit             *_cellSearch {};
+    QComboBox             *_projectFilter {};
+    QComboBox             *_procNameFilter {};
+    QComboBox             *_moduleFilter {};
     QComboBox             *_levelFilter {};
     QComboBox             *_logNameFilter {};
     QMenu                 *_recentFilesMenu {};

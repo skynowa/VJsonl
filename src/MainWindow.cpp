@@ -69,6 +69,18 @@ MainWindow::MainWindow(QWidget *parent) :
     _filter->setPlaceholderText(QStringLiteral("Filter text in all columns..."));
     _filter->setClearButtonEnabled(true);
 
+    _projectFilter = new QComboBox(this);
+    _projectFilter->addItem(QStringLiteral("All projects"), QString());
+    _projectFilter->setMinimumWidth(140);
+
+    _procNameFilter = new QComboBox(this);
+    _procNameFilter->addItem(QStringLiteral("All proc names"), QString());
+    _procNameFilter->setMinimumWidth(160);
+
+    _moduleFilter = new QComboBox(this);
+    _moduleFilter->addItem(QStringLiteral("All modules"), QString());
+    _moduleFilter->setMinimumWidth(140);
+
     _levelFilter = new QComboBox(this);
     _levelFilter->addItem(QStringLiteral("All levels"), QString());
     _levelFilter->addItem(LogLevelStyle::iconForLevel(QStringLiteral("fatal")), QStringLiteral("Fatal"), QStringLiteral("fatal"));
@@ -168,6 +180,9 @@ MainWindow::MainWindow(QWidget *parent) :
     auto *filterPanel = new QWidget(this);
     auto *filterLayout = new QHBoxLayout(filterPanel);
     filterLayout->setContentsMargins(0, 0, 0, 0);
+    filterLayout->addWidget(_projectFilter);
+    filterLayout->addWidget(_procNameFilter);
+    filterLayout->addWidget(_moduleFilter);
     filterLayout->addWidget(_logNameFilter);
     filterLayout->addWidget(_levelFilter);
     filterLayout->addWidget(_filter, 1);
@@ -300,6 +315,21 @@ MainWindow::MainWindow(QWidget *parent) :
         updateStatus();
     });
 
+    connect(_projectFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
+        _proxy->setProjectFilter(_projectFilter->itemData(index).toString());
+        updateStatus();
+    });
+
+    connect(_procNameFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
+        _proxy->setProcNameFilter(_procNameFilter->itemData(index).toString());
+        updateStatus();
+    });
+
+    connect(_moduleFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
+        _proxy->setModuleFilter(_moduleFilter->itemData(index).toString());
+        updateStatus();
+    });
+
     connect(_logNameFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
         _proxy->setLogNameFilter(_logNameFilter->itemData(index).toString());
         updateStatus();
@@ -424,6 +454,9 @@ void MainWindow::openFile(const QString &fileName)
     _format->setEnabled(false);
     _htmlPreview->setEnabled(false);
     updateLogNameFilterItems();
+    updateColumnFilterItems(_projectFilter, QStringLiteral("project"), QStringLiteral("All projects"));
+    updateColumnFilterItems(_procNameFilter, QStringLiteral("proc_name"), QStringLiteral("All proc names"));
+    updateColumnFilterItems(_moduleFilter, QStringLiteral("module"), QStringLiteral("All modules"));
     _table->sortByColumn(0, Qt::AscendingOrder);
     _table->resizeColumnsToContents();
 
@@ -594,8 +627,18 @@ void MainWindow::updateRecentFilesMenu()
 //-------------------------------------------------------------------------------------------------
 void MainWindow::updateLogNameFilterItems()
 {
-    const QString selectedLogName = _logNameFilter->currentData().toString();
-    QStringList logNames;
+    updateColumnFilterItems(_logNameFilter, QStringLiteral("log_name"), QStringLiteral("All log names"));
+}
+
+//-------------------------------------------------------------------------------------------------
+void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &columnName, const QString &allLabel)
+{
+    if (filter == nullptr) {
+        return;
+    }
+
+    const QString selectedValue = filter->currentData().toString();
+    QStringList values;
 
     for (int row = 0; row < _model->rowCount(); ++row) {
         const auto *record = _model->recordAt(row);
@@ -604,26 +647,29 @@ void MainWindow::updateLogNameFilterItems()
             continue;
         }
 
-        const QString logName = record->value(QStringLiteral("log_name"));
+        const QString value = record->value(columnName);
 
-        if (!logName.isEmpty() && !logNames.contains(logName, Qt::CaseInsensitive)) {
-            logNames.push_back(logName);
+        if (!value.isEmpty() && !values.contains(value, Qt::CaseInsensitive)) {
+            values.push_back(value);
         }
     }
 
-    logNames.sort(Qt::CaseInsensitive);
+    values.sort(Qt::CaseInsensitive);
 
-    QSignalBlocker blocker(_logNameFilter);
-    _logNameFilter->clear();
-    _logNameFilter->addItem(QStringLiteral("All log names"), QString());
+    QSignalBlocker blocker(filter);
+    filter->clear();
+    filter->addItem(allLabel, QString());
 
-    for (const QString &logName : logNames) {
-        _logNameFilter->addItem(logName, logName);
+    for (const QString &value : values) {
+        filter->addItem(value, value);
     }
 
-    const int selectedIndex = _logNameFilter->findData(selectedLogName);
-    _logNameFilter->setCurrentIndex(selectedIndex >= 0 ? selectedIndex : 0);
+    const int selectedIndex = filter->findData(selectedValue);
+    filter->setCurrentIndex(selectedIndex >= 0 ? selectedIndex : 0);
     _proxy->setLogNameFilter(_logNameFilter->currentData().toString());
+    _proxy->setProjectFilter(_projectFilter->currentData().toString());
+    _proxy->setProcNameFilter(_procNameFilter->currentData().toString());
+    _proxy->setModuleFilter(_moduleFilter->currentData().toString());
 }
 //-------------------------------------------------------------------------------------------------
 QString MainWindow::openDirectory() const
