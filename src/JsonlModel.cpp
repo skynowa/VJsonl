@@ -138,6 +138,13 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
         return QBrush(Qt::white);
     }
 
+    if (
+        role == Qt::ForegroundRole
+        && (column == QStringLiteral("proc_name") || column == QStringLiteral("module"))
+    ) {
+        return QBrush(QColor(80, 170, 80));
+    }
+
     if (role == Qt::DecorationRole && column == QStringLiteral("level")) {
         return LogLevelStyle::iconForLevel(level);
     }
