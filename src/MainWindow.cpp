@@ -12,6 +12,7 @@
 #include "Delegates.h"
 #include "DemangleUtils.h"
 #include "FileUtils.h"
+#include "FilterUtils.h"
 #include "HtmlUtils.h"
 #include "JsonSyntaxHighlighter.h"
 #include "LogFilterProxyModel.h"
@@ -27,6 +28,7 @@
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QDir>
+#include <QEvent>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFont>
@@ -42,6 +44,7 @@
 #include <QSettings>
 #include <QShortcut>
 #include <QSizePolicy>
+#include <QScrollBar>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
@@ -56,26 +59,6 @@
 #include <QUrl>
 
 //-------------------------------------------------------------------------------------------------
-namespace
-{
-QString selectedFilterValue(const QComboBox *filter)
-{
-    if (filter == nullptr) {
-        return {};
-    }
-
-    const QString text = filter->currentText().trimmed();
-
-    if (filter->currentIndex() <= 0 || text.startsWith(QStringLiteral("All "), Qt::CaseInsensitive)) {
-        return {};
-    }
-
-    const QString value = filter->currentData().toString().trimmed();
-    return value.isEmpty() ? text : value;
-}
-}
-
-//-------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -88,21 +71,23 @@ MainWindow::MainWindow(QWidget *parent) :
     _filter = new QLineEdit(this);
     _filter->setPlaceholderText(QStringLiteral("Filter text in all columns..."));
     _filter->setClearButtonEnabled(true);
+    _filter->setMinimumWidth(0);
 
     _projectFilter = new QComboBox(this);
     _projectFilter->addItem(QStringLiteral("All projects"), QString());
-    _projectFilter->setMinimumWidth(140);
+    _projectFilter->setMinimumWidth(0);
 
     _procNameFilter = new QComboBox(this);
     _procNameFilter->addItem(QStringLiteral("All proc names"), QString());
-    _procNameFilter->setMinimumWidth(160);
+    _procNameFilter->setMinimumWidth(0);
 
     _moduleFilter = new QComboBox(this);
     _moduleFilter->addItem(QStringLiteral("All modules"), QString());
-    _moduleFilter->setMinimumWidth(140);
+    _moduleFilter->setMinimumWidth(0);
 
     _levelFilter = new QComboBox(this);
     _levelFilter->addItem(QStringLiteral("All levels"), QString());
+    _levelFilter->setMinimumWidth(0);
     _levelFilter->addItem(LogLevelStyle::iconForLevel(QStringLiteral("fatal")), QStringLiteral("Fatal"), QStringLiteral("fatal"));
     _levelFilter->addItem(LogLevelStyle::iconForLevel(QStringLiteral("error")), QStringLiteral("Error"), QStringLiteral("error"));
     _levelFilter->addItem(LogLevelStyle::iconForLevel(QStringLiteral("warn")), QStringLiteral("Warn"), QStringLiteral("warn"));
@@ -113,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _logNameFilter = new QComboBox(this);
     _logNameFilter->addItem(QStringLiteral("All log names"), QString());
-    _logNameFilter->setMinimumWidth(160);
+    _logNameFilter->setMinimumWidth(0);
 
     _table = new QTableView(this);
     _table->setModel(_proxy);
@@ -127,6 +112,8 @@ MainWindow::MainWindow(QWidget *parent) :
     headerFont.setBold(true);
     _table->horizontalHeader()->setFont(headerFont);
     _table->verticalHeader()->setFont(headerFont);
+    _table->viewport()->installEventFilter(this);
+    _table->horizontalHeader()->installEventFilter(this);
 
     _cellView = new QTextEdit(this);
     _cellView->setReadOnly(true);
@@ -197,17 +184,17 @@ MainWindow::MainWindow(QWidget *parent) :
     auto *central = new QWidget(this);
     auto *layout = new QVBoxLayout(central);
 
-    auto *filterPanel = new QWidget(this);
-    auto *filterLayout = new QHBoxLayout(filterPanel);
-    filterLayout->setContentsMargins(0, 0, 0, 0);
-    filterLayout->addWidget(_projectFilter);
-    filterLayout->addWidget(_procNameFilter);
-    filterLayout->addWidget(_moduleFilter);
-    filterLayout->addWidget(_logNameFilter);
-    filterLayout->addWidget(_levelFilter);
-    filterLayout->addWidget(_filter, 1);
+    _filterPanel = new QWidget(this);
+    _filterPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    _filterPanel->setFixedHeight(qMax(_projectFilter->sizeHint().height(), _filter->sizeHint().height()));
+    _projectFilter->setParent(_filterPanel);
+    _procNameFilter->setParent(_filterPanel);
+    _moduleFilter->setParent(_filterPanel);
+    _logNameFilter->setParent(_filterPanel);
+    _levelFilter->setParent(_filterPanel);
+    _filter->setParent(_filterPanel);
 
-    layout->addWidget(filterPanel);
+    layout->addWidget(_filterPanel);
     layout->addWidget(_mainSplitter);
     setCentralWidget(central);
 
@@ -342,6 +329,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_procNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_moduleFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_logNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
+    connect(_table->horizontalHeader(), &QHeaderView::sectionResized, this, [this] {
+        updateFilterGeometry();
+    });
+    connect(_table->horizontalHeader(), &QHeaderView::sectionMoved, this, [this] {
+        updateFilterGeometry();
+    });
+    connect(_table->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this] {
+        updateFilterGeometry();
+    });
 
     connect(
         _table->selectionModel(),
@@ -395,8 +391,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QTimer::singleShot(0, this, [this] {
         restorePanelLayout();
         restoreColumnWidths();
+        updateFilterGeometry();
     });
 
+    updateFilterGeometry();
     updateStatus();
 }
 //-------------------------------------------------------------------------------------------------
@@ -407,6 +405,20 @@ void MainWindow::closeEvent(QCloseEvent *event)
     savePanelLayout();
     saveColumnWidths();
     QMainWindow::closeEvent(event);
+}
+//-------------------------------------------------------------------------------------------------
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (
+        (watched == _table->viewport() || watched == _table->horizontalHeader())
+        && event->type() == QEvent::Resize
+    ) {
+        QTimer::singleShot(0, this, [this] {
+            updateFilterGeometry();
+        });
+    }
+
+    return QMainWindow::eventFilter(watched, event);
 }
 //-------------------------------------------------------------------------------------------------
 void MainWindow::openFile()
@@ -479,6 +491,7 @@ void MainWindow::openFile(const QString &fileName)
     }
 
     restoreColumnWidths();
+    updateFilterGeometry();
 
     addRecentFile(fileName);
     saveOpenDirectory(fileName);
@@ -645,7 +658,7 @@ void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &colum
         return;
     }
 
-    const QString selectedValue = selectedFilterValue(filter);
+    const QString selectedValue = FilterUtils::selectedFilterValue(filter);
     QStringList values;
 
     for (int row = 0; row < _model->rowCount(); ++row) {
@@ -679,11 +692,57 @@ void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &colum
 //-------------------------------------------------------------------------------------------------
 void MainWindow::applyFilters()
 {
-    _proxy->setProjectFilter(selectedFilterValue(_projectFilter));
-    _proxy->setProcNameFilter(selectedFilterValue(_procNameFilter));
-    _proxy->setModuleFilter(selectedFilterValue(_moduleFilter));
-    _proxy->setLogNameFilter(selectedFilterValue(_logNameFilter));
-    _proxy->setLevelFilter(selectedFilterValue(_levelFilter).toLower());
+    _proxy->setProjectFilter(FilterUtils::selectedFilterValue(_projectFilter));
+    _proxy->setProcNameFilter(FilterUtils::selectedFilterValue(_procNameFilter));
+    _proxy->setModuleFilter(FilterUtils::selectedFilterValue(_moduleFilter));
+    _proxy->setLogNameFilter(FilterUtils::selectedFilterValue(_logNameFilter));
+    _proxy->setLevelFilter(FilterUtils::selectedFilterValue(_levelFilter).toLower());
+}
+
+//-------------------------------------------------------------------------------------------------
+void MainWindow::updateFilterGeometry()
+{
+    if (_filterPanel == nullptr || _table == nullptr || _table->model() == nullptr) {
+        return;
+    }
+
+    const QRect viewportRect = _table->viewport()->geometry();
+    const int panelHeight = _filterPanel->height();
+
+    auto placeFilter = [&](QWidget *filter, const QString &columnName) {
+        if (filter == nullptr) {
+            return;
+        }
+
+        const int column = FilterUtils::columnByName(_table->model(), columnName);
+
+        if (column < 0 || _table->isColumnHidden(column)) {
+            filter->hide();
+            return;
+        }
+
+        const int sectionX = _table->horizontalHeader()->sectionViewportPosition(column);
+        const int sectionWidth = _table->horizontalHeader()->sectionSize(column);
+        const int x = viewportRect.x() + sectionX;
+        const int left = qMax(x, viewportRect.left());
+        const int right = qMin(x + sectionWidth, viewportRect.right() + 1);
+        const int width = right - left;
+
+        if (width <= 0) {
+            filter->hide();
+            return;
+        }
+
+        filter->setGeometry(left, 0, width, panelHeight);
+        filter->show();
+    };
+
+    placeFilter(_projectFilter, QStringLiteral("project"));
+    placeFilter(_procNameFilter, QStringLiteral("proc_name"));
+    placeFilter(_moduleFilter, QStringLiteral("module"));
+    placeFilter(_logNameFilter, QStringLiteral("log_name"));
+    placeFilter(_levelFilter, QStringLiteral("level"));
+    placeFilter(_filter, QStringLiteral("msg"));
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -30,6 +30,8 @@ add_executable(VJson
     src/CodeFormatter.cpp
     src/FileUtils.h
     src/FileUtils.cpp
+    src/FilterUtils.h
+    src/FilterUtils.cpp
     src/HtmlUtils.h
     src/HtmlUtils.cpp
     src/JsonSyntaxHighlighter.h

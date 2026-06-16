@@ -24,7 +24,9 @@ class QTextBrowser;
 class QMenu;
 class QAction;
 class QCloseEvent;
+class QEvent;
 class QSplitter;
+class QWidget;
 class JsonSyntaxHighlighter;
 class LogFilterProxyModel;
 //-------------------------------------------------------------------------------------------------
@@ -37,6 +39,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     void openFile();
@@ -56,6 +59,7 @@ private:
     void savePanelLayout() const;
     void restorePanelLayout();
     void applyFilters();
+    void updateFilterGeometry();
     void updateStatus();
 
 private:
@@ -70,6 +74,7 @@ private:
     QStackedWidget        *_cellStack {};
     QSplitter             *_mainSplitter {};
     QSplitter             *_detailsSplitter {};
+    QWidget               *_filterPanel {};
     QCheckBox             *_format {};
     QCheckBox             *_wrapCellLine {};
     QCheckBox             *_htmlPreview {};
