@@ -140,7 +140,11 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
 
     if (
         role == Qt::ForegroundRole
-        && (column == QStringLiteral("proc_name") || column == QStringLiteral("module"))
+        && (
+            column == QStringLiteral("app")
+            || column == QStringLiteral("proc_name")
+            || column == QStringLiteral("module")
+        )
     ) {
         return QBrush(QColor(80, 170, 80));
     }

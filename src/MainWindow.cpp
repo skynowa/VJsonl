@@ -77,6 +77,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _projectFilter->addItem(QStringLiteral("All projects"), QString());
     _projectFilter->setMinimumWidth(0);
 
+    _appFilter = new QComboBox(this);
+    _appFilter->addItem(QStringLiteral("All apps"), QString());
+    _appFilter->setMinimumWidth(0);
+
     _procNameFilter = new QComboBox(this);
     _procNameFilter->addItem(QStringLiteral("All proc names"), QString());
     _procNameFilter->setMinimumWidth(0);
@@ -188,6 +192,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _filterPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     _filterPanel->setFixedHeight(qMax(_projectFilter->sizeHint().height(), _filter->sizeHint().height()));
     _projectFilter->setParent(_filterPanel);
+    _appFilter->setParent(_filterPanel);
     _procNameFilter->setParent(_filterPanel);
     _moduleFilter->setParent(_filterPanel);
     _logNameFilter->setParent(_filterPanel);
@@ -326,6 +331,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(_levelFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_projectFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
+    connect(_appFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_procNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_moduleFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_logNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
@@ -475,6 +481,7 @@ void MainWindow::openFile(const QString &fileName)
     _htmlPreview->setEnabled(false);
     updateColumnFilterItems(_logNameFilter, QStringLiteral("log_name"), QStringLiteral("All log names"));
     updateColumnFilterItems(_projectFilter, QStringLiteral("project"), QStringLiteral("All projects"));
+    updateColumnFilterItems(_appFilter, QStringLiteral("app"), QStringLiteral("All apps"));
     updateColumnFilterItems(_procNameFilter, QStringLiteral("proc_name"), QStringLiteral("All proc names"));
     updateColumnFilterItems(_moduleFilter, QStringLiteral("module"), QStringLiteral("All modules"));
     _table->sortByColumn(-1, Qt::AscendingOrder);
@@ -687,6 +694,7 @@ void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &colum
 void MainWindow::applyFilters()
 {
     _proxy->setProjectFilter(FilterUtils::selectedFilterValue(_projectFilter));
+    _proxy->setAppFilter(FilterUtils::selectedFilterValue(_appFilter));
     _proxy->setProcNameFilter(FilterUtils::selectedFilterValue(_procNameFilter));
     _proxy->setModuleFilter(FilterUtils::selectedFilterValue(_moduleFilter));
     _proxy->setLogNameFilter(FilterUtils::selectedFilterValue(_logNameFilter));
@@ -732,6 +740,7 @@ void MainWindow::updateFilterGeometry()
     };
 
     placeFilter(_projectFilter, QStringLiteral("project"));
+    placeFilter(_appFilter, QStringLiteral("app"));
     placeFilter(_procNameFilter, QStringLiteral("proc_name"));
     placeFilter(_moduleFilter, QStringLiteral("module"));
     placeFilter(_logNameFilter, QStringLiteral("log_name"));

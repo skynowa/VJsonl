@@ -20,6 +20,7 @@ public:
     void setLevelFilter(const QString &level);
     void setLogNameFilter(const QString &logName);
     void setProjectFilter(const QString &project);
+    void setAppFilter(const QString &app);
     void setProcNameFilter(const QString &procName);
     void setModuleFilter(const QString &module);
 

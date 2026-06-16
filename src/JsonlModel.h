@@ -48,6 +48,7 @@ private:
         // QStringLiteral("line"),
         QStringLiteral("valid"),
         QStringLiteral("project"),
+        QStringLiteral("app"),
         QStringLiteral("proc_name"),
         QStringLiteral("module"),
         QStringLiteral("log_name"),

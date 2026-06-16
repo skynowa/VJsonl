@@ -80,6 +80,7 @@ private:
     QLineEdit             *_filter {};
     QLineEdit             *_cellSearch {};
     QComboBox             *_projectFilter {};
+    QComboBox             *_appFilter {};
     QComboBox             *_procNameFilter {};
     QComboBox             *_moduleFilter {};
     QComboBox             *_levelFilter {};

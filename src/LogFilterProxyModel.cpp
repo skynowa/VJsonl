@@ -44,6 +44,12 @@ void LogFilterProxyModel::setProjectFilter(const QString &project)
 }
 
 //-------------------------------------------------------------------------------------------------
+void LogFilterProxyModel::setAppFilter(const QString &app)
+{
+    setColumnFilter(QStringLiteral("app"), app);
+}
+
+//-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setProcNameFilter(const QString &procName)
 {
     setColumnFilter(QStringLiteral("proc_name"), procName);
