@@ -22,7 +22,6 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QApplication>
-#include <QBuffer>
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
@@ -55,38 +54,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QUrl>
-//-------------------------------------------------------------------------------------------------
-namespace
-{
-QString iconHtmlForLevel(const QString &level)
-{
-    const QPixmap pixmap = LogLevelStyle::iconForLevel(level).pixmap(16, 16);
-
-    if (pixmap.isNull()) {
-        return {};
-    }
-
-    QByteArray bytes;
-    QBuffer buffer(&bytes);
-    buffer.open(QIODevice::WriteOnly);
-    pixmap.save(&buffer, "PNG");
-
-    return QStringLiteral("<img width=\"16\" height=\"16\" src=\"data:image/png;base64,%1\">")
-        .arg(QString::fromLatin1(bytes.toBase64()));
-}
-
-QString levelCounterHtml(const QString &level, int count)
-{
-    const QString iconHtml = iconHtmlForLevel(level);
-
-    if (iconHtml.isEmpty()) {
-        return {};
-    }
-
-    return QStringLiteral("%1&nbsp;%2").arg(iconHtml).arg(count);
-}
-
-}
 
 //-------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
@@ -766,14 +733,14 @@ void MainWindow::updateStatus()
 
             if (count > 0) {
                 levelParts.push_back(QStringLiteral("%1=%2").arg(level).arg(count));
-                levelHtmlParts.push_back(levelCounterHtml(level, count));
+                levelHtmlParts.push_back(LogLevelStyle::levelCounterHtml(level, count));
             }
         }
 
         for (auto it = levelCounts.cbegin(); it != levelCounts.cend(); ++it) {
             if (!orderedLevels.contains(it.key())) {
                 levelParts.push_back(QStringLiteral("%1=%2").arg(it.key()).arg(it.value()));
-                levelHtmlParts.push_back(levelCounterHtml(it.key(), it.value()));
+                levelHtmlParts.push_back(LogLevelStyle::levelCounterHtml(it.key(), it.value()));
             }
         }
 

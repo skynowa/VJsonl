@@ -6,6 +6,7 @@
 
 #include "LogLevelStyle.h"
 
+#include <QBuffer>
 #include <QColor>
 #include <QPainter>
 #include <QPixmap>
@@ -70,6 +71,34 @@ QIcon iconForLevel(const QString &level)
     return level.trimmed().isEmpty()
         ? QIcon()
         : makeIcon(QColor(115, 115, 115), level.trimmed());
+}
+//-------------------------------------------------------------------------------------------------
+QString iconHtmlForLevel(const QString &level)
+{
+    const QPixmap pixmap = iconForLevel(level).pixmap(16, 16);
+
+    if (pixmap.isNull()) {
+        return {};
+    }
+
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+    buffer.open(QIODevice::WriteOnly);
+    pixmap.save(&buffer, "PNG");
+
+    return QStringLiteral("<img width=\"16\" height=\"16\" src=\"data:image/png;base64,%1\">")
+        .arg(QString::fromLatin1(bytes.toBase64()));
+}
+//-------------------------------------------------------------------------------------------------
+QString levelCounterHtml(const QString &level, int count)
+{
+    const QString iconHtml = iconHtmlForLevel(level);
+
+    if (iconHtml.isEmpty()) {
+        return {};
+    }
+
+    return QStringLiteral("%1&nbsp;%2").arg(iconHtml).arg(count);
 }
 }
 //-------------------------------------------------------------------------------------------------

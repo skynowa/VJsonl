@@ -13,5 +13,7 @@
 namespace LogLevelStyle
 {
 QIcon iconForLevel(const QString &level);
+QString iconHtmlForLevel(const QString &level);
+QString levelCounterHtml(const QString &level, int count);
 }
 //-------------------------------------------------------------------------------------------------
