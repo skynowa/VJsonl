@@ -55,6 +55,7 @@ private:
     void restoreColumnWidths();
     void savePanelLayout() const;
     void restorePanelLayout();
+    void applyFilters();
     void updateStatus();
 
 private:

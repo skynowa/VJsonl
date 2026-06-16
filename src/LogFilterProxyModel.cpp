@@ -28,79 +28,61 @@ void LogFilterProxyModel::setTextFilter(const QString &text)
 //-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setLevelFilter(const QString &level)
 {
-    if (_levelFilter == level) {
-        return;
-    }
-
-    _levelFilter = level;
-    invalidateFilter();
+    setColumnFilter(QStringLiteral("level"), level);
 }
 
 //-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setLogNameFilter(const QString &logName)
 {
-    if (_logNameFilter == logName) {
-        return;
-    }
-
-    _logNameFilter = logName;
-    invalidateFilter();
+    setColumnFilter(QStringLiteral("log_name"), logName);
 }
 
 //-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setProjectFilter(const QString &project)
 {
-    if (_projectFilter == project) {
-        return;
-    }
-
-    _projectFilter = project;
-    invalidateFilter();
+    setColumnFilter(QStringLiteral("project"), project);
 }
 
 //-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setProcNameFilter(const QString &procName)
 {
-    if (_procNameFilter == procName) {
-        return;
-    }
-
-    _procNameFilter = procName;
-    invalidateFilter();
+    setColumnFilter(QStringLiteral("proc_name"), procName);
 }
 
 //-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setModuleFilter(const QString &module)
 {
-    if (_moduleFilter == module) {
+    setColumnFilter(QStringLiteral("module"), module);
+}
+
+//-------------------------------------------------------------------------------------------------
+void LogFilterProxyModel::setColumnFilter(const QString &columnName, const QString &value)
+{
+    const QString normalizedValue = value.trimmed();
+
+    if (normalizedValue.isEmpty()) {
+        if (_columnFilters.remove(columnName) > 0) {
+            invalidateFilter();
+        }
+
         return;
     }
 
-    _moduleFilter = module;
+    if (_columnFilters.value(columnName) == normalizedValue) {
+        return;
+    }
+
+    _columnFilters.insert(columnName, normalizedValue);
     invalidateFilter();
 }
 
 //-------------------------------------------------------------------------------------------------
 bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    if (!projectMatches(sourceRow, sourceParent)) {
-        return false;
-    }
-
-    if (!procNameMatches(sourceRow, sourceParent)) {
-        return false;
-    }
-
-    if (!moduleMatches(sourceRow, sourceParent)) {
-        return false;
-    }
-
-    if (!levelMatches(sourceRow, sourceParent)) {
-        return false;
-    }
-
-    if (!logNameMatches(sourceRow, sourceParent)) {
-        return false;
+    for (auto it = _columnFilters.cbegin(); it != _columnFilters.cend(); ++it) {
+        if (!columnMatches(sourceRow, sourceParent, it.key(), it.value())) {
+            return false;
+        }
     }
 
     if (_textFilter.isEmpty()) {
@@ -155,36 +137,6 @@ int LogFilterProxyModel::columnByName(const QString &name) const
     }
 
     return -1;
-}
-
-//-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::levelMatches(int sourceRow, const QModelIndex &sourceParent) const
-{
-    return columnMatches(sourceRow, sourceParent, QStringLiteral("level"), _levelFilter);
-}
-
-//-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::logNameMatches(int sourceRow, const QModelIndex &sourceParent) const
-{
-    return columnMatches(sourceRow, sourceParent, QStringLiteral("log_name"), _logNameFilter);
-}
-
-//-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::projectMatches(int sourceRow, const QModelIndex &sourceParent) const
-{
-    return columnMatches(sourceRow, sourceParent, QStringLiteral("project"), _projectFilter);
-}
-
-//-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::procNameMatches(int sourceRow, const QModelIndex &sourceParent) const
-{
-    return columnMatches(sourceRow, sourceParent, QStringLiteral("proc_name"), _procNameFilter);
-}
-
-//-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::moduleMatches(int sourceRow, const QModelIndex &sourceParent) const
-{
-    return columnMatches(sourceRow, sourceParent, QStringLiteral("module"), _moduleFilter);
 }
 
 //-------------------------------------------------------------------------------------------------

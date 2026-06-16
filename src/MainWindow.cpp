@@ -56,6 +56,26 @@
 #include <QUrl>
 
 //-------------------------------------------------------------------------------------------------
+namespace
+{
+QString selectedFilterValue(const QComboBox *filter)
+{
+    if (filter == nullptr) {
+        return {};
+    }
+
+    const QString text = filter->currentText().trimmed();
+
+    if (filter->currentIndex() <= 0 || text.startsWith(QStringLiteral("All "), Qt::CaseInsensitive)) {
+        return {};
+    }
+
+    const QString value = filter->currentData().toString().trimmed();
+    return value.isEmpty() ? text : value;
+}
+}
+
+//-------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -310,30 +330,18 @@ MainWindow::MainWindow(QWidget *parent) :
         updateStatus();
     });
 
-    connect(_levelFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
-        _proxy->setLevelFilter(_levelFilter->itemData(index).toString());
+    auto applyComboFilters = [this](int index) {
+        Q_UNUSED(index);
+        applyFilters();
+        _table->scrollToTop();
         updateStatus();
-    });
+    };
 
-    connect(_projectFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
-        _proxy->setProjectFilter(_projectFilter->itemData(index).toString());
-        updateStatus();
-    });
-
-    connect(_procNameFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
-        _proxy->setProcNameFilter(_procNameFilter->itemData(index).toString());
-        updateStatus();
-    });
-
-    connect(_moduleFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
-        _proxy->setModuleFilter(_moduleFilter->itemData(index).toString());
-        updateStatus();
-    });
-
-    connect(_logNameFilter, &QComboBox::currentIndexChanged, this, [this](int index) {
-        _proxy->setLogNameFilter(_logNameFilter->itemData(index).toString());
-        updateStatus();
-    });
+    connect(_levelFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
+    connect(_projectFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
+    connect(_procNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
+    connect(_moduleFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
+    connect(_logNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
 
     connect(
         _table->selectionModel(),
@@ -457,7 +465,7 @@ void MainWindow::openFile(const QString &fileName)
     updateColumnFilterItems(_projectFilter, QStringLiteral("project"), QStringLiteral("All projects"));
     updateColumnFilterItems(_procNameFilter, QStringLiteral("proc_name"), QStringLiteral("All proc names"));
     updateColumnFilterItems(_moduleFilter, QStringLiteral("module"), QStringLiteral("All modules"));
-    _table->sortByColumn(0, Qt::AscendingOrder);
+    _table->sortByColumn(-1, Qt::AscendingOrder);
     _table->resizeColumnsToContents();
 
     constexpr int maxColumnWidth = 360;
@@ -637,7 +645,7 @@ void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &colum
         return;
     }
 
-    const QString selectedValue = filter->currentData().toString();
+    const QString selectedValue = selectedFilterValue(filter);
     QStringList values;
 
     for (int row = 0; row < _model->rowCount(); ++row) {
@@ -666,11 +674,18 @@ void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &colum
 
     const int selectedIndex = filter->findData(selectedValue);
     filter->setCurrentIndex(selectedIndex >= 0 ? selectedIndex : 0);
-    _proxy->setLogNameFilter(_logNameFilter->currentData().toString());
-    _proxy->setProjectFilter(_projectFilter->currentData().toString());
-    _proxy->setProcNameFilter(_procNameFilter->currentData().toString());
-    _proxy->setModuleFilter(_moduleFilter->currentData().toString());
+    applyFilters();
 }
+//-------------------------------------------------------------------------------------------------
+void MainWindow::applyFilters()
+{
+    _proxy->setProjectFilter(selectedFilterValue(_projectFilter));
+    _proxy->setProcNameFilter(selectedFilterValue(_procNameFilter));
+    _proxy->setModuleFilter(selectedFilterValue(_moduleFilter));
+    _proxy->setLogNameFilter(selectedFilterValue(_logNameFilter));
+    _proxy->setLevelFilter(selectedFilterValue(_levelFilter).toLower());
+}
+
 //-------------------------------------------------------------------------------------------------
 QString MainWindow::openDirectory() const
 {

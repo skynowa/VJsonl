@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <QMap>
 #include <QSortFilterProxyModel>
 #include <QString>
 
@@ -27,21 +28,13 @@ protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 
 private:
+    void setColumnFilter(const QString &columnName, const QString &value);
     QString columnName(int column) const;
     int columnByName(const QString &name) const;
-    bool levelMatches(int sourceRow, const QModelIndex &sourceParent) const;
-    bool logNameMatches(int sourceRow, const QModelIndex &sourceParent) const;
-    bool projectMatches(int sourceRow, const QModelIndex &sourceParent) const;
-    bool procNameMatches(int sourceRow, const QModelIndex &sourceParent) const;
-    bool moduleMatches(int sourceRow, const QModelIndex &sourceParent) const;
     bool columnMatches(int sourceRow, const QModelIndex &sourceParent, const QString &columnName, const QString &value) const;
 
 private:
-    QString _textFilter;
-    QString _levelFilter;
-    QString _logNameFilter;
-    QString _projectFilter;
-    QString _procNameFilter;
-    QString _moduleFilter;
+    QString                _textFilter;
+    QMap<QString, QString> _columnFilters;
 };
 //-------------------------------------------------------------------------------------------------
