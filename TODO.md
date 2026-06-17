@@ -21,13 +21,16 @@
 - Add filter mode: contains / regex / exact.
 - Add negative filter mode.
 - Add column-specific filter:
-  - all columns
-  - `msg`
-  - `query`
+  - [+] all columns
+  - [+] `msg`
+  - [+] `query`
   - `request_id`
   - `raw`
 - Add quick filter for error rows only.
-- Add quick filter chips for `log_name`, `service`, and `proc_name`.
+- Add quick filter chips:
+  - [+] `log_name`
+  - `service`
+  - [+] `proc_name`
 
 ## Navigation
 
@@ -45,21 +48,21 @@
 - Highlight all search matches, not only the first match.
 - Add next/previous match navigation in the value panel.
 - Add JSON tree view.
-- Add SQL syntax highlighting.
-- Add XML syntax highlighting.
+- [+] Add SQL syntax highlighting.
+- [+] Add XML syntax highlighting.
 
 ## Table
 
 - Auto-detect JSON keys and add them as columns.
 - Allow custom column order.
-- Save column widths.
+- [+] Save column widths.
 - Save visible/hidden column state.
 - Add pinned/frozen columns for `line`, `level`, and `msg`.
-- Add tooltip with full cell value for truncated cells.
+- [+] Add tooltip with full cell value for truncated cells.
 - Add more color styles:
-  - `Info`
-  - `Warn`
-  - `Trace`
+  - [+] `Info`
+  - [+] `Warn`
+  - [+] `Trace`
 
 ## File Handling
 
@@ -76,13 +79,13 @@
 
 ## Statistics
 
-- Add level counters:
-  - `Fatal`
-  - `Error`
-  - `Warn`
-  - `Info`
-  - `Debug`
-  - `Trace`
+- [+] Add level counters:
+  - [+] `Fatal`
+  - [+] `Error`
+  - [+] `Warn`
+  - [+] `Info`
+  - [+] `Debug`
+  - [+] `Trace`
 - Add top values panel:
   - top `log_name`
   - top `service`
@@ -108,4 +111,3 @@
 - Keep `ChangeLog.md` updated after each user-visible change.
 - Add screenshots for main workflows.
 - Add test data descriptions for files in `sample/`.
-
