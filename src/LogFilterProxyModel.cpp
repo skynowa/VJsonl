@@ -64,6 +64,12 @@ void LogFilterProxyModel::setModuleFilter(const QString &module)
 }
 
 //-------------------------------------------------------------------------------------------------
+void LogFilterProxyModel::setQueryFilter(const QString &query)
+{
+    setColumnFilter(QStringLiteral("query"), query);
+}
+
+//-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setTimestampRange(
     const QDateTime &from,
     bool hasFrom,

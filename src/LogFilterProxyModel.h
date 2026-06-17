@@ -24,6 +24,7 @@ public:
     void setAppFilter(const QString &app);
     void setProcNameFilter(const QString &procName);
     void setModuleFilter(const QString &module);
+    void setQueryFilter(const QString &query);
     void setTimestampRange(
         const QDateTime &from,
         bool hasFrom,
