@@ -151,7 +151,7 @@ QString formatXml(const QString &text)
     return reader.hasError() ? text : formatted.trimmed();
 }
 
-int findJsonEnd(const QString &text, int start)
+qsizetype findJsonEnd(const QString &text, qsizetype start)
 {
     const QChar open = text.at(start);
     const QChar close = open == QLatin1Char('{') ? QLatin1Char('}') : QLatin1Char(']');
@@ -159,7 +159,7 @@ int findJsonEnd(const QString &text, int start)
     bool inString = false;
     bool escaped = false;
 
-    for (int i = start; i < text.size(); ++i) {
+    for (qsizetype i = start; i < text.size(); ++i) {
         const QChar ch = text.at(i);
 
         if (inString) {
@@ -202,14 +202,14 @@ int findJsonEnd(const QString &text, int start)
 
 QString formatJsonFragments(QString text, bool *changed)
 {
-    for (int start = 0; start < text.size(); ++start) {
+    for (qsizetype start = 0; start < text.size(); ++start) {
         const QChar ch = text.at(start);
 
         if (ch != QLatin1Char('{') && ch != QLatin1Char('[')) {
             continue;
         }
 
-        const int end = findJsonEnd(text, start);
+        const qsizetype end = findJsonEnd(text, start);
 
         if (end <= start) {
             continue;
@@ -232,10 +232,10 @@ QString formatJsonFragments(QString text, bool *changed)
 
 QString formatXmlFragments(QString text, bool *changed)
 {
-    int searchFrom = 0;
+    qsizetype searchFrom = 0;
 
     while (searchFrom < text.size()) {
-        const int start = text.indexOf(QLatin1Char('<'), searchFrom);
+        const qsizetype start = text.indexOf(QLatin1Char('<'), searchFrom);
 
         if (start < 0 || start + 1 >= text.size() || !text.at(start + 1).isLetter()) {
             searchFrom = start < 0 ? text.size() : start + 1;
@@ -244,7 +244,7 @@ QString formatXmlFragments(QString text, bool *changed)
 
         bool formattedFragment = false;
 
-        for (int end = text.indexOf(QLatin1Char('>'), start + 1); end >= 0; end = text.indexOf(QLatin1Char('>'), end + 1)) {
+        for (qsizetype end = text.indexOf(QLatin1Char('>'), start + 1); end >= 0; end = text.indexOf(QLatin1Char('>'), end + 1)) {
             const QString fragment = text.mid(start, end - start + 1);
 
             if (!isXmlText(fragment)) {
@@ -267,7 +267,7 @@ QString formatXmlFragments(QString text, bool *changed)
     return text;
 }
 
-int findSqlStart(const QString &text)
+qsizetype findSqlStart(const QString &text)
 {
     static const QRegularExpression sqlStart(
         QStringLiteral("\\b(SELECT|UPDATE|INSERT|DELETE|WITH|CREATE|ALTER|DROP)\\b"),
@@ -280,14 +280,14 @@ int findSqlStart(const QString &text)
 
 QString formatSqlFragment(const QString &text, bool *changed)
 {
-    const int start = findSqlStart(text);
+    const qsizetype start = findSqlStart(text);
 
     if (start < 0) {
         return text;
     }
 
-    const int semicolon = text.indexOf(QLatin1Char(';'), start);
-    const int end = semicolon >= 0 ? semicolon + 1 : text.size();
+    const qsizetype semicolon = text.indexOf(QLatin1Char(';'), start);
+    const qsizetype end = semicolon >= 0 ? semicolon + 1 : text.size();
     QString formatted = text;
     formatted.replace(start, end - start, formatSql(text.mid(start, end - start)));
     *changed = true;

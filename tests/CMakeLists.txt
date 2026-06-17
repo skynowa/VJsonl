@@ -8,6 +8,8 @@ function(add_vjson_test target source)
         Qt6::Test
     )
 
+    vjson_enable_strict_warnings(${target})
+
     add_test(NAME ${target} COMMAND ${target})
 endfunction()
 

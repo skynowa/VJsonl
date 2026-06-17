@@ -57,13 +57,13 @@ JsonlModel::JsonlModel(QObject *parent) :
 //-------------------------------------------------------------------------------------------------
 int JsonlModel::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : _records.size();
+    return parent.isValid() ? 0 : static_cast<int>(_records.size());
 }
 
 //-------------------------------------------------------------------------------------------------
 int JsonlModel::columnCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : _columns.size();
+    return parent.isValid() ? 0 : static_cast<int>(_columns.size());
 }
 
 //-------------------------------------------------------------------------------------------------

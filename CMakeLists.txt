@@ -12,6 +12,29 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Test Widgets)
 
+function(vjson_enable_strict_warnings target)
+    if(MSVC)
+        target_compile_options(${target} PRIVATE
+            /W4
+            /WX
+            /permissive-
+        )
+    else()
+        target_compile_options(${target} PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Wconversion
+            -Wsign-conversion
+            -Wshadow
+            -Wold-style-cast
+            -Woverloaded-virtual
+            -Wnon-virtual-dtor
+            -Werror
+        )
+    endif()
+endfunction()
+
 set(VJSON_SOURCES
     src/AppSettings.h
     src/AppSettings.cpp
@@ -57,12 +80,14 @@ add_library(VJsonLib STATIC
 target_compile_definitions(VJsonLib PRIVATE VJSON_BUILD_TYPE="$<CONFIG>")
 target_include_directories(VJsonLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(VJsonLib PUBLIC Qt6::Widgets)
+vjson_enable_strict_warnings(VJsonLib)
 
 add_executable(VJson
     src/main.cpp
 )
 
 target_link_libraries(VJson PRIVATE VJsonLib)
+vjson_enable_strict_warnings(VJson)
 
 enable_testing()
 add_subdirectory(tests)

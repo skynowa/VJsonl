@@ -99,7 +99,7 @@ void JsonSyntaxHighlighter::highlightBacktrace(const QString &text)
 
         while (matches.hasNext()) {
             const QRegularExpressionMatch match = matches.next();
-            setFormat(match.capturedStart(), match.capturedLength(), format);
+            setFormat(static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), format);
         }
     };
 
@@ -116,7 +116,7 @@ void JsonSyntaxHighlighter::highlightJson(const QString &text)
 
         while (matches.hasNext()) {
             const QRegularExpressionMatch match = matches.next();
-            setFormat(match.capturedStart(), match.capturedLength(), format);
+            setFormat(static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), format);
         }
     };
 
@@ -134,7 +134,7 @@ void JsonSyntaxHighlighter::highlightSql(const QString &text)
 
         while (matches.hasNext()) {
             const QRegularExpressionMatch match = matches.next();
-            setFormat(match.capturedStart(), match.capturedLength(), format);
+            setFormat(static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), format);
         }
     };
 
@@ -151,7 +151,7 @@ void JsonSyntaxHighlighter::highlightXml(const QString &text)
 
         while (matches.hasNext()) {
             const QRegularExpressionMatch match = matches.next();
-            setFormat(match.capturedStart(), match.capturedLength(), format);
+            setFormat(static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), format);
         }
     };
 
@@ -169,7 +169,7 @@ void JsonSyntaxHighlighter::highlightHtml(const QString &text)
 
     while (matches.hasNext()) {
         const QRegularExpressionMatch match = matches.next();
-        setFormat(match.capturedStart(), match.capturedLength(), _tagFormat);
+        setFormat(static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), _tagFormat);
     }
 }
 //-------------------------------------------------------------------------------------------------
