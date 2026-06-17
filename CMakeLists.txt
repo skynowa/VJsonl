@@ -34,6 +34,8 @@ add_executable(VJson
     src/FilterUtils.cpp
     src/HtmlUtils.h
     src/HtmlUtils.cpp
+    src/IconUtils.h
+    src/IconUtils.cpp
     src/JsonSyntaxHighlighter.h
     src/JsonSyntaxHighlighter.cpp
     src/LogLevelStyle.h

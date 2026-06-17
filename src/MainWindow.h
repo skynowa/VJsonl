@@ -20,6 +20,7 @@ class QCheckBox;
 class QComboBox;
 class QDateTimeEdit;
 class QProgressBar;
+class QToolButton;
 class QStackedWidget;
 class QTextBrowser;
 class QMenu;
@@ -59,6 +60,7 @@ private:
     void savePanelLayout() const;
     void restorePanelLayout();
     void applyFilters();
+    void updateTimestampFilterStatus();
     void updateFilterGeometry();
     void updateTimestampFilterBounds();
     void updateStatus();
@@ -87,7 +89,8 @@ private:
     QComboBox             *_moduleFilter {};
     QComboBox             *_levelFilter {};
     QComboBox             *_logNameFilter {};
-    QWidget               *_tsFilterPanel {};
+    QMenu                 *_tsFilterMenu {};
+    QToolButton           *_tsFilterButton {};
     QCheckBox             *_tsFromEnabled {};
     QCheckBox             *_tsToEnabled {};
     QDateTimeEdit         *_tsFrom {};

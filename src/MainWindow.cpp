@@ -14,6 +14,7 @@
 #include "FileUtils.h"
 #include "FilterUtils.h"
 #include "HtmlUtils.h"
+#include "IconUtils.h"
 #include "JsonSyntaxHighlighter.h"
 #include "LogFilterProxyModel.h"
 #include "LogLevelStyle.h"
@@ -57,7 +58,9 @@
 #include <QTextCursor>
 #include <QTextEdit>
 #include <QTimer>
+#include <QToolButton>
 #include <QVBoxLayout>
+#include <QWidgetAction>
 #include <QWidget>
 #include <QUrl>
 
@@ -107,29 +110,39 @@ MainWindow::MainWindow(QWidget *parent) :
     _logNameFilter->addItem(QStringLiteral("All log names"), QString());
     _logNameFilter->setMinimumWidth(0);
 
-    _tsFilterPanel = new QWidget(this);
-    auto *tsFilterLayout = new QHBoxLayout(_tsFilterPanel);
+    _tsFilterButton = new QToolButton(this);
+    _tsFilterButton->setText(QStringLiteral("off"));
+    _tsFilterButton->setIcon(IconUtils::calendarIcon());
+    _tsFilterButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    _tsFilterButton->setPopupMode(QToolButton::InstantPopup);
+    _tsFilterButton->setMinimumWidth(0);
+
+    _tsFilterMenu = new QMenu(_tsFilterButton);
+    auto *tsFilterWidget = new QWidget(_tsFilterMenu);
+    auto *tsFilterLayout = new QHBoxLayout(tsFilterWidget);
     tsFilterLayout->setContentsMargins(0, 0, 0, 0);
     tsFilterLayout->setSpacing(2);
 
-    _tsFromEnabled = new QCheckBox(QStringLiteral("from"), _tsFilterPanel);
-    _tsFrom = new QDateTimeEdit(QDateTime::currentDateTime(), _tsFilterPanel);
+    _tsFromEnabled = new QCheckBox(QStringLiteral("from"), tsFilterWidget);
+    _tsFrom = new QDateTimeEdit(QDateTime::currentDateTime(), tsFilterWidget);
     _tsFrom->setCalendarPopup(true);
     _tsFrom->setDisplayFormat(QStringLiteral("yyyy-MM-dd HH:mm:ss.zzz"));
-    _tsFrom->setMinimumWidth(0);
     _tsFrom->setEnabled(false);
 
-    _tsToEnabled = new QCheckBox(QStringLiteral("to"), _tsFilterPanel);
-    _tsTo = new QDateTimeEdit(QDateTime::currentDateTime(), _tsFilterPanel);
+    _tsToEnabled = new QCheckBox(QStringLiteral("to"), tsFilterWidget);
+    _tsTo = new QDateTimeEdit(QDateTime::currentDateTime(), tsFilterWidget);
     _tsTo->setCalendarPopup(true);
     _tsTo->setDisplayFormat(QStringLiteral("yyyy-MM-dd HH:mm:ss.zzz"));
-    _tsTo->setMinimumWidth(0);
     _tsTo->setEnabled(false);
 
     tsFilterLayout->addWidget(_tsFromEnabled);
     tsFilterLayout->addWidget(_tsFrom, 1);
     tsFilterLayout->addWidget(_tsToEnabled);
     tsFilterLayout->addWidget(_tsTo, 1);
+    auto *tsFilterAction = new QWidgetAction(_tsFilterMenu);
+    tsFilterAction->setDefaultWidget(tsFilterWidget);
+    _tsFilterMenu->addAction(tsFilterAction);
+    _tsFilterButton->setMenu(_tsFilterMenu);
 
     _table = new QTableView(this);
     _table->setModel(_proxy);
@@ -223,7 +236,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _procNameFilter->setParent(_filterPanel);
     _moduleFilter->setParent(_filterPanel);
     _logNameFilter->setParent(_filterPanel);
-    _tsFilterPanel->setParent(_filterPanel);
+    _tsFilterButton->setParent(_filterPanel);
     _levelFilter->setParent(_filterPanel);
     _filter->setParent(_filterPanel);
 
@@ -353,6 +366,7 @@ MainWindow::MainWindow(QWidget *parent) :
     auto applyComboFilters = [this](int index) {
         Q_UNUSED(index);
         applyFilters();
+        updateTimestampFilterStatus();
         _table->scrollToTop();
         updateStatus();
     };
@@ -367,13 +381,38 @@ MainWindow::MainWindow(QWidget *parent) :
         _tsFrom->setEnabled(_tsFromEnabled->isChecked());
         _tsTo->setEnabled(_tsToEnabled->isChecked());
         applyFilters();
+        updateTimestampFilterStatus();
+        _table->scrollToTop();
+        updateStatus();
+    };
+    auto applyTimestampFrom = [this] {
+        if (!_tsFromEnabled->isChecked()) {
+            const QSignalBlocker blocker(_tsFromEnabled);
+            _tsFromEnabled->setChecked(true);
+        }
+
+        _tsFrom->setEnabled(true);
+        applyFilters();
+        updateTimestampFilterStatus();
+        _table->scrollToTop();
+        updateStatus();
+    };
+    auto applyTimestampTo = [this] {
+        if (!_tsToEnabled->isChecked()) {
+            const QSignalBlocker blocker(_tsToEnabled);
+            _tsToEnabled->setChecked(true);
+        }
+
+        _tsTo->setEnabled(true);
+        applyFilters();
+        updateTimestampFilterStatus();
         _table->scrollToTop();
         updateStatus();
     };
     connect(_tsFromEnabled, &QCheckBox::toggled, this, applyTimestampFilter);
     connect(_tsToEnabled, &QCheckBox::toggled, this, applyTimestampFilter);
-    connect(_tsFrom, &QDateTimeEdit::dateTimeChanged, this, applyTimestampFilter);
-    connect(_tsTo, &QDateTimeEdit::dateTimeChanged, this, applyTimestampFilter);
+    connect(_tsFrom, &QDateTimeEdit::dateTimeChanged, this, applyTimestampFrom);
+    connect(_tsTo, &QDateTimeEdit::dateTimeChanged, this, applyTimestampTo);
     connect(_table->horizontalHeader(), &QHeaderView::sectionResized, this, [this] {
         updateFilterGeometry();
     });
@@ -756,6 +795,33 @@ void MainWindow::applyFilters()
 }
 
 //-------------------------------------------------------------------------------------------------
+void MainWindow::updateTimestampFilterStatus()
+{
+    if (_tsFilterButton == nullptr) {
+        return;
+    }
+
+    const bool hasFrom = _tsFromEnabled->isChecked();
+    const bool hasTo = _tsToEnabled->isChecked();
+    QString text = QStringLiteral("off");
+    QString tooltip = QStringLiteral("Timestamp filter is off");
+
+    if (hasFrom && hasTo) {
+        text = QStringLiteral("range");
+        tooltip = QStringLiteral("ts from %1\nts to %2").arg(_tsFrom->text(), _tsTo->text());
+    } else if (hasFrom) {
+        text = QStringLiteral("from");
+        tooltip = QStringLiteral("ts from %1").arg(_tsFrom->text());
+    } else if (hasTo) {
+        text = QStringLiteral("to");
+        tooltip = QStringLiteral("ts to %1").arg(_tsTo->text());
+    }
+
+    _tsFilterButton->setText(text);
+    _tsFilterButton->setToolTip(tooltip);
+}
+
+//-------------------------------------------------------------------------------------------------
 void MainWindow::updateFilterGeometry()
 {
     if (_filterPanel == nullptr || _table == nullptr || _table->model() == nullptr) {
@@ -798,7 +864,7 @@ void MainWindow::updateFilterGeometry()
     placeFilter(_procNameFilter, QStringLiteral("proc_name"));
     placeFilter(_moduleFilter, QStringLiteral("module"));
     placeFilter(_logNameFilter, QStringLiteral("log_name"));
-    placeFilter(_tsFilterPanel, QStringLiteral("ts"));
+    placeFilter(_tsFilterButton, QStringLiteral("ts"));
     placeFilter(_levelFilter, QStringLiteral("level"));
     placeFilter(_filter, QStringLiteral("msg"));
 }
@@ -851,6 +917,7 @@ void MainWindow::updateTimestampFilterBounds()
     _tsTo->setMaximumDateTime(maxTimestamp);
     _tsFrom->setDateTime(minTimestamp);
     _tsTo->setDateTime(maxTimestamp);
+    updateTimestampFilterStatus();
     applyFilters();
 }
 
