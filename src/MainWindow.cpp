@@ -875,7 +875,7 @@ void MainWindow::updateFilterGeometry()
     placeFilter(_tsFilterButton, QStringLiteral("ts"));
     placeFilter(_levelFilter, QStringLiteral("level"));
     placeFilter(_queryFilter, QStringLiteral("query"));
-    placeFilter(_filter, QStringLiteral("msg"));
+    placeFilter(_filter, QStringLiteral("raw"));
 }
 
 //-------------------------------------------------------------------------------------------------
