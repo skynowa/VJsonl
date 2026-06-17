@@ -22,6 +22,14 @@ class JsonlModel final : public QAbstractTableModel
 
 public:
     using ProgressCallback = std::function<void(qint64 current, qint64 total)>;
+    struct MemoryStats
+    {
+        bool   hasValues {};
+        int    count {};
+        qint64 minKb {};
+        qint64 maxKb {};
+        double averageKb {};
+    };
 
     explicit JsonlModel(QObject *parent = nullptr);
 
@@ -41,6 +49,7 @@ public:
     QString fileName() const;
     int invalidRowsCount() const;
     QMap<QString, int> levelCounts() const;
+    MemoryStats memoryStats() const;
 
 private:
     QVector<JsonlRecord> _records;
@@ -69,5 +78,7 @@ private:
     QString              _fileName;
     int                  _invalidRowsCount {};
     QMap<QString, int>   _levelCounts;
+    MemoryStats          _memoryStats;
+    double               _memoryUsageTotalKb {};
 };
 //-------------------------------------------------------------------------------------------------

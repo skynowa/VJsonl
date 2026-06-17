@@ -90,10 +90,10 @@
   - top `log_name`
   - top `service`
   - top `proc_name`
-- Add memory statistics for `mem_usage_kb`:
-  - min
-  - max
-  - average
+- [+] Add memory statistics for `mem_usage_kb`:
+  - [+] min
+  - [+] max
+  - [+] average
 - Add simple timeline by `ts`.
 - Add error timeline by `ts`.
 

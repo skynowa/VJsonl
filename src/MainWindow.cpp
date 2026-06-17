@@ -1147,6 +1147,7 @@ void MainWindow::updateStatus()
 
     _levelsStatusLabel->setText(levelsHtml.isEmpty() ? QStringLiteral("-") : levelsHtml);
     _levelsStatusLabel->setToolTip(QStringLiteral("levels: %1").arg(levelsText));
+
     _statusLabel->setText(
         QStringLiteral("current: %1 / %2, invalid: %3, file: %4")
             .arg(currentLine)

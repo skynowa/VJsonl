@@ -178,15 +178,30 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
 //-------------------------------------------------------------------------------------------------
 QVariant JsonlModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (role != Qt::DisplayRole) {
+    if (role != Qt::DisplayRole && role != Qt::ToolTipRole) {
         return {};
     }
 
     if (orientation == Qt::Horizontal) {
-        return _columns.value(section);
+        const QString column = _columns.value(section);
+
+        if (role == Qt::ToolTipRole && column == QStringLiteral("mem_usage_kb") && _memoryStats.hasValues) {
+            return QStringLiteral(
+                "<table>"
+                "<tr><td align=\"right\"><b>min</b></td><td>&nbsp;%1</td></tr>"
+                "<tr><td align=\"right\"><b>max</b></td><td>&nbsp;%2</td></tr>"
+                "<tr><td align=\"right\"><b>average</b></td><td>&nbsp;%3</td></tr>"
+                "</table>"
+            )
+                .arg(file_utils::humanFileSize(_memoryStats.minKb * 1024))
+                .arg(file_utils::humanFileSize(_memoryStats.maxKb * 1024))
+                .arg(file_utils::humanFileSize(static_cast<qint64>(_memoryStats.averageKb * 1024.0 + 0.5)));
+        }
+
+        return role == Qt::DisplayRole ? column : QVariant();
     }
 
-    return section + 1;
+    return role == Qt::DisplayRole ? section + 1 : QVariant();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -212,6 +227,8 @@ bool JsonlModel::loadFile(
     _fileName = fileName;
     _invalidRowsCount = 0;
     _levelCounts.clear();
+    _memoryStats = {};
+    _memoryUsageTotalKb = 0.0;
 
     const qint64 totalBytes = file.size();
     qint64 readBytes = 0;
@@ -274,6 +291,24 @@ bool JsonlModel::loadFile(
             if (!level.isEmpty()) {
                 ++_levelCounts[level];
             }
+
+            bool memoryOk = false;
+            const qint64 memoryKb = record.value(QStringLiteral("mem_usage_kb")).trimmed().toLongLong(&memoryOk);
+
+            if (memoryOk && memoryKb >= 0) {
+                if (!_memoryStats.hasValues) {
+                    _memoryStats.minKb = memoryKb;
+                    _memoryStats.maxKb = memoryKb;
+                    _memoryStats.hasValues = true;
+                } else {
+                    _memoryStats.minKb = qMin(_memoryStats.minKb, memoryKb);
+                    _memoryStats.maxKb = qMax(_memoryStats.maxKb, memoryKb);
+                }
+
+                ++_memoryStats.count;
+                _memoryUsageTotalKb += static_cast<double>(memoryKb);
+                _memoryStats.averageKb = _memoryUsageTotalKb / _memoryStats.count;
+            }
         }
 
         _records.push_back(std::move(record));
@@ -313,5 +348,11 @@ int JsonlModel::invalidRowsCount() const
 QMap<QString, int> JsonlModel::levelCounts() const
 {
     return _levelCounts;
+}
+
+//-------------------------------------------------------------------------------------------------
+JsonlModel::MemoryStats JsonlModel::memoryStats() const
+{
+    return _memoryStats;
 }
 //-------------------------------------------------------------------------------------------------
