@@ -205,28 +205,59 @@ MainWindow::MainWindow(QWidget *parent) :
     _cellSearch->setPlaceholderText(QStringLiteral("Find in value..."));
     _cellSearch->setClearButtonEnabled(true);
 
+    auto *activeCellTitle = new QLabel(QStringLiteral("Active Cell"), this);
+    QFont detailsTitleFont = activeCellTitle->font();
+    detailsTitleFont.setBold(true);
+    activeCellTitle->setFont(detailsTitleFont);
+
     auto *cellTools = new QWidget(this);
     auto *cellToolsLayout = new QHBoxLayout(cellTools);
     cellToolsLayout->setContentsMargins(0, 0, 0, 0);
+    cellToolsLayout->addWidget(activeCellTitle);
     cellToolsLayout->addWidget(_format);
     cellToolsLayout->addWidget(_wrapCellLine);
     cellToolsLayout->addWidget(_htmlPreview);
     cellToolsLayout->addWidget(_cellSearch, 1);
     cellToolsLayout->addStretch(1);
     cellTools->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    cellTools->setFixedHeight(cellTools->sizeHint().height());
+    const int detailsToolsHeight = cellTools->sizeHint().height();
+    cellTools->setFixedHeight(detailsToolsHeight);
+
+    auto *activeCellPanel = new QWidget(this);
+    auto *activeCellLayout = new QVBoxLayout(activeCellPanel);
+    activeCellLayout->setContentsMargins(0, 0, 0, 0);
+    activeCellLayout->setSpacing(0);
+    activeCellLayout->addWidget(cellTools, 0);
+    activeCellLayout->addWidget(_cellStack, 1);
+
+    auto *rawCellTitle = new QLabel(QStringLiteral("Raw Cell"), this);
+    rawCellTitle->setFont(detailsTitleFont);
+
+    auto *rawCellTools = new QWidget(this);
+    auto *rawCellToolsLayout = new QHBoxLayout(rawCellTools);
+    rawCellToolsLayout->setContentsMargins(0, 0, 0, 0);
+    rawCellToolsLayout->addWidget(rawCellTitle);
+    rawCellToolsLayout->addStretch(1);
+    rawCellTools->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    rawCellTools->setFixedHeight(detailsToolsHeight);
+
+    auto *rawCellPanel = new QWidget(this);
+    auto *rawCellLayout = new QVBoxLayout(rawCellPanel);
+    rawCellLayout->setContentsMargins(0, 0, 0, 0);
+    rawCellLayout->setSpacing(0);
+    rawCellLayout->addWidget(rawCellTools, 0);
+    rawCellLayout->addWidget(_rawView, 1);
+
+    _detailsSplitter = new QSplitter(Qt::Horizontal, this);
+    _detailsSplitter->addWidget(activeCellPanel);
+    _detailsSplitter->addWidget(rawCellPanel);
+    _detailsSplitter->setStretchFactor(0, 1);
+    _detailsSplitter->setStretchFactor(1, 1);
 
     auto *cellPanel = new QWidget(this);
     auto *cellLayout = new QVBoxLayout(cellPanel);
     cellLayout->setContentsMargins(0, 0, 0, 0);
-    cellLayout->addWidget(cellTools, 0);
-
-    _detailsSplitter = new QSplitter(Qt::Horizontal, this);
-    _detailsSplitter->addWidget(_cellStack);
-    _detailsSplitter->addWidget(_rawView);
-    _detailsSplitter->setStretchFactor(0, 1);
-    _detailsSplitter->setStretchFactor(1, 1);
-
+    cellLayout->setSpacing(0);
     cellLayout->addWidget(_detailsSplitter, 1);
 
     _mainSplitter = new QSplitter(Qt::Vertical, this);
