@@ -6,9 +6,9 @@
 
 #include "JsonlModel.h"
 
-#include "FileUtils.h"
+#include "Utils/File.h"
 #include "LogLevelStyle.h"
-#include "TimestampUtils.h"
+#include "Utils/Timestamp.h"
 
 #include <QBrush>
 #include <QColor>
@@ -135,7 +135,7 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
             const qint64 kb = record.value(column).toLongLong(&ok);
 
             if (ok) {
-                return humanFileSize(kb * 1024);
+                return file_utils::humanFileSize(kb * 1024);
             }
 
             return record.value(column);
@@ -169,7 +169,7 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::DisplayRole && column == QStringLiteral("ts")) {
-        return TimestampUtils::formatTimestamp(record.value(column));
+        return datetime_utils::formatTimestamp(record.value(column));
     }
 
     return record.value(column);

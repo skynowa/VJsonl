@@ -40,8 +40,8 @@ set(VJSON_SOURCES
     src/AppSettings.cpp
     src/BuildInfo.h
     src/BuildInfo.cpp
-    src/DemangleUtils.h
-    src/DemangleUtils.cpp
+    src/Utils/Demangle.h
+    src/Utils/Demangle.cpp
     src/MainWindow.h
     src/MainWindow.cpp
     src/Delegates.h
@@ -50,14 +50,14 @@ set(VJSON_SOURCES
     src/LogFilterProxyModel.cpp
     src/CodeFormatter.h
     src/CodeFormatter.cpp
-    src/FileUtils.h
-    src/FileUtils.cpp
-    src/FilterUtils.h
-    src/FilterUtils.cpp
-    src/HtmlUtils.h
-    src/HtmlUtils.cpp
-    src/IconUtils.h
-    src/IconUtils.cpp
+    src/Utils/File.h
+    src/Utils/File.cpp
+    src/Utils/Filter.h
+    src/Utils/Filter.cpp
+    src/Utils/Html.h
+    src/Utils/Html.cpp
+    src/Utils/Icon.h
+    src/Utils/Icon.cpp
     src/JsonSyntaxHighlighter.h
     src/JsonSyntaxHighlighter.cpp
     src/LogLevelStyle.h
@@ -65,12 +65,12 @@ set(VJSON_SOURCES
     src/JsonlModel.h
     src/JsonlModel.cpp
     src/JsonlRecord.h
-    src/JsonUtils.h
-    src/JsonUtils.cpp
+    src/Utils/Json.h
+    src/Utils/Json.cpp
     src/ThemeManager.h
     src/ThemeManager.cpp
-    src/TimestampUtils.h
-    src/TimestampUtils.cpp
+    src/Utils/Timestamp.h
+    src/Utils/Timestamp.cpp
 )
 
 add_library(VJsonLib STATIC

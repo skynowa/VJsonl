@@ -1,6 +1,6 @@
 /**
- * \file  FileUtils.h
- * \brief Declares file-related display helpers.
+ * \file  Utils/Html.h
+ * \brief Declares HTML detection helpers for preview switching.
  */
 
 
@@ -9,5 +9,8 @@
 #include <QString>
 
 //-------------------------------------------------------------------------------------------------
-QString humanFileSize(qint64 bytes);
+namespace html_utils
+{
+bool looksLikeHtml(const QString &text);
+}
 //-------------------------------------------------------------------------------------------------

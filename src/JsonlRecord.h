@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "JsonUtils.h"
+#include "Utils/Json.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -27,7 +27,7 @@ struct JsonlRecord final
             return {};
         }
 
-        return jsonValueToString(doc.object().value(key));
+        return json_utils::jsonValueToString(doc.object().value(key));
     }
 };
 //-------------------------------------------------------------------------------------------------

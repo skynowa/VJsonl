@@ -1,6 +1,6 @@
 /**
- * \file  HtmlUtils.h
- * \brief Declares HTML detection helpers for preview switching.
+ * \file  Utils/Demangle.h
+ * \brief Declares helpers for demangling C++ symbols in backtraces.
  */
 
 
@@ -9,8 +9,8 @@
 #include <QString>
 
 //-------------------------------------------------------------------------------------------------
-namespace HtmlUtils
+namespace demangle_utils
 {
-bool looksLikeHtml(const QString &text);
+QString demangleSymbols(const QString &text);
 }
 //-------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /**
- * \file  IconUtils.h
+ * \file  Utils/Icon.h
  * \brief Declares shared icon helpers.
  */
 
@@ -9,7 +9,7 @@
 #include <QIcon>
 
 //-------------------------------------------------------------------------------------------------
-namespace IconUtils
+namespace icon_utils
 {
 QIcon calendarIcon();
 }

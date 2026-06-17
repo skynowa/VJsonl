@@ -1,10 +1,10 @@
 /**
- * \file  TimestampUtils.cpp
+ * \file  Utils/Timestamp.cpp
  * \brief Implements timestamp parsing and formatting helpers.
  */
 
 
-#include "TimestampUtils.h"
+#include "Utils/Timestamp.h"
 
 #include <QRegularExpression>
 #include <QStringList>
@@ -48,7 +48,7 @@ int offsetSeconds(const QString &offsetText)
 }
 
 //-------------------------------------------------------------------------------------------------
-namespace TimestampUtils
+namespace datetime_utils
 {
 QDateTime parseTimestamp(const QString &text)
 {

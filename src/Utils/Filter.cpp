@@ -1,16 +1,16 @@
 /**
- * \file  FilterUtils.cpp
+ * \file  Utils/Filter.cpp
  * \brief Implements helpers for table filter widgets.
  */
 
 
-#include "FilterUtils.h"
+#include "Utils/Filter.h"
 
 #include <QAbstractItemModel>
 #include <QComboBox>
 
 //-------------------------------------------------------------------------------------------------
-namespace FilterUtils
+namespace filter_utils
 {
 QString selectedFilterValue(const QComboBox *filter)
 {

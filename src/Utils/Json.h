@@ -1,18 +1,17 @@
 /**
- * \file  TimestampUtils.h
- * \brief Declares timestamp parsing and formatting helpers.
+ * \file  Utils/Json.h
+ * \brief Declares helpers for converting JSON values to display strings.
  */
 
 
 #pragma once
 
-#include <QDateTime>
+#include <QJsonValue>
 #include <QString>
 
 //-------------------------------------------------------------------------------------------------
-namespace TimestampUtils
+namespace json_utils
 {
-QDateTime parseTimestamp(const QString &text);
-QString formatTimestamp(const QString &text);
+QString jsonValueToString(const QJsonValue &value);
 }
 //-------------------------------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 
 #include "LogFilterProxyModel.h"
 
-#include "TimestampUtils.h"
+#include "Utils/Timestamp.h"
 
 #include <QAbstractItemModel>
 
@@ -266,7 +266,7 @@ bool LogFilterProxyModel::timestampMatches(int sourceRow, const QModelIndex &sou
     }
 
     const QModelIndex index = sourceModel()->index(sourceRow, column, sourceParent);
-    const QDateTime timestamp = TimestampUtils::parseTimestamp(sourceModel()->data(index, Qt::ToolTipRole).toString());
+    const QDateTime timestamp = datetime_utils::parseTimestamp(sourceModel()->data(index, Qt::ToolTipRole).toString());
 
     if (!timestamp.isValid()) {
         return false;

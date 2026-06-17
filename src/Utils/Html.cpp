@@ -1,15 +1,15 @@
 /**
- * \file  HtmlUtils.cpp
+ * \file  Utils/Html.cpp
  * \brief Implements HTML detection helpers for cell previews.
  */
 
 
-#include "HtmlUtils.h"
+#include "Utils/Html.h"
 
 #include <QRegularExpression>
 
 //-------------------------------------------------------------------------------------------------
-namespace HtmlUtils
+namespace html_utils
 {
 bool looksLikeHtml(const QString &text)
 {

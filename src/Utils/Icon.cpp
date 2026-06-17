@@ -1,10 +1,10 @@
 /**
- * \file  IconUtils.cpp
+ * \file  Utils/Icon.cpp
  * \brief Implements shared icon helpers.
  */
 
 
-#include "IconUtils.h"
+#include "Utils/Icon.h"
 
 #include <QColor>
 #include <QFont>
@@ -12,7 +12,7 @@
 #include <QPixmap>
 
 //-------------------------------------------------------------------------------------------------
-namespace IconUtils
+namespace icon_utils
 {
 QIcon calendarIcon()
 {

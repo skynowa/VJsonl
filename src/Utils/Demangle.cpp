@@ -1,10 +1,10 @@
 /**
- * \file  DemangleUtils.cpp
+ * \file  Utils/Demangle.cpp
  * \brief Implements helpers for demangling C++ symbols in backtraces.
  */
 
 
-#include "DemangleUtils.h"
+#include "Utils/Demangle.h"
 
 #include <QByteArray>
 #include <QRegularExpression>
@@ -34,6 +34,8 @@ QString demangleSymbol(const QString &symbol)
 }
 
 //-------------------------------------------------------------------------------------------------
+namespace demangle_utils
+{
 QString demangleSymbols(const QString &text)
 {
     static const QRegularExpression mangledSymbol(QStringLiteral(R"(_Z[A-Za-z0-9_]+)"));
@@ -53,5 +55,6 @@ QString demangleSymbols(const QString &text)
 
     result += text.mid(lastEnd);
     return result;
+}
 }
 //-------------------------------------------------------------------------------------------------

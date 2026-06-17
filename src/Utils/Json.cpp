@@ -1,16 +1,18 @@
 /**
- * \file  JsonUtils.cpp
+ * \file  Utils/Json.cpp
  * \brief Implements conversion of JSON values to compact display strings.
  */
 
 
-#include "JsonUtils.h"
+#include "Utils/Json.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
 //-------------------------------------------------------------------------------------------------
+namespace json_utils
+{
 QString jsonValueToString(const QJsonValue &value)
 {
     if (value.isUndefined() || value.isNull()) {
@@ -54,5 +56,6 @@ QString jsonValueToString(const QJsonValue &value)
     }
 
     return {};
+}
 }
 //-------------------------------------------------------------------------------------------------

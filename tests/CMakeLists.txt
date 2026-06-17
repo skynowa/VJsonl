@@ -15,4 +15,4 @@ endfunction()
 
 add_vjson_test(TestJsonlModel TestJsonlModel.cpp)
 add_vjson_test(TestLogFilterProxyModel TestLogFilterProxyModel.cpp)
-add_vjson_test(TestUtils TestUtils.cpp)
+add_vjson_test(TestUtilities TestUtilities.cpp)

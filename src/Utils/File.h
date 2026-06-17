@@ -1,6 +1,6 @@
 /**
- * \file  DemangleUtils.h
- * \brief Declares helpers for demangling C++ symbols in backtraces.
+ * \file  Utils/File.h
+ * \brief Declares file-related display helpers.
  */
 
 
@@ -9,5 +9,8 @@
 #include <QString>
 
 //-------------------------------------------------------------------------------------------------
-QString demangleSymbols(const QString &text);
+namespace file_utils
+{
+QString humanFileSize(qint64 bytes);
+}
 //-------------------------------------------------------------------------------------------------

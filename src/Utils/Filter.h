@@ -1,5 +1,5 @@
 /**
- * \file  FilterUtils.h
+ * \file  Utils/Filter.h
  * \brief Declares helpers for table filter widgets.
  */
 
@@ -12,7 +12,7 @@ class QAbstractItemModel;
 class QComboBox;
 
 //-------------------------------------------------------------------------------------------------
-namespace FilterUtils
+namespace filter_utils
 {
 QString selectedFilterValue(const QComboBox *filter);
 int columnByName(const QAbstractItemModel *model, const QString &name);

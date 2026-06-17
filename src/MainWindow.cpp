@@ -10,16 +10,16 @@
 #include "BuildInfo.h"
 #include "CodeFormatter.h"
 #include "Delegates.h"
-#include "DemangleUtils.h"
-#include "FileUtils.h"
-#include "FilterUtils.h"
-#include "HtmlUtils.h"
-#include "IconUtils.h"
+#include "Utils/Demangle.h"
+#include "Utils/File.h"
+#include "Utils/Filter.h"
+#include "Utils/Html.h"
+#include "Utils/Icon.h"
 #include "JsonSyntaxHighlighter.h"
 #include "LogFilterProxyModel.h"
 #include "LogLevelStyle.h"
 #include "ThemeManager.h"
-#include "TimestampUtils.h"
+#include "Utils/Timestamp.h"
 
 #include <QAbstractItemView>
 #include <QAction>
@@ -122,7 +122,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _tsFilterButton = new QToolButton(this);
     _tsFilterButton->setText(QStringLiteral("off"));
-    _tsFilterButton->setIcon(IconUtils::calendarIcon());
+    _tsFilterButton->setIcon(icon_utils::calendarIcon());
     _tsFilterButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     _tsFilterButton->setPopupMode(QToolButton::InstantPopup);
     _tsFilterButton->setMinimumWidth(0);
@@ -644,11 +644,11 @@ void MainWindow::updateCellView(const QModelIndex &current)
     const auto *record = _model->recordAt(sourceIndex.row());
     const QString columnName = current.model()->headerData(current.column(), Qt::Horizontal, Qt::DisplayRole).toString();
     const QString text = current.data(Qt::DisplayRole).toString();
-    const QString previewText = columnName == QStringLiteral("backtrace") ? demangleSymbols(text) : text;
+    const QString previewText = columnName == QStringLiteral("backtrace") ? demangle_utils::demangleSymbols(text) : text;
     bool canFormat = false;
     const QString formatted = CodeFormatter::formatFragments(previewText, &canFormat);
     const QString displayText = canFormat && _format->isChecked() ? formatted : previewText;
-    const bool canPreviewHtml = HtmlUtils::looksLikeHtml(previewText);
+    const bool canPreviewHtml = html_utils::looksLikeHtml(previewText);
     bool canFormatRaw = false;
     const QString rawText = record != nullptr ? record->raw : QString();
     const QString formattedRaw = CodeFormatter::formatFragments(rawText, &canFormatRaw);
@@ -666,13 +666,13 @@ void MainWindow::updateCellView(const QModelIndex &current)
             : columnName == QStringLiteral("backtrace") ? JsonSyntaxHighlighter::Mode::Backtrace
             : CodeFormatter::looksLikeJson(displayText) ? JsonSyntaxHighlighter::Mode::Json
             : CodeFormatter::looksLikeSql(displayText)  ? JsonSyntaxHighlighter::Mode::Sql
-            : HtmlUtils::looksLikeHtml(displayText)     ? JsonSyntaxHighlighter::Mode::Html
+            : html_utils::looksLikeHtml(displayText)     ? JsonSyntaxHighlighter::Mode::Html
             : CodeFormatter::looksLikeXml(displayText)  ? JsonSyntaxHighlighter::Mode::Xml
                                                         : JsonSyntaxHighlighter::Mode::None;
     const auto rawHighlightMode =
         CodeFormatter::looksLikeJson(_rawView->toPlainText()) ? JsonSyntaxHighlighter::Mode::Json
         : CodeFormatter::looksLikeSql(_rawView->toPlainText())  ? JsonSyntaxHighlighter::Mode::Sql
-        : HtmlUtils::looksLikeHtml(_rawView->toPlainText())     ? JsonSyntaxHighlighter::Mode::Html
+        : html_utils::looksLikeHtml(_rawView->toPlainText())     ? JsonSyntaxHighlighter::Mode::Html
         : CodeFormatter::looksLikeXml(_rawView->toPlainText())  ? JsonSyntaxHighlighter::Mode::Xml
                                                                 : JsonSyntaxHighlighter::Mode::None;
     _cellJsonHighlighter->setMode(cellHighlightMode);
@@ -761,7 +761,7 @@ void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &colum
         return;
     }
 
-    const QString selectedValue = FilterUtils::selectedFilterValue(filter);
+    const QString selectedValue = filter_utils::selectedFilterValue(filter);
     QStringList values;
 
     for (int row = 0; row < _model->rowCount(); ++row) {
@@ -795,12 +795,12 @@ void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &colum
 //-------------------------------------------------------------------------------------------------
 void MainWindow::applyFilters()
 {
-    _proxy->setProjectFilter(FilterUtils::selectedFilterValue(_projectFilter));
-    _proxy->setAppFilter(FilterUtils::selectedFilterValue(_appFilter));
-    _proxy->setProcNameFilter(FilterUtils::selectedFilterValue(_procNameFilter));
-    _proxy->setModuleFilter(FilterUtils::selectedFilterValue(_moduleFilter));
-    _proxy->setLogNameFilter(FilterUtils::selectedFilterValue(_logNameFilter));
-    _proxy->setLevelFilter(FilterUtils::selectedFilterValue(_levelFilter).toLower());
+    _proxy->setProjectFilter(filter_utils::selectedFilterValue(_projectFilter));
+    _proxy->setAppFilter(filter_utils::selectedFilterValue(_appFilter));
+    _proxy->setProcNameFilter(filter_utils::selectedFilterValue(_procNameFilter));
+    _proxy->setModuleFilter(filter_utils::selectedFilterValue(_moduleFilter));
+    _proxy->setLogNameFilter(filter_utils::selectedFilterValue(_logNameFilter));
+    _proxy->setLevelFilter(filter_utils::selectedFilterValue(_levelFilter).toLower());
 
     QDateTime from = _tsFrom->dateTime();
     QDateTime to = _tsTo->dateTime();
@@ -859,7 +859,7 @@ void MainWindow::updateFilterGeometry()
             return;
         }
 
-        const int column = FilterUtils::columnByName(_table->model(), columnName);
+        const int column = filter_utils::columnByName(_table->model(), columnName);
 
         if (column < 0 || _table->isColumnHidden(column)) {
             filter->hide();
@@ -907,7 +907,7 @@ void MainWindow::updateTimestampFilterBounds()
             continue;
         }
 
-        const QDateTime timestamp = TimestampUtils::parseTimestamp(record->value(QStringLiteral("ts")));
+        const QDateTime timestamp = datetime_utils::parseTimestamp(record->value(QStringLiteral("ts")));
 
         if (!timestamp.isValid()) {
             continue;
@@ -1019,7 +1019,7 @@ void MainWindow::updateStatus()
     const QString fileName = _model->fileName();
     const QString fileSize = fileName.isEmpty()
         ? QStringLiteral("-")
-        : humanFileSize(QFileInfo(fileName).size());
+        : file_utils::humanFileSize(QFileInfo(fileName).size());
     const QModelIndex current = _table->currentIndex();
     QString currentLine = QStringLiteral("-");
 
