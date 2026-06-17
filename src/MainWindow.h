@@ -49,6 +49,7 @@ private:
     void onCurrentChanged(const QModelIndex &current);
     void updateCellView(const QModelIndex &current);
     void findInCellView();
+    void findInRawView();
     void addRecentFile(const QString &fileName);
     void loadRecentFiles();
     void updateRecentFilesMenu();
@@ -84,6 +85,7 @@ private:
     QLineEdit             *_filter {};
     QLineEdit             *_msgFilter {};
     QLineEdit             *_cellSearch {};
+    QLineEdit             *_rawSearch {};
     QComboBox             *_projectFilter {};
     QComboBox             *_appFilter {};
     QComboBox             *_procNameFilter {};

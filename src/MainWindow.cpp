@@ -205,6 +205,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _cellSearch->setPlaceholderText(QStringLiteral("Find in value..."));
     _cellSearch->setClearButtonEnabled(true);
 
+    _rawSearch = new QLineEdit(this);
+    _rawSearch->setPlaceholderText(QStringLiteral("Find in raw..."));
+    _rawSearch->setClearButtonEnabled(true);
+
     auto *activeCellTitle = new QLabel(QStringLiteral("Active Cell"), this);
     QFont detailsTitleFont = activeCellTitle->font();
     detailsTitleFont.setBold(true);
@@ -237,6 +241,7 @@ MainWindow::MainWindow(QWidget *parent) :
     auto *rawCellToolsLayout = new QHBoxLayout(rawCellTools);
     rawCellToolsLayout->setContentsMargins(0, 0, 0, 0);
     rawCellToolsLayout->addWidget(rawCellTitle);
+    rawCellToolsLayout->addWidget(_rawSearch, 1);
     rawCellToolsLayout->addStretch(1);
     rawCellTools->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     rawCellTools->setFixedHeight(detailsToolsHeight);
@@ -508,6 +513,10 @@ MainWindow::MainWindow(QWidget *parent) :
         findInCellView();
     });
 
+    connect(_rawSearch, &QLineEdit::textChanged, this, [this] {
+        findInRawView();
+    });
+
     new QShortcut(QKeySequence::Find, this, [this] {
         _filter->setFocus();
         _filter->selectAll();
@@ -709,25 +718,41 @@ void MainWindow::updateCellView(const QModelIndex &current)
     _cellJsonHighlighter->setMode(cellHighlightMode);
     _rawJsonHighlighter->setMode(rawHighlightMode);
     findInCellView();
+    findInRawView();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::findInCellView()
+namespace
 {
-    const QString text = _cellSearch->text();
-    auto *activeTextView = qobject_cast<QTextEdit *>(_cellStack->currentWidget());
-    _cellSearch->setStyleSheet({});
+void findInTextView(QLineEdit *search, QTextEdit *view)
+{
+    const QString text = search->text();
+    search->setStyleSheet({});
 
-    if (text.isEmpty() || activeTextView == nullptr) {
+    if (text.isEmpty() || view == nullptr) {
         return;
     }
 
-    QTextCursor cursor = activeTextView->textCursor();
+    QTextCursor cursor = view->textCursor();
     cursor.movePosition(QTextCursor::Start);
-    activeTextView->setTextCursor(cursor);
+    view->setTextCursor(cursor);
 
-    if (!activeTextView->find(text)) {
-        _cellSearch->setStyleSheet(QStringLiteral("background-color: #ffdede;"));
+    if (!view->find(text)) {
+        search->setStyleSheet(QStringLiteral("background-color: #ffdede;"));
     }
+}
+}
+
+//-------------------------------------------------------------------------------------------------
+void MainWindow::findInCellView()
+{
+    auto *activeTextView = qobject_cast<QTextEdit *>(_cellStack->currentWidget());
+    findInTextView(_cellSearch, activeTextView);
+}
+
+//-------------------------------------------------------------------------------------------------
+void MainWindow::findInRawView()
+{
+    findInTextView(_rawSearch, _rawView);
 }
 //-------------------------------------------------------------------------------------------------
 void MainWindow::addRecentFile(const QString &fileName)
