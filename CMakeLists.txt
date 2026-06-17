@@ -10,10 +10,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Test Widgets)
 
-add_executable(VJson
-    src/main.cpp
+set(VJSON_SOURCES
     src/AppSettings.h
     src/AppSettings.cpp
     src/BuildInfo.h
@@ -51,5 +50,19 @@ add_executable(VJson
     src/TimestampUtils.cpp
 )
 
-target_compile_definitions(VJson PRIVATE VJSON_BUILD_TYPE="$<CONFIG>")
-target_link_libraries(VJson PRIVATE Qt6::Widgets)
+add_library(VJsonLib STATIC
+    ${VJSON_SOURCES}
+)
+
+target_compile_definitions(VJsonLib PRIVATE VJSON_BUILD_TYPE="$<CONFIG>")
+target_include_directories(VJsonLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(VJsonLib PUBLIC Qt6::Widgets)
+
+add_executable(VJson
+    src/main.cpp
+)
+
+target_link_libraries(VJson PRIVATE VJsonLib)
+
+enable_testing()
+add_subdirectory(tests)

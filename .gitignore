@@ -1,6 +1,6 @@
 build/
 build-codex/
+build-tests/
 
 CMakeLists.txt.user
 *.log
-
