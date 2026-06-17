@@ -102,7 +102,9 @@ private:
     QMenu                 *_recentFilesMenu {};
     QAction               *_openOriginalFileAction {};
     QAction               *_lightThemeAction {};
+    QAction               *_lightGrayThemeAction {};
     QAction               *_greyThemeAction {};
+    QAction               *_mediumGrayThemeAction {};
     QAction               *_darkGreyThemeAction {};
     QAction               *_darkThemeAction {};
     QStringList            _recentFiles;

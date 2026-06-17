@@ -322,9 +322,17 @@ MainWindow::MainWindow(QWidget *parent) :
     _lightThemeAction->setCheckable(true);
     themeGroup->addAction(_lightThemeAction);
 
+    _lightGrayThemeAction = themeMenu->addAction(QStringLiteral("LightGray"));
+    _lightGrayThemeAction->setCheckable(true);
+    themeGroup->addAction(_lightGrayThemeAction);
+
     _greyThemeAction = themeMenu->addAction(QStringLiteral("Grey"));
     _greyThemeAction->setCheckable(true);
     themeGroup->addAction(_greyThemeAction);
+
+    _mediumGrayThemeAction = themeMenu->addAction(QStringLiteral("MediumGray"));
+    _mediumGrayThemeAction->setCheckable(true);
+    themeGroup->addAction(_mediumGrayThemeAction);
 
     _darkGreyThemeAction = themeMenu->addAction(QStringLiteral("DarkGrey"));
     _darkGreyThemeAction->setCheckable(true);
@@ -368,10 +376,20 @@ MainWindow::MainWindow(QWidget *parent) :
         QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::Light));
     });
+    connect(_lightGrayThemeAction, &QAction::triggered, this, [this] {
+        ThemeManager::applyTheme(qApp, ThemeManager::Theme::LightGray);
+        QSettings settings(settingsFileName(), QSettings::IniFormat);
+        settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::LightGray));
+    });
     connect(_greyThemeAction, &QAction::triggered, this, [this] {
         ThemeManager::applyTheme(qApp, ThemeManager::Theme::Grey);
         QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::Grey));
+    });
+    connect(_mediumGrayThemeAction, &QAction::triggered, this, [this] {
+        ThemeManager::applyTheme(qApp, ThemeManager::Theme::MediumGray);
+        QSettings settings(settingsFileName(), QSettings::IniFormat);
+        settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::MediumGray));
     });
     connect(_darkGreyThemeAction, &QAction::triggered, this, [this] {
         ThemeManager::applyTheme(qApp, ThemeManager::Theme::DarkGrey);
@@ -529,7 +547,9 @@ MainWindow::MainWindow(QWidget *parent) :
     const auto theme = ThemeManager::themeFromString(settings.value(QStringLiteral("ui/theme"), QStringLiteral("light")).toString());
     ThemeManager::applyTheme(qApp, theme);
     _lightThemeAction->setChecked(theme == ThemeManager::Theme::Light);
+    _lightGrayThemeAction->setChecked(theme == ThemeManager::Theme::LightGray);
     _greyThemeAction->setChecked(theme == ThemeManager::Theme::Grey);
+    _mediumGrayThemeAction->setChecked(theme == ThemeManager::Theme::MediumGray);
     _darkGreyThemeAction->setChecked(theme == ThemeManager::Theme::DarkGrey);
     _darkThemeAction->setChecked(theme == ThemeManager::Theme::Dark);
     restoreGeometry(settings.value(QStringLiteral("window/geometry")).toByteArray());

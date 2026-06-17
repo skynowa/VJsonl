@@ -16,7 +16,9 @@ namespace ThemeManager
 enum class Theme
 {
     Light,
+    LightGray,
     Grey,
+    MediumGray,
     DarkGrey,
     Dark
 };
