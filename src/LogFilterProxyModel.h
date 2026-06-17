@@ -48,6 +48,7 @@ private:
 private:
     QString                _textFilter;
     QString                _msgTextFilter;
+    QString                _queryTextFilter;
     QMap<QString, QString> _columnFilters;
     QDateTime              _timestampFrom;
     QDateTime              _timestampTo;

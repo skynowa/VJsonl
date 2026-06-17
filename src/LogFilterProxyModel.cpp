@@ -77,7 +77,12 @@ void LogFilterProxyModel::setModuleFilter(const QString &module)
 //-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setQueryFilter(const QString &query)
 {
-    setColumnFilter(QStringLiteral("query"), query);
+    if (_queryTextFilter == query) {
+        return;
+    }
+
+    _queryTextFilter = query;
+    invalidateFilter();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -140,6 +145,10 @@ bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
     }
 
     if (!textColumnMatches(sourceRow, sourceParent, QStringLiteral("msg"), _msgTextFilter)) {
+        return false;
+    }
+
+    if (!textColumnMatches(sourceRow, sourceParent, QStringLiteral("query"), _queryTextFilter)) {
         return false;
     }
 

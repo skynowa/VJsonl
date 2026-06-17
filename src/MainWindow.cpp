@@ -115,8 +115,9 @@ MainWindow::MainWindow(QWidget *parent) :
     _logNameFilter->addItem(QStringLiteral("All log names"), QString());
     _logNameFilter->setMinimumWidth(0);
 
-    _queryFilter = new QComboBox(this);
-    _queryFilter->addItem(QStringLiteral("All queries"), QString());
+    _queryFilter = new QLineEdit(this);
+    _queryFilter->setPlaceholderText(QStringLiteral("Filter query..."));
+    _queryFilter->setClearButtonEnabled(true);
     _queryFilter->setMinimumWidth(0);
 
     _tsFilterButton = new QToolButton(this);
@@ -394,7 +395,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_procNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_moduleFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_logNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
-    connect(_queryFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
+    connect(_queryFilter, &QLineEdit::textChanged, this, [this](const QString &text) {
+        _proxy->setQueryFilter(text);
+        _table->scrollToTop();
+        updateStatus();
+    });
     auto applyTimestampFilter = [this] {
         _tsFrom->setEnabled(_tsFromEnabled->isChecked());
         _tsTo->setEnabled(_tsToEnabled->isChecked());
@@ -580,7 +585,6 @@ void MainWindow::openFile(const QString &fileName)
     updateColumnFilterItems(_appFilter, QStringLiteral("app"), QStringLiteral("All apps"));
     updateColumnFilterItems(_procNameFilter, QStringLiteral("proc_name"), QStringLiteral("All proc names"));
     updateColumnFilterItems(_moduleFilter, QStringLiteral("module"), QStringLiteral("All modules"));
-    updateColumnFilterItems(_queryFilter, QStringLiteral("query"), QStringLiteral("All queries"));
     updateTimestampFilterBounds();
     _table->sortByColumn(-1, Qt::AscendingOrder);
     _table->resizeColumnsToContents();
@@ -796,7 +800,6 @@ void MainWindow::applyFilters()
     _proxy->setProcNameFilter(FilterUtils::selectedFilterValue(_procNameFilter));
     _proxy->setModuleFilter(FilterUtils::selectedFilterValue(_moduleFilter));
     _proxy->setLogNameFilter(FilterUtils::selectedFilterValue(_logNameFilter));
-    _proxy->setQueryFilter(FilterUtils::selectedFilterValue(_queryFilter));
     _proxy->setLevelFilter(FilterUtils::selectedFilterValue(_levelFilter).toLower());
 
     QDateTime from = _tsFrom->dateTime();
