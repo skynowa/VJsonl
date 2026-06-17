@@ -45,6 +45,8 @@ add_executable(VJson
     src/JsonUtils.cpp
     src/ThemeManager.h
     src/ThemeManager.cpp
+    src/TimestampUtils.h
+    src/TimestampUtils.cpp
 )
 
 target_compile_definitions(VJson PRIVATE VJSON_BUILD_TYPE="$<CONFIG>")

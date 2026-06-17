@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <QDateTime>
 #include <QMap>
 #include <QSortFilterProxyModel>
 #include <QString>
@@ -23,6 +24,12 @@ public:
     void setAppFilter(const QString &app);
     void setProcNameFilter(const QString &procName);
     void setModuleFilter(const QString &module);
+    void setTimestampRange(
+        const QDateTime &from,
+        bool hasFrom,
+        const QDateTime &to,
+        bool hasTo
+    );
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
@@ -33,9 +40,14 @@ private:
     QString columnName(int column) const;
     int columnByName(const QString &name) const;
     bool columnMatches(int sourceRow, const QModelIndex &sourceParent, const QString &columnName, const QString &value) const;
+    bool timestampMatches(int sourceRow, const QModelIndex &sourceParent) const;
 
 private:
     QString                _textFilter;
     QMap<QString, QString> _columnFilters;
+    QDateTime              _timestampFrom;
+    QDateTime              _timestampTo;
+    bool                   _hasTimestampFrom {};
+    bool                   _hasTimestampTo {};
 };
 //-------------------------------------------------------------------------------------------------

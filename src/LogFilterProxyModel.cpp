@@ -6,6 +6,8 @@
 
 #include "LogFilterProxyModel.h"
 
+#include "TimestampUtils.h"
+
 #include <QAbstractItemModel>
 
 //-------------------------------------------------------------------------------------------------
@@ -62,6 +64,31 @@ void LogFilterProxyModel::setModuleFilter(const QString &module)
 }
 
 //-------------------------------------------------------------------------------------------------
+void LogFilterProxyModel::setTimestampRange(
+    const QDateTime &from,
+    bool hasFrom,
+    const QDateTime &to,
+    bool hasTo
+)
+{
+    const bool changed =
+        _hasTimestampFrom != hasFrom
+        || _hasTimestampTo != hasTo
+        || _timestampFrom != from
+        || _timestampTo != to;
+
+    if (!changed) {
+        return;
+    }
+
+    _timestampFrom = from;
+    _timestampTo = to;
+    _hasTimestampFrom = hasFrom;
+    _hasTimestampTo = hasTo;
+    invalidateFilter();
+}
+
+//-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setColumnFilter(const QString &columnName, const QString &value)
 {
     const QString normalizedValue = value.trimmed();
@@ -89,6 +116,10 @@ bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
         if (!columnMatches(sourceRow, sourceParent, it.key(), it.value())) {
             return false;
         }
+    }
+
+    if (!timestampMatches(sourceRow, sourceParent)) {
+        return false;
     }
 
     if (_textFilter.isEmpty()) {
@@ -166,5 +197,35 @@ bool LogFilterProxyModel::columnMatches(
     const QModelIndex index = sourceModel()->index(sourceRow, column, sourceParent);
     const QString text = sourceModel()->data(index, Qt::DisplayRole).toString();
     return text.compare(value, Qt::CaseInsensitive) == 0;
+}
+//-------------------------------------------------------------------------------------------------
+bool LogFilterProxyModel::timestampMatches(int sourceRow, const QModelIndex &sourceParent) const
+{
+    if (!_hasTimestampFrom && !_hasTimestampTo) {
+        return true;
+    }
+
+    const int column = columnByName(QStringLiteral("ts"));
+
+    if (column < 0) {
+        return false;
+    }
+
+    const QModelIndex index = sourceModel()->index(sourceRow, column, sourceParent);
+    const QDateTime timestamp = TimestampUtils::parseTimestamp(sourceModel()->data(index, Qt::ToolTipRole).toString());
+
+    if (!timestamp.isValid()) {
+        return false;
+    }
+
+    if (_hasTimestampFrom && timestamp < _timestampFrom) {
+        return false;
+    }
+
+    if (_hasTimestampTo && timestamp > _timestampTo) {
+        return false;
+    }
+
+    return true;
 }
 //-------------------------------------------------------------------------------------------------

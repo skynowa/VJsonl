@@ -8,6 +8,7 @@
 
 #include "FileUtils.h"
 #include "LogLevelStyle.h"
+#include "TimestampUtils.h"
 
 #include <QBrush>
 #include <QColor>
@@ -17,53 +18,12 @@
 #include <QPainter>
 #include <QPen>
 #include <QPixmap>
-#include <QRegularExpression>
 
 #include <utility>
 
 //-------------------------------------------------------------------------------------------------
 namespace
 {
-
-QString formatTimestamp(const QString &text)
-{
-    static const QStringList months {
-        QStringLiteral("jan"),
-        QStringLiteral("feb"),
-        QStringLiteral("mar"),
-        QStringLiteral("apr"),
-        QStringLiteral("may"),
-        QStringLiteral("jun"),
-        QStringLiteral("jul"),
-        QStringLiteral("aug"),
-        QStringLiteral("sep"),
-        QStringLiteral("oct"),
-        QStringLiteral("nov"),
-        QStringLiteral("dec")
-    };
-    static const QRegularExpression timestampPattern(
-        QStringLiteral(R"(^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2}:\d{2})(?:\.(\d+))?(?:Z|[+-]\d{2}:?\d{2})?\)?$)")
-    );
-
-    const QRegularExpressionMatch match = timestampPattern.match(text.trimmed());
-
-    if (!match.hasMatch()) {
-        return text;
-    }
-
-    bool ok = false;
-    const int month = match.captured(2).toInt(&ok);
-
-    if (!ok || month < 1 || month > months.size()) {
-        return text;
-    }
-
-    const QString milliseconds = match.captured(5).leftJustified(3, QLatin1Char('0')).left(3);
-
-    return QStringLiteral("%1-%2-%3 %4.%5")
-        .arg(match.captured(1), months.at(month - 1), match.captured(3), match.captured(4), milliseconds);
-}
-
 QIcon invalidRowIcon()
 {
     static const QIcon icon = [] {
@@ -209,7 +169,7 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
     }
 
     if (role == Qt::DisplayRole && column == QStringLiteral("ts")) {
-        return formatTimestamp(record.value(column));
+        return TimestampUtils::formatTimestamp(record.value(column));
     }
 
     return record.value(column);
