@@ -79,6 +79,11 @@ MainWindow::MainWindow(QWidget *parent) :
     _filter->setClearButtonEnabled(true);
     _filter->setMinimumWidth(0);
 
+    _msgFilter = new QLineEdit(this);
+    _msgFilter->setPlaceholderText(QStringLiteral("Filter msg..."));
+    _msgFilter->setClearButtonEnabled(true);
+    _msgFilter->setMinimumWidth(0);
+
     _projectFilter = new QComboBox(this);
     _projectFilter->addItem(QStringLiteral("All projects"), QString());
     _projectFilter->setMinimumWidth(0);
@@ -243,6 +248,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _tsFilterButton->setParent(_filterPanel);
     _levelFilter->setParent(_filterPanel);
     _queryFilter->setParent(_filterPanel);
+    _msgFilter->setParent(_filterPanel);
     _filter->setParent(_filterPanel);
 
     layout->addWidget(_filterPanel);
@@ -365,6 +371,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(_filter, &QLineEdit::textChanged, this, [this](const QString &text) {
         _proxy->setTextFilter(text);
+        updateStatus();
+    });
+
+    connect(_msgFilter, &QLineEdit::textChanged, this, [this](const QString &text) {
+        _proxy->setMsgTextFilter(text);
+        _table->scrollToTop();
         updateStatus();
     });
 
@@ -874,6 +886,7 @@ void MainWindow::updateFilterGeometry()
     placeFilter(_logNameFilter, QStringLiteral("log_name"));
     placeFilter(_tsFilterButton, QStringLiteral("ts"));
     placeFilter(_levelFilter, QStringLiteral("level"));
+    placeFilter(_msgFilter, QStringLiteral("msg"));
     placeFilter(_queryFilter, QStringLiteral("query"));
     placeFilter(_filter, QStringLiteral("raw"));
 }

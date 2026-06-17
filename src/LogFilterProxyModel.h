@@ -18,6 +18,7 @@ public:
     explicit LogFilterProxyModel(QObject *parent = nullptr);
 
     void setTextFilter(const QString &text);
+    void setMsgTextFilter(const QString &text);
     void setLevelFilter(const QString &level);
     void setLogNameFilter(const QString &logName);
     void setProjectFilter(const QString &project);
@@ -41,10 +42,12 @@ private:
     QString columnName(int column) const;
     int columnByName(const QString &name) const;
     bool columnMatches(int sourceRow, const QModelIndex &sourceParent, const QString &columnName, const QString &value) const;
+    bool textColumnMatches(int sourceRow, const QModelIndex &sourceParent, const QString &columnName, const QString &text) const;
     bool timestampMatches(int sourceRow, const QModelIndex &sourceParent) const;
 
 private:
     QString                _textFilter;
+    QString                _msgTextFilter;
     QMap<QString, QString> _columnFilters;
     QDateTime              _timestampFrom;
     QDateTime              _timestampTo;

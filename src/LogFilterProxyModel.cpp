@@ -28,6 +28,17 @@ void LogFilterProxyModel::setTextFilter(const QString &text)
 }
 
 //-------------------------------------------------------------------------------------------------
+void LogFilterProxyModel::setMsgTextFilter(const QString &text)
+{
+    if (_msgTextFilter == text) {
+        return;
+    }
+
+    _msgTextFilter = text;
+    invalidateFilter();
+}
+
+//-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setLevelFilter(const QString &level)
 {
     setColumnFilter(QStringLiteral("level"), level);
@@ -128,6 +139,10 @@ bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
         return false;
     }
 
+    if (!textColumnMatches(sourceRow, sourceParent, QStringLiteral("msg"), _msgTextFilter)) {
+        return false;
+    }
+
     if (_textFilter.isEmpty()) {
         return true;
     }
@@ -204,6 +219,30 @@ bool LogFilterProxyModel::columnMatches(
     const QString text = sourceModel()->data(index, Qt::DisplayRole).toString();
     return text.compare(value, Qt::CaseInsensitive) == 0;
 }
+
+//-------------------------------------------------------------------------------------------------
+bool LogFilterProxyModel::textColumnMatches(
+    int sourceRow,
+    const QModelIndex &sourceParent,
+    const QString &columnName,
+    const QString &text
+) const
+{
+    if (text.isEmpty()) {
+        return true;
+    }
+
+    const int column = columnByName(columnName);
+
+    if (column < 0) {
+        return false;
+    }
+
+    const QModelIndex index = sourceModel()->index(sourceRow, column, sourceParent);
+    const QString value = sourceModel()->data(index, Qt::DisplayRole).toString();
+    return value.contains(text, Qt::CaseInsensitive);
+}
+
 //-------------------------------------------------------------------------------------------------
 bool LogFilterProxyModel::timestampMatches(int sourceRow, const QModelIndex &sourceParent) const
 {

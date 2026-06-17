@@ -82,6 +82,7 @@ private:
     QCheckBox             *_wrapCellLine {};
     QCheckBox             *_htmlPreview {};
     QLineEdit             *_filter {};
+    QLineEdit             *_msgFilter {};
     QLineEdit             *_cellSearch {};
     QComboBox             *_projectFilter {};
     QComboBox             *_appFilter {};
