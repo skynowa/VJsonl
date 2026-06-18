@@ -59,7 +59,8 @@ private:
     void addRecentFile(const QString &fileName);
     void loadRecentFiles();
     void updateRecentFilesMenu();
-    void updateColumnFilterItems(QComboBox *filter, const QString &columnName, const QString &allLabel);
+    void updateColumnFilterItems(QComboBox *filter, const QString &columnName,
+            const QString &allLabel);
     QString openDirectory() const;
     void saveOpenDirectory(const QString &fileName) const;
     void saveColumnWidths() const;

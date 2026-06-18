@@ -9,9 +9,9 @@
 #include <QRegularExpression>
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>
-
 //-------------------------------------------------------------------------------------------------
-class JsonSyntaxHighlighter final : public QSyntaxHighlighter
+class JsonSyntaxHighlighter final :
+    public QSyntaxHighlighter
 {
 public:
     enum class Mode

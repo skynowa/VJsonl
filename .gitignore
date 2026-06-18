@@ -4,3 +4,4 @@ build-tests/
 
 CMakeLists.txt.user
 *.log
+*.autosave

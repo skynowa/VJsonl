@@ -14,14 +14,15 @@
 #include <QVector>
 
 #include <functional>
-
 //-------------------------------------------------------------------------------------------------
-class JsonlModel final : public QAbstractTableModel
+class JsonlModel final :
+    public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
     using ProgressCallback = std::function<void(qint64 current, qint64 total)>;
+
     struct MemoryStats
     {
         bool   hasValues {};
@@ -33,23 +34,21 @@ public:
 
     explicit JsonlModel(QObject *parent = nullptr);
 
-    int rowCount(const QModelIndex &parent = {}) const override;
-    int columnCount(const QModelIndex &parent = {}) const override;
+    int      rowCount(const QModelIndex &parent = {}) const override;
+    int      columnCount(const QModelIndex &parent = {}) const override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole)
+                const override;
 
-    bool loadFile(
-        const QString &fileName,
-        QString *outError = nullptr,
-        const ProgressCallback &progressCallback = {}
-    );
+    bool     loadFile(const QString &fileName, QString *outError = nullptr,
+                const ProgressCallback &progressCallback = {});
 
     const JsonlRecord *recordAt(int row) const;
-    QString fileName() const;
-    int invalidRowsCount() const;
+    QString            fileName() const;
+    int                invalidRowsCount() const;
     QMap<QString, int> levelCounts() const;
-    MemoryStats memoryStats() const;
+    MemoryStats        memoryStats() const;
 
 private:
     QVector<JsonlRecord> _records;

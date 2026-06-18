@@ -10,7 +10,6 @@
 #include <QMap>
 #include <QSortFilterProxyModel>
 #include <QString>
-
 //-------------------------------------------------------------------------------------------------
 class LogFilterProxyModel final : public QSortFilterProxyModel
 {
@@ -26,12 +25,7 @@ public:
     void setProcNameFilter(const QString &procName);
     void setModuleFilter(const QString &module);
     void setQueryFilter(const QString &query);
-    void setTimestampRange(
-        const QDateTime &from,
-        bool hasFrom,
-        const QDateTime &to,
-        bool hasTo
-    );
+    void setTimestampRange(const QDateTime &from, bool hasFrom, const QDateTime &to, bool hasTo);
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
@@ -40,9 +34,11 @@ protected:
 private:
     void setColumnFilter(const QString &columnName, const QString &value);
     QString columnName(int column) const;
-    int columnByName(const QString &name) const;
-    bool columnMatches(int sourceRow, const QModelIndex &sourceParent, const QString &columnName, const QString &value) const;
-    bool textColumnMatches(int sourceRow, const QModelIndex &sourceParent, const QString &columnName, const QString &text) const;
+    int  columnByName(const QString &name) const;
+    bool columnMatches(int sourceRow, const QModelIndex &sourceParent, const QString &columnName,
+            const QString &value) const;
+    bool textColumnMatches(int sourceRow, const QModelIndex &sourceParent, const
+            QString &columnName, const QString &text) const;
     bool timestampMatches(int sourceRow, const QModelIndex &sourceParent) const;
 
 private:

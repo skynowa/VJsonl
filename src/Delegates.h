@@ -10,14 +10,15 @@
 
 //-------------------------------------------------------------------------------------------------
 class QTableView;
-
 //-------------------------------------------------------------------------------------------------
-class ActiveCellDelegate final : public QStyledItemDelegate
+class ActiveCellDelegate final :
+    public QStyledItemDelegate
 {
 public:
     explicit ActiveCellDelegate(QTableView *table, QObject *parent = nullptr);
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)
+            const override;
 
 protected:
     void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;

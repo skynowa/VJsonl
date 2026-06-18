@@ -8,12 +8,13 @@
 
 #include <QIcon>
 #include <QString>
-
 //-------------------------------------------------------------------------------------------------
 namespace LogLevelStyle
 {
-QIcon iconForLevel(const QString &level);
+
+QIcon   iconForLevel(const QString &level);
 QString iconHtmlForLevel(const QString &level);
 QString levelCounterHtml(const QString &level, int count);
+
 }
 //-------------------------------------------------------------------------------------------------
