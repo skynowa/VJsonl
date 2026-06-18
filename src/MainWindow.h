@@ -51,6 +51,8 @@ private:
     void updateCellView(const QModelIndex &current);
     void copyActiveCellValue();
     void copyFormattedCellValue();
+    void copyRawCellValue();
+    void copyFormattedRawCellValue();
     void findInTextView(QLineEdit *search, QTextEdit *view);
     void findInCellView();
     void findInRawView();
@@ -97,6 +99,8 @@ private:
     QLineEdit             *_rawSearch {};
     QToolButton           *_copyValueButton {};
     QToolButton           *_copyFormattedValueButton {};
+    QToolButton           *_copyRawValueButton {};
+    QToolButton           *_copyFormattedRawValueButton {};
     QComboBox             *_projectFilter {};
     QComboBox             *_appFilter {};
     QComboBox             *_procNameFilter {};
@@ -121,6 +125,8 @@ private:
     QStringList            _recentFiles;
     QString                _activeCellValue;
     QString                _formattedCellValue;
+    QString                _rawCellValue;
+    QString                _formattedRawCellValue;
     QLabel                *_levelsStatusLabel {};
     QLabel                *_statusLabel {};
     QProgressBar          *_loadProgress {};

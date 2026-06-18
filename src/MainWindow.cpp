@@ -223,6 +223,16 @@ MainWindow::MainWindow(QWidget *parent) :
     _copyFormattedValueButton->setToolTip(QStringLiteral("Copy formatted value"));
     _copyFormattedValueButton->setEnabled(false);
 
+    _copyRawValueButton = new QToolButton(this);
+    _copyRawValueButton->setIcon(icon_utils::copyIcon());
+    _copyRawValueButton->setToolTip(QStringLiteral("Copy value"));
+    _copyRawValueButton->setEnabled(false);
+
+    _copyFormattedRawValueButton = new QToolButton(this);
+    _copyFormattedRawValueButton->setIcon(icon_utils::copyFormattedIcon());
+    _copyFormattedRawValueButton->setToolTip(QStringLiteral("Copy formatted value"));
+    _copyFormattedRawValueButton->setEnabled(false);
+
     auto *activeCellTitle = new QLabel(QStringLiteral("Active Cell"), this);
     QFont detailsTitleFont = activeCellTitle->font();
     detailsTitleFont.setBold(true);
@@ -258,6 +268,8 @@ MainWindow::MainWindow(QWidget *parent) :
     rawCellToolsLayout->setContentsMargins(0, 0, 0, 0);
     rawCellToolsLayout->addWidget(rawCellTitle);
     rawCellToolsLayout->addWidget(_rawSearch, 1);
+    rawCellToolsLayout->addWidget(_copyRawValueButton);
+    rawCellToolsLayout->addWidget(_copyFormattedRawValueButton);
     rawCellToolsLayout->addStretch(1);
     rawCellTools->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     rawCellTools->setFixedHeight(detailsToolsHeight);
@@ -559,6 +571,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(_copyValueButton, &QToolButton::clicked, this, &MainWindow::copyActiveCellValue);
     connect(_copyFormattedValueButton, &QToolButton::clicked, this, &MainWindow::copyFormattedCellValue);
+    connect(_copyRawValueButton, &QToolButton::clicked, this, &MainWindow::copyRawCellValue);
+    connect(_copyFormattedRawValueButton, &QToolButton::clicked, this, &MainWindow::copyFormattedRawCellValue);
 
     new QShortcut(QKeySequence::Find, this, [this] {
         _filter->setFocus();
@@ -709,6 +723,8 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
     if (!current.isValid()) {
         _activeCellValue.clear();
         _formattedCellValue.clear();
+        _rawCellValue.clear();
+        _formattedRawCellValue.clear();
         _cellView->clear();
         _rawView->clear();
         _cellJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
@@ -718,6 +734,8 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
         _htmlPreview->setEnabled(false);
         _copyValueButton->setEnabled(false);
         _copyFormattedValueButton->setEnabled(false);
+        _copyRawValueButton->setEnabled(false);
+        _copyFormattedRawValueButton->setEnabled(false);
         updateStatus();
         return;
     }
@@ -731,6 +749,8 @@ void MainWindow::updateCellView(const QModelIndex &current)
     if (!current.isValid()) {
         _activeCellValue.clear();
         _formattedCellValue.clear();
+        _rawCellValue.clear();
+        _formattedRawCellValue.clear();
         _cellView->clear();
         _rawView->clear();
         _cellJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
@@ -740,6 +760,8 @@ void MainWindow::updateCellView(const QModelIndex &current)
         _htmlPreview->setEnabled(false);
         _copyValueButton->setEnabled(false);
         _copyFormattedValueButton->setEnabled(false);
+        _copyRawValueButton->setEnabled(false);
+        _copyFormattedRawValueButton->setEnabled(false);
         return;
     }
 
@@ -757,11 +779,15 @@ void MainWindow::updateCellView(const QModelIndex &current)
     bool canFormatRaw = false;
     const QString rawText = record != nullptr ? record->raw : QString();
     const QString formattedRaw = CodeFormatter::formatFragments(rawText, &canFormatRaw);
+    _rawCellValue = rawText;
+    _formattedRawCellValue = canFormatRaw ? formattedRaw : QString();
 
     _format->setEnabled(canFormat);
     _htmlPreview->setEnabled(canPreviewHtml);
     _copyValueButton->setEnabled(true);
     _copyFormattedValueButton->setEnabled(canFormat);
+    _copyRawValueButton->setEnabled(record != nullptr);
+    _copyFormattedRawValueButton->setEnabled(canFormatRaw);
 
     _cellView->setPlainText(displayText);
     _htmlPreviewView->setHtml(previewText);
@@ -796,6 +822,16 @@ void MainWindow::copyActiveCellValue()
 void MainWindow::copyFormattedCellValue()
 {
     QApplication::clipboard()->setText(_formattedCellValue);
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::copyRawCellValue()
+{
+    QApplication::clipboard()->setText(_rawCellValue);
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::copyFormattedRawCellValue()
+{
+    QApplication::clipboard()->setText(_formattedRawCellValue);
 }
 //-------------------------------------------------------------------------------------------------
 void MainWindow::findInTextView(QLineEdit *search, QTextEdit *view)
