@@ -41,7 +41,7 @@
 
 ## Value Panel
 
-- Add `Copy value` button.
+- [+] Add `Copy value` button.
 - Add `Copy formatted value` button.
 - Add `Save value to file`.
 - Add `Raw / Formatted / Preview` mode selector.

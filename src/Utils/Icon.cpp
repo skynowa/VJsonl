@@ -38,5 +38,21 @@ QIcon calendarIcon()
 
     return QIcon(pixmap);
 }
+
+//-------------------------------------------------------------------------------------------------
+QIcon copyIcon()
+{
+    QPixmap pixmap(16, 16);
+    pixmap.fill(Qt::transparent);
+
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing, false);
+    painter.setPen(QPen(QColor(90, 90, 90), 1));
+    painter.setBrush(QColor(245, 245, 245));
+    painter.drawRect(QRect(5, 2, 8, 10));
+    painter.drawRect(QRect(2, 5, 8, 9));
+
+    return QIcon(pixmap);
+}
 }
 //-------------------------------------------------------------------------------------------------

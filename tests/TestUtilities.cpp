@@ -8,6 +8,7 @@
 #include "Utils/Demangle.h"
 #include "Utils/File.h"
 #include "Utils/Html.h"
+#include "Utils/Icon.h"
 #include "Utils/Json.h"
 #include "Utils/Timestamp.h"
 
@@ -68,6 +69,12 @@ private slots:
 
         QVERIFY(demangled.contains(QStringLiteral("foo")));
         QVERIFY(demangled.contains(QStringLiteral("int")));
+    }
+
+    void createsIcons()
+    {
+        QVERIFY(!icon_utils::calendarIcon().isNull());
+        QVERIFY(!icon_utils::copyIcon().isNull());
     }
 };
 

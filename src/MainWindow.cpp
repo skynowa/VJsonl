@@ -27,6 +27,7 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QCloseEvent>
+#include <QClipboard>
 #include <QComboBox>
 #include <QDateTime>
 #include <QDateTimeEdit>
@@ -209,6 +210,11 @@ MainWindow::MainWindow(QWidget *parent) :
     _rawSearch->setPlaceholderText(QStringLiteral("Find in raw..."));
     _rawSearch->setClearButtonEnabled(true);
 
+    _copyValueButton = new QToolButton(this);
+    _copyValueButton->setIcon(icon_utils::copyIcon());
+    _copyValueButton->setToolTip(QStringLiteral("Copy value"));
+    _copyValueButton->setEnabled(false);
+
     auto *activeCellTitle = new QLabel(QStringLiteral("Active Cell"), this);
     QFont detailsTitleFont = activeCellTitle->font();
     detailsTitleFont.setBold(true);
@@ -222,6 +228,7 @@ MainWindow::MainWindow(QWidget *parent) :
     cellToolsLayout->addWidget(_wrapCellLine);
     cellToolsLayout->addWidget(_htmlPreview);
     cellToolsLayout->addWidget(_cellSearch, 1);
+    cellToolsLayout->addWidget(_copyValueButton);
     cellToolsLayout->addStretch(1);
     cellTools->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     const int detailsToolsHeight = cellTools->sizeHint().height();
@@ -535,6 +542,8 @@ MainWindow::MainWindow(QWidget *parent) :
         findInRawView();
     });
 
+    connect(_copyValueButton, &QToolButton::clicked, this, &MainWindow::copyActiveCellValue);
+
     new QShortcut(QKeySequence::Find, this, [this] {
         _filter->setFocus();
         _filter->selectAll();
@@ -672,6 +681,7 @@ void MainWindow::openFile(const QString &fileName)
 void MainWindow::onCurrentChanged(const QModelIndex &current)
 {
     if (!current.isValid()) {
+        _activeCellValue.clear();
         _cellView->clear();
         _rawView->clear();
         _cellJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
@@ -679,6 +689,7 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
         _htmlPreviewView->clear();
         _format->setEnabled(false);
         _htmlPreview->setEnabled(false);
+        _copyValueButton->setEnabled(false);
         updateStatus();
         return;
     }
@@ -690,6 +701,7 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
 void MainWindow::updateCellView(const QModelIndex &current)
 {
     if (!current.isValid()) {
+        _activeCellValue.clear();
         _cellView->clear();
         _rawView->clear();
         _cellJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
@@ -697,6 +709,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
         _htmlPreviewView->clear();
         _format->setEnabled(false);
         _htmlPreview->setEnabled(false);
+        _copyValueButton->setEnabled(false);
         return;
     }
 
@@ -704,6 +717,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
     const auto *record = _model->recordAt(sourceIndex.row());
     const QString columnName = current.model()->headerData(current.column(), Qt::Horizontal, Qt::DisplayRole).toString();
     const QString text = current.data(Qt::DisplayRole).toString();
+    _activeCellValue = text;
     const QString previewText = columnName == QStringLiteral("backtrace") ? demangle_utils::demangleSymbols(text) : text;
     bool canFormat = false;
     const QString formatted = CodeFormatter::formatFragments(previewText, &canFormat);
@@ -715,6 +729,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
 
     _format->setEnabled(canFormat);
     _htmlPreview->setEnabled(canPreviewHtml);
+    _copyValueButton->setEnabled(true);
 
     _cellView->setPlainText(displayText);
     _htmlPreviewView->setHtml(previewText);
@@ -739,6 +754,11 @@ void MainWindow::updateCellView(const QModelIndex &current)
     _rawJsonHighlighter->setMode(rawHighlightMode);
     findInCellView();
     findInRawView();
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::copyActiveCellValue()
+{
+    QApplication::clipboard()->setText(_activeCellValue);
 }
 //-------------------------------------------------------------------------------------------------
 namespace
