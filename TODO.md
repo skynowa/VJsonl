@@ -94,8 +94,8 @@
   - [+] min
   - [+] max
   - [+] average
-- Add simple timeline by `ts`.
-- Add error timeline by `ts`.
+- [?] Add simple timeline by `ts`.
+- [?] Add error timeline by `ts`.
 
 ## Performance
 
