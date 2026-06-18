@@ -61,6 +61,8 @@ private:
     void saveOpenDirectory(const QString &fileName) const;
     void saveColumnWidths() const;
     void restoreColumnWidths();
+    void saveColumnOrder() const;
+    void restoreColumnOrder();
     void savePanelLayout() const;
     void restorePanelLayout();
     void applyFilters();

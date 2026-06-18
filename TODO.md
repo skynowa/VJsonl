@@ -54,7 +54,7 @@
 ## Table
 
 - Auto-detect JSON keys and add them as columns.
-- Allow custom column order.
+- [+] Allow custom column order.
 - [+] Save column widths.
 - Save visible/hidden column state.
 - Add pinned/frozen columns for `line`, `level`, and `msg`.

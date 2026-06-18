@@ -10,12 +10,16 @@
 #include "Utils/Html.h"
 #include "Utils/Icon.h"
 #include "Utils/Json.h"
+#include "Utils/TableHeader.h"
 #include "Utils/TextSearch.h"
 #include "Utils/Timestamp.h"
 
+#include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QStandardItemModel>
 #include <QTest>
+#include <QTableView>
 #include <QTextEdit>
 
 //-------------------------------------------------------------------------------------------------
@@ -94,6 +98,31 @@ private slots:
 
         QCOMPARE(text_search_utils::highlightAll(&view, QString()), 0);
         QCOMPARE(text_search_utils::highlightAll(nullptr, QStringLiteral("error")), 0);
+    }
+
+    void savesAndRestoresTableColumnOrder()
+    {
+        QStandardItemModel model(0, 3);
+        model.setHorizontalHeaderLabels({QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")});
+
+        QTableView table;
+        table.setModel(&model);
+        table.horizontalHeader()->moveSection(2, 0);
+
+        QCOMPARE(
+            table_header_utils::columnOrder(table.horizontalHeader(), &model),
+            QStringList({QStringLiteral("c"), QStringLiteral("a"), QStringLiteral("b")})
+        );
+
+        table_header_utils::restoreColumnOrder(
+            table.horizontalHeader(),
+            &model,
+            {QStringLiteral("b"), QStringLiteral("c"), QStringLiteral("a")}
+        );
+        QCOMPARE(
+            table_header_utils::columnOrder(table.horizontalHeader(), &model),
+            QStringList({QStringLiteral("b"), QStringLiteral("c"), QStringLiteral("a")})
+        );
     }
 };
 

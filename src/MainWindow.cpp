@@ -19,6 +19,7 @@
 #include "LogFilterProxyModel.h"
 #include "LogLevelStyle.h"
 #include "ThemeManager.h"
+#include "Utils/TableHeader.h"
 #include "Utils/TextSearch.h"
 #include "Utils/Timestamp.h"
 
@@ -163,6 +164,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _table->setAlternatingRowColors(true);
     _table->setItemDelegate(new ActiveCellDelegate(_table, _table));
     _table->horizontalHeader()->setStretchLastSection(false);
+    _table->horizontalHeader()->setSectionsMovable(true);
     QFont headerFont = _table->horizontalHeader()->font();
     headerFont.setBold(true);
     _table->horizontalHeader()->setFont(headerFont);
@@ -570,9 +572,11 @@ MainWindow::MainWindow(QWidget *parent) :
     _darkThemeAction->setChecked(theme == ThemeManager::Theme::Dark);
     restoreGeometry(settings.value(QStringLiteral("window/geometry")).toByteArray());
     restorePanelLayout();
+    restoreColumnOrder();
     restoreColumnWidths();
     QTimer::singleShot(0, this, [this] {
         restorePanelLayout();
+        restoreColumnOrder();
         restoreColumnWidths();
         updateFilterGeometry();
     });
@@ -586,6 +590,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("window/geometry"), saveGeometry());
     savePanelLayout();
+    saveColumnOrder();
     saveColumnWidths();
     QMainWindow::closeEvent(event);
 }
@@ -622,6 +627,7 @@ void MainWindow::openFile()
 //-------------------------------------------------------------------------------------------------
 void MainWindow::openFile(const QString &fileName)
 {
+    saveColumnOrder();
     saveColumnWidths();
 
     QString error;
@@ -675,6 +681,7 @@ void MainWindow::openFile(const QString &fileName)
         }
     }
 
+    restoreColumnOrder();
     restoreColumnWidths();
     updateFilterGeometry();
 
@@ -1102,6 +1109,22 @@ void MainWindow::restoreColumnWidths()
     }
 
     settings.endGroup();
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::saveColumnOrder() const
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    settings.setValue(
+        QStringLiteral("columns/order"),
+        table_header_utils::columnOrder(_table->horizontalHeader(), _table->model())
+    );
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::restoreColumnOrder()
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    const QStringList order = settings.value(QStringLiteral("columns/order")).toStringList();
+    table_header_utils::restoreColumnOrder(_table->horizontalHeader(), _table->model(), order);
 }
 //-------------------------------------------------------------------------------------------------
 void MainWindow::savePanelLayout() const
