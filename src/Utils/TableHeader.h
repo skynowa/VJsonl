@@ -16,10 +16,14 @@ class QTableView;
 //-------------------------------------------------------------------------------------------------
 namespace table_header_utils
 {
+
 QStringList columnOrder(const QHeaderView *header, const QAbstractItemModel *model);
-void restoreColumnOrder(QHeaderView *header, const QAbstractItemModel *model, const QStringList &order);
+void        restoreColumnOrder(QHeaderView *header, const QAbstractItemModel *model,
+                const QStringList &order);
 QStringList hiddenColumns(const QHeaderView *header, const QAbstractItemModel *model);
-void restoreHiddenColumns(QHeaderView *header, const QAbstractItemModel *model, const QStringList &hiddenColumnNames);
-void populateColumnVisibilityMenu(QMenu *menu, QTableView *table);
+void        restoreHiddenColumns(QHeaderView *header, const QAbstractItemModel *model,
+                const QStringList &hiddenColumnNames);
+void        populateColumnVisibilityMenu(QMenu *menu, QTableView *table);
+
 }
 //-------------------------------------------------------------------------------------------------

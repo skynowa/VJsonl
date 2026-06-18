@@ -15,6 +15,6 @@ class QComboBox;
 namespace filter_utils
 {
 QString selectedFilterValue(const QComboBox *filter);
-int columnByName(const QAbstractItemModel *model, const QString &name);
+int     columnByName(const QAbstractItemModel *model, const QString &name);
 }
 //-------------------------------------------------------------------------------------------------
