@@ -81,9 +81,13 @@ private slots:
 
     void createsIcons()
     {
+        const QIcon copy = icon_utils::copyIcon();
+        const QIcon copyFormatted = icon_utils::copyFormattedIcon();
+
         QVERIFY(!icon_utils::calendarIcon().isNull());
-        QVERIFY(!icon_utils::copyIcon().isNull());
-        QVERIFY(!icon_utils::copyFormattedIcon().isNull());
+        QVERIFY(!copy.isNull());
+        QVERIFY(!copyFormatted.isNull());
+        QVERIFY(copy.pixmap(16, 16).toImage() != copyFormatted.pixmap(16, 16).toImage());
     }
 
     void highlightsAllTextMatches()
