@@ -714,7 +714,10 @@ void MainWindow::openFile(const QString &fileName)
     addRecentFile(fileName);
     saveOpenDirectory(fileName);
     _openOriginalFileAction->setEnabled(true);
-    setWindowTitle(QStringLiteral("VJson - %1").arg(QFileInfo(fileName).fileName()));
+    setWindowTitle(
+        QStringLiteral("VJson - %1 (%2)")
+            .arg(QFileInfo(fileName).fileName(), file_utils::humanFileSize(fileSize))
+    );
     updateStatus();
 }
 //-------------------------------------------------------------------------------------------------
@@ -1221,10 +1224,6 @@ void MainWindow::restorePanelLayout()
 //-------------------------------------------------------------------------------------------------
 void MainWindow::updateStatus()
 {
-    const QString fileName = _model->fileName();
-    const QString fileSize = fileName.isEmpty()
-        ? QStringLiteral("-")
-        : file_utils::humanFileSize(QFileInfo(fileName).size());
     const QModelIndex current = _table->currentIndex();
     QString currentLine = QStringLiteral("-");
 
@@ -1278,11 +1277,10 @@ void MainWindow::updateStatus()
     _levelsStatusLabel->setToolTip(QStringLiteral("levels: %1").arg(levelsText));
 
     _statusLabel->setText(
-        QStringLiteral("current: %1 / %2, invalid: %3, file: %4")
+        QStringLiteral("current: %1 / %2, invalid: %3")
             .arg(currentLine)
             .arg(_model->rowCount())
             .arg(_model->invalidRowsCount())
-            .arg(fileSize)
     );
 }
 //-------------------------------------------------------------------------------------------------
