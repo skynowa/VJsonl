@@ -2,35 +2,35 @@
 
 ## High Priority
 
-- [-] Add `Go to line...`.
-- [-] Add `Next Error` / `Previous Error`.
-- [-] Add `Next Fatal` / `Previous Fatal`.
+- [n/a] Add `Go to line...`.
+- [n/a] Add `Next Error` / `Previous Error`.
+- [n/a] Add `Next Fatal` / `Previous Fatal`.
 - [?] Add context menu for table cells:
-  - Copy cell value.
-  - Copy row as JSON/raw.
-  - Copy selected rows.
-- [-] Add export for filtered rows:
-  - `.jsonl`
-  - `.txt`
+    - Copy cell value.
+    - Copy row as JSON/raw.
+    - Copy selected rows.
+- [n/a] Add export for filtered rows:
+    - `.jsonl`
+    - `.txt`
 - [+] Add column visibility menu from the table header.
-- [-] Add drag and drop file opening.
+- [n/a] Add drag and drop file opening.
 - [?] Add auto-open last file on startup.
 
 ## Filtering
 
-- [-] Add filter mode: contains / regex / exact.
+- [n/a] Add filter mode: contains / regex / exact.
 - [?] Add negative filter mode.
 - Add column-specific filter:
-  - [+] all columns
-  - [+] `msg`
-  - [+] `query`
-  - `request_id`
-  - `raw`
+    - [+] all columns
+    - [+] `msg`
+    - [+] `query`
+    - `request_id`
+    - `raw`
 - Add quick filter for error rows only.
 - Add quick filter chips:
-  - [+] `log_name`
-  - `service`
-  - [+] `proc_name`
+    - [+] `log_name`
+    - `service`
+    - [+] `proc_name`
 
 ## Navigation
 
@@ -46,8 +46,8 @@
 - [?] Add `Save value to file`.
 - [?] Add `Raw / Formatted / Preview` mode selector.
 - [+] Highlight all search matches, not only the first match.
-- [-] Add next/previous match navigation in the value panel.
-- [-] Add JSON tree view.
+- [n/a] Add next/previous match navigation in the value panel.
+- [n/a] Add JSON tree view.
 - [+] Add SQL syntax highlighting.
 - [+] Add XML syntax highlighting.
 - [+] Add HTML syntax highlighting.
@@ -61,9 +61,9 @@
 - Add pinned/frozen columns for `line`, `level`, and `msg`.
 - [+] Add tooltip with full cell value for truncated cells.
 - [+] Add more color styles:
-  - [+] `Info`
-  - [+] `Warn`
-  - [+] `Trace`
+    - [+] `Info`
+    - [+] `Warn`
+    - [+] `Trace`
 
 ## File Handling
 
@@ -73,28 +73,28 @@
 - Add tail mode for append-only logs.
 - Add cancel button for large file loading.
 - Move large file loading to a background worker thread.
-- [-] Add loading statistics:
-  - bytes read
-  - lines read
-  - read speed
+- [n/a] Add loading statistics:
+    - bytes read
+    - lines read
+    - read speed
 
 ## Statistics
 
 - [+] Add level counters:
-  - [+] `Fatal`
-  - [+] `Error`
-  - [+] `Warn`
-  - [+] `Info`
-  - [+] `Debug`
-  - [+] `Trace`
+    - [+] `Fatal`
+    - [+] `Error`
+    - [+] `Warn`
+    - [+] `Info`
+    - [+] `Debug`
+    - [+] `Trace`
 - Add top values panel:
-  - top `log_name`
-  - top `service`
-  - top `proc_name`
+    - top `log_name`
+    - top `service`
+    - top `proc_name`
 - [+] Add memory statistics for `mem_usage_kb`:
-  - [+] min
-  - [+] max
-  - [+] average
+    - [+] min
+    - [+] max
+    - [+] average
 - [?] Add simple timeline by `ts`.
 - [?] Add error timeline by `ts`.
 
