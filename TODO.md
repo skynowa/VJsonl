@@ -50,6 +50,7 @@
 - Add JSON tree view.
 - [+] Add SQL syntax highlighting.
 - [+] Add XML syntax highlighting.
+- [+] Add HTML syntax highlighting.
 
 ## Table
 
