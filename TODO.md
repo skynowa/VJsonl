@@ -42,7 +42,7 @@
 ## Value Panel
 
 - [+] Add `Copy value` button.
-- Add `Copy formatted value` button.
+- [+] Add `Copy formatted value` button.
 - Add `Save value to file`.
 - Add `Raw / Formatted / Preview` mode selector.
 - Highlight all search matches, not only the first match.

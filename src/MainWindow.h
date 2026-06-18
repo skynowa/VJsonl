@@ -49,6 +49,7 @@ private:
     void onCurrentChanged(const QModelIndex &current);
     void updateCellView(const QModelIndex &current);
     void copyActiveCellValue();
+    void copyFormattedCellValue();
     void findInCellView();
     void findInRawView();
     void addRecentFile(const QString &fileName);
@@ -88,6 +89,7 @@ private:
     QLineEdit             *_cellSearch {};
     QLineEdit             *_rawSearch {};
     QToolButton           *_copyValueButton {};
+    QToolButton           *_copyFormattedValueButton {};
     QComboBox             *_projectFilter {};
     QComboBox             *_appFilter {};
     QComboBox             *_procNameFilter {};
@@ -111,6 +113,7 @@ private:
     QAction               *_darkThemeAction {};
     QStringList            _recentFiles;
     QString                _activeCellValue;
+    QString                _formattedCellValue;
     QLabel                *_levelsStatusLabel {};
     QLabel                *_statusLabel {};
     QProgressBar          *_loadProgress {};

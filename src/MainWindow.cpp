@@ -215,6 +215,11 @@ MainWindow::MainWindow(QWidget *parent) :
     _copyValueButton->setToolTip(QStringLiteral("Copy value"));
     _copyValueButton->setEnabled(false);
 
+    _copyFormattedValueButton = new QToolButton(this);
+    _copyFormattedValueButton->setIcon(icon_utils::copyFormattedIcon());
+    _copyFormattedValueButton->setToolTip(QStringLiteral("Copy formatted value"));
+    _copyFormattedValueButton->setEnabled(false);
+
     auto *activeCellTitle = new QLabel(QStringLiteral("Active Cell"), this);
     QFont detailsTitleFont = activeCellTitle->font();
     detailsTitleFont.setBold(true);
@@ -229,6 +234,7 @@ MainWindow::MainWindow(QWidget *parent) :
     cellToolsLayout->addWidget(_htmlPreview);
     cellToolsLayout->addWidget(_cellSearch, 1);
     cellToolsLayout->addWidget(_copyValueButton);
+    cellToolsLayout->addWidget(_copyFormattedValueButton);
     cellToolsLayout->addStretch(1);
     cellTools->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     const int detailsToolsHeight = cellTools->sizeHint().height();
@@ -543,6 +549,7 @@ MainWindow::MainWindow(QWidget *parent) :
     });
 
     connect(_copyValueButton, &QToolButton::clicked, this, &MainWindow::copyActiveCellValue);
+    connect(_copyFormattedValueButton, &QToolButton::clicked, this, &MainWindow::copyFormattedCellValue);
 
     new QShortcut(QKeySequence::Find, this, [this] {
         _filter->setFocus();
@@ -682,6 +689,7 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
 {
     if (!current.isValid()) {
         _activeCellValue.clear();
+        _formattedCellValue.clear();
         _cellView->clear();
         _rawView->clear();
         _cellJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
@@ -690,6 +698,7 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
         _format->setEnabled(false);
         _htmlPreview->setEnabled(false);
         _copyValueButton->setEnabled(false);
+        _copyFormattedValueButton->setEnabled(false);
         updateStatus();
         return;
     }
@@ -702,6 +711,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
 {
     if (!current.isValid()) {
         _activeCellValue.clear();
+        _formattedCellValue.clear();
         _cellView->clear();
         _rawView->clear();
         _cellJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
@@ -710,6 +720,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
         _format->setEnabled(false);
         _htmlPreview->setEnabled(false);
         _copyValueButton->setEnabled(false);
+        _copyFormattedValueButton->setEnabled(false);
         return;
     }
 
@@ -721,6 +732,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
     const QString previewText = columnName == QStringLiteral("backtrace") ? demangle_utils::demangleSymbols(text) : text;
     bool canFormat = false;
     const QString formatted = CodeFormatter::formatFragments(previewText, &canFormat);
+    _formattedCellValue = canFormat ? formatted : QString();
     const QString displayText = canFormat && _format->isChecked() ? formatted : previewText;
     const bool canPreviewHtml = html_utils::looksLikeHtml(previewText);
     bool canFormatRaw = false;
@@ -730,6 +742,7 @@ void MainWindow::updateCellView(const QModelIndex &current)
     _format->setEnabled(canFormat);
     _htmlPreview->setEnabled(canPreviewHtml);
     _copyValueButton->setEnabled(true);
+    _copyFormattedValueButton->setEnabled(canFormat);
 
     _cellView->setPlainText(displayText);
     _htmlPreviewView->setHtml(previewText);
@@ -759,6 +772,11 @@ void MainWindow::updateCellView(const QModelIndex &current)
 void MainWindow::copyActiveCellValue()
 {
     QApplication::clipboard()->setText(_activeCellValue);
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::copyFormattedCellValue()
+{
+    QApplication::clipboard()->setText(_formattedCellValue);
 }
 //-------------------------------------------------------------------------------------------------
 namespace

@@ -75,6 +75,7 @@ private slots:
     {
         QVERIFY(!icon_utils::calendarIcon().isNull());
         QVERIFY(!icon_utils::copyIcon().isNull());
+        QVERIFY(!icon_utils::copyFormattedIcon().isNull());
     }
 };
 

@@ -54,5 +54,21 @@ QIcon copyIcon()
 
     return QIcon(pixmap);
 }
+
+//-------------------------------------------------------------------------------------------------
+QIcon copyFormattedIcon()
+{
+    QPixmap pixmap = copyIcon().pixmap(16, 16);
+
+    QPainter painter(&pixmap);
+    painter.setPen(QColor(35, 95, 170));
+    QFont font = painter.font();
+    font.setBold(true);
+    font.setPixelSize(7);
+    painter.setFont(font);
+    painter.drawText(QRect(8, 8, 8, 8), Qt::AlignCenter, QStringLiteral("F"));
+
+    return QIcon(pixmap);
+}
 }
 //-------------------------------------------------------------------------------------------------
