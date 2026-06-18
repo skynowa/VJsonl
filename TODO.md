@@ -2,24 +2,24 @@
 
 ## High Priority
 
-- Add `Go to line...`.
-- Add `Next Error` / `Previous Error`.
-- Add `Next Fatal` / `Previous Fatal`.
-- Add context menu for table cells:
+- [-] Add `Go to line...`.
+- [-] Add `Next Error` / `Previous Error`.
+- [-] Add `Next Fatal` / `Previous Fatal`.
+- [?] Add context menu for table cells:
   - Copy cell value.
   - Copy row as JSON/raw.
   - Copy selected rows.
-- Add export for filtered rows:
+- [-] Add export for filtered rows:
   - `.jsonl`
   - `.txt`
 - [+] Add column visibility menu from the table header.
-- Add drag and drop file opening.
-- Add auto-open last file on startup.
+- [-] Add drag and drop file opening.
+- [?] Add auto-open last file on startup.
 
 ## Filtering
 
-- Add filter mode: contains / regex / exact.
-- Add negative filter mode.
+- [-] Add filter mode: contains / regex / exact.
+- [?] Add negative filter mode.
 - Add column-specific filter:
   - [+] all columns
   - [+] `msg`
@@ -37,30 +37,30 @@
 - Add bookmarks for important rows.
 - Add previous/next bookmark navigation.
 - Add selection history back/forward.
-- Add keyboard shortcuts for common navigation actions.
+- [?] Add keyboard shortcuts for common navigation actions.
 
 ## Value Panel
 
 - [+] Add `Copy value` button.
 - [+] Add `Copy formatted value` button.
 - [?] Add `Save value to file`.
-- Add `Raw / Formatted / Preview` mode selector.
+- [?] Add `Raw / Formatted / Preview` mode selector.
 - [+] Highlight all search matches, not only the first match.
-- Add next/previous match navigation in the value panel.
-- Add JSON tree view.
+- [-] Add next/previous match navigation in the value panel.
+- [-] Add JSON tree view.
 - [+] Add SQL syntax highlighting.
 - [+] Add XML syntax highlighting.
 - [+] Add HTML syntax highlighting.
 
 ## Table
 
-- Auto-detect JSON keys and add them as columns.
+- [?] Auto-detect JSON keys and add them as columns.
 - [+] Allow custom column order.
 - [+] Save column widths.
 - [+] Save visible/hidden column state.
 - Add pinned/frozen columns for `line`, `level`, and `msg`.
 - [+] Add tooltip with full cell value for truncated cells.
-- Add more color styles:
+- [+] Add more color styles:
   - [+] `Info`
   - [+] `Warn`
   - [+] `Trace`
@@ -73,7 +73,7 @@
 - Add tail mode for append-only logs.
 - Add cancel button for large file loading.
 - Move large file loading to a background worker thread.
-- Add loading statistics:
+- [-] Add loading statistics:
   - bytes read
   - lines read
   - read speed
