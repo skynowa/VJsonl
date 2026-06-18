@@ -12,7 +12,7 @@
 - Add export for filtered rows:
   - `.jsonl`
   - `.txt`
-- Add column visibility menu from the table header.
+- [+] Add column visibility menu from the table header.
 - Add drag and drop file opening.
 - Add auto-open last file on startup.
 
@@ -56,7 +56,7 @@
 - Auto-detect JSON keys and add them as columns.
 - [+] Allow custom column order.
 - [+] Save column widths.
-- Save visible/hidden column state.
+- [+] Save visible/hidden column state.
 - Add pinned/frozen columns for `line`, `level`, and `msg`.
 - [+] Add tooltip with full cell value for truncated cells.
 - Add more color styles:

@@ -14,9 +14,11 @@
 #include "Utils/TextSearch.h"
 #include "Utils/Timestamp.h"
 
+#include <QAction>
 #include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QMenu>
 #include <QStandardItemModel>
 #include <QTest>
 #include <QTableView>
@@ -123,6 +125,57 @@ private slots:
             table_header_utils::columnOrder(table.horizontalHeader(), &model),
             QStringList({QStringLiteral("b"), QStringLiteral("c"), QStringLiteral("a")})
         );
+    }
+
+    void savesAndRestoresHiddenTableColumns()
+    {
+        QStandardItemModel model(0, 3);
+        model.setHorizontalHeaderLabels({QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")});
+
+        QTableView table;
+        table.setModel(&model);
+        table.setColumnHidden(1, true);
+
+        QCOMPARE(
+            table_header_utils::hiddenColumns(table.horizontalHeader(), &model),
+            QStringList({QStringLiteral("b")})
+        );
+
+        table.setColumnHidden(1, false);
+        table.setColumnHidden(2, true);
+        table_header_utils::restoreHiddenColumns(
+            table.horizontalHeader(),
+            &model,
+            {QStringLiteral("a"), QStringLiteral("missing")}
+        );
+
+        QVERIFY(table.isColumnHidden(0));
+        QVERIFY(!table.isColumnHidden(1));
+        QVERIFY(!table.isColumnHidden(2));
+    }
+
+    void populatesColumnVisibilityMenu()
+    {
+        QStandardItemModel model(0, 3);
+        model.setHorizontalHeaderLabels({QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")});
+
+        QTableView table;
+        table.setModel(&model);
+        table.setColumnHidden(2, true);
+
+        QMenu menu;
+        table_header_utils::populateColumnVisibilityMenu(&menu, &table);
+        QCOMPARE(menu.actions().size(), 3);
+        QVERIFY(menu.actions().at(0)->isChecked());
+        QVERIFY(!menu.actions().at(2)->isChecked());
+
+        menu.actions().at(2)->trigger();
+        QVERIFY(!table.isColumnHidden(2));
+
+        table.setColumnHidden(0, true);
+        table.setColumnHidden(2, true);
+        table_header_utils::populateColumnVisibilityMenu(&menu, &table);
+        QVERIFY(!menu.actions().at(1)->isEnabled());
     }
 };
 

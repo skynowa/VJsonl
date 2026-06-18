@@ -24,6 +24,7 @@ class QToolButton;
 class QStackedWidget;
 class QTextBrowser;
 class QMenu;
+class QPoint;
 class QAction;
 class QCloseEvent;
 class QEvent;
@@ -63,6 +64,9 @@ private:
     void restoreColumnWidths();
     void saveColumnOrder() const;
     void restoreColumnOrder();
+    void saveColumnVisibility() const;
+    void restoreColumnVisibility();
+    void showColumnVisibilityMenu(const QPoint &position);
     void savePanelLayout() const;
     void restorePanelLayout();
     void applyFilters();

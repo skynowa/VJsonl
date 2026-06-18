@@ -165,6 +165,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _table->setItemDelegate(new ActiveCellDelegate(_table, _table));
     _table->horizontalHeader()->setStretchLastSection(false);
     _table->horizontalHeader()->setSectionsMovable(true);
+    _table->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     QFont headerFont = _table->horizontalHeader()->font();
     headerFont.setBold(true);
     _table->horizontalHeader()->setFont(headerFont);
@@ -511,6 +512,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_table->horizontalHeader(), &QHeaderView::sectionMoved, this, [this] {
         updateFilterGeometry();
     });
+    connect(
+        _table->horizontalHeader(),
+        &QHeaderView::customContextMenuRequested,
+        this,
+        &MainWindow::showColumnVisibilityMenu
+    );
     connect(_table->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this] {
         updateFilterGeometry();
     });
@@ -573,10 +580,12 @@ MainWindow::MainWindow(QWidget *parent) :
     restoreGeometry(settings.value(QStringLiteral("window/geometry")).toByteArray());
     restorePanelLayout();
     restoreColumnOrder();
+    restoreColumnVisibility();
     restoreColumnWidths();
     QTimer::singleShot(0, this, [this] {
         restorePanelLayout();
         restoreColumnOrder();
+        restoreColumnVisibility();
         restoreColumnWidths();
         updateFilterGeometry();
     });
@@ -591,6 +600,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     settings.setValue(QStringLiteral("window/geometry"), saveGeometry());
     savePanelLayout();
     saveColumnOrder();
+    saveColumnVisibility();
     saveColumnWidths();
     QMainWindow::closeEvent(event);
 }
@@ -628,6 +638,7 @@ void MainWindow::openFile()
 void MainWindow::openFile(const QString &fileName)
 {
     saveColumnOrder();
+    saveColumnVisibility();
     saveColumnWidths();
 
     QString error;
@@ -682,6 +693,7 @@ void MainWindow::openFile(const QString &fileName)
     }
 
     restoreColumnOrder();
+    restoreColumnVisibility();
     restoreColumnWidths();
     updateFilterGeometry();
 
@@ -1125,6 +1137,36 @@ void MainWindow::restoreColumnOrder()
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     const QStringList order = settings.value(QStringLiteral("columns/order")).toStringList();
     table_header_utils::restoreColumnOrder(_table->horizontalHeader(), _table->model(), order);
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::saveColumnVisibility() const
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    settings.setValue(
+        QStringLiteral("columns/hidden"),
+        table_header_utils::hiddenColumns(_table->horizontalHeader(), _table->model())
+    );
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::restoreColumnVisibility()
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    const QStringList hiddenColumnNames = settings.value(QStringLiteral("columns/hidden")).toStringList();
+    table_header_utils::restoreHiddenColumns(_table->horizontalHeader(), _table->model(), hiddenColumnNames);
+}
+//-------------------------------------------------------------------------------------------------
+void MainWindow::showColumnVisibilityMenu(const QPoint &position)
+{
+    QMenu menu(this);
+    table_header_utils::populateColumnVisibilityMenu(&menu, _table);
+
+    if (menu.isEmpty()) {
+        return;
+    }
+
+    menu.exec(_table->horizontalHeader()->mapToGlobal(position));
+    saveColumnVisibility();
+    updateFilterGeometry();
 }
 //-------------------------------------------------------------------------------------------------
 void MainWindow::savePanelLayout() const
