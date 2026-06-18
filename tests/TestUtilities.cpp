@@ -10,11 +10,13 @@
 #include "Utils/Html.h"
 #include "Utils/Icon.h"
 #include "Utils/Json.h"
+#include "Utils/TextSearch.h"
 #include "Utils/Timestamp.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QTest>
+#include <QTextEdit>
 
 //-------------------------------------------------------------------------------------------------
 class TestUtilities final : public QObject
@@ -76,6 +78,22 @@ private slots:
         QVERIFY(!icon_utils::calendarIcon().isNull());
         QVERIFY(!icon_utils::copyIcon().isNull());
         QVERIFY(!icon_utils::copyFormattedIcon().isNull());
+    }
+
+    void highlightsAllTextMatches()
+    {
+        QTextEdit view;
+        view.setPlainText(QStringLiteral("error one\nerror two\nERROR"));
+
+        QCOMPARE(text_search_utils::highlightAll(&view, QStringLiteral("error")), 3);
+        QCOMPARE(view.extraSelections().size(), 3);
+        QCOMPARE(view.textCursor().selectedText(), QStringLiteral("error"));
+
+        QCOMPARE(text_search_utils::highlightAll(&view, QStringLiteral("missing")), 0);
+        QVERIFY(view.extraSelections().isEmpty());
+
+        QCOMPARE(text_search_utils::highlightAll(&view, QString()), 0);
+        QCOMPARE(text_search_utils::highlightAll(nullptr, QStringLiteral("error")), 0);
     }
 };
 

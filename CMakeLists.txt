@@ -71,6 +71,8 @@ set(VJSON_SOURCES
     src/ThemeManager.cpp
     src/Utils/Timestamp.h
     src/Utils/Timestamp.cpp
+    src/Utils/TextSearch.h
+    src/Utils/TextSearch.cpp
 )
 
 add_library(VJsonLib STATIC

@@ -50,6 +50,7 @@ private:
     void updateCellView(const QModelIndex &current);
     void copyActiveCellValue();
     void copyFormattedCellValue();
+    void findInTextView(QLineEdit *search, QTextEdit *view);
     void findInCellView();
     void findInRawView();
     void addRecentFile(const QString &fileName);

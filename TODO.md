@@ -45,7 +45,7 @@
 - [+] Add `Copy formatted value` button.
 - [?] Add `Save value to file`.
 - Add `Raw / Formatted / Preview` mode selector.
-- Highlight all search matches, not only the first match.
+- [+] Highlight all search matches, not only the first match.
 - Add next/previous match navigation in the value panel.
 - Add JSON tree view.
 - [+] Add SQL syntax highlighting.

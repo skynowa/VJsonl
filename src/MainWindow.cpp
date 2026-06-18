@@ -19,6 +19,7 @@
 #include "LogFilterProxyModel.h"
 #include "LogLevelStyle.h"
 #include "ThemeManager.h"
+#include "Utils/TextSearch.h"
 #include "Utils/Timestamp.h"
 
 #include <QAbstractItemView>
@@ -56,7 +57,6 @@
 #include <QSignalBlocker>
 #include <QTableView>
 #include <QTextBrowser>
-#include <QTextCursor>
 #include <QTextEdit>
 #include <QTimer>
 #include <QToolButton>
@@ -779,25 +779,15 @@ void MainWindow::copyFormattedCellValue()
     QApplication::clipboard()->setText(_formattedCellValue);
 }
 //-------------------------------------------------------------------------------------------------
-namespace
-{
-void findInTextView(QLineEdit *search, QTextEdit *view)
+void MainWindow::findInTextView(QLineEdit *search, QTextEdit *view)
 {
     const QString text = search->text();
+    const int matchCount = text_search_utils::highlightAll(view, text);
     search->setStyleSheet({});
 
-    if (text.isEmpty() || view == nullptr) {
-        return;
-    }
-
-    QTextCursor cursor = view->textCursor();
-    cursor.movePosition(QTextCursor::Start);
-    view->setTextCursor(cursor);
-
-    if (!view->find(text)) {
+    if (!text.isEmpty() && matchCount == 0) {
         search->setStyleSheet(QStringLiteral("background-color: #ffdede;"));
     }
-}
 }
 
 //-------------------------------------------------------------------------------------------------
