@@ -12,7 +12,6 @@ class QAbstractItemModel;
 class QHeaderView;
 class QMenu;
 class QTableView;
-
 //-------------------------------------------------------------------------------------------------
 namespace table_header_utils
 {

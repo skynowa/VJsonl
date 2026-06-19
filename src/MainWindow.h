@@ -33,7 +33,8 @@ class QWidget;
 class JsonSyntaxHighlighter;
 class LogFilterProxyModel;
 //-------------------------------------------------------------------------------------------------
-class MainWindow final : public QMainWindow
+class MainWindow final :
+    public QMainWindow
 {
     Q_OBJECT
 

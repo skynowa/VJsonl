@@ -8,7 +8,6 @@
 
 #include <QDateTime>
 #include <QString>
-
 //-------------------------------------------------------------------------------------------------
 namespace datetime_utils
 {

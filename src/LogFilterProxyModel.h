@@ -11,7 +11,8 @@
 #include <QSortFilterProxyModel>
 #include <QString>
 //-------------------------------------------------------------------------------------------------
-class LogFilterProxyModel final : public QSortFilterProxyModel
+class LogFilterProxyModel final :
+    public QSortFilterProxyModel
 {
 public:
     explicit LogFilterProxyModel(QObject *parent = nullptr);

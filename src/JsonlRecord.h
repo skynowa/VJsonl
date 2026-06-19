@@ -11,7 +11,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QString>
-
 //-------------------------------------------------------------------------------------------------
 struct JsonlRecord final
 {

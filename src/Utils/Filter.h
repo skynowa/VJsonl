@@ -10,7 +10,6 @@
 
 class QAbstractItemModel;
 class QComboBox;
-
 //-------------------------------------------------------------------------------------------------
 namespace filter_utils
 {

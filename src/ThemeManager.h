@@ -9,10 +9,10 @@
 #include <QString>
 
 class QApplication;
-
 //-------------------------------------------------------------------------------------------------
 namespace ThemeManager
 {
+
 enum class Theme
 {
     Light,
@@ -23,8 +23,9 @@ enum class Theme
     Dark
 };
 
-Theme themeFromString(const QString &value);
+Theme   themeFromString(const QString &value);
 QString themeToString(Theme theme);
-void applyTheme(QApplication *application, Theme theme);
+void    applyTheme(QApplication *application, Theme theme);
+
 }
 //-------------------------------------------------------------------------------------------------

@@ -9,7 +9,6 @@
 #include <QString>
 
 class QTextEdit;
-
 //-------------------------------------------------------------------------------------------------
 namespace text_search_utils
 {
