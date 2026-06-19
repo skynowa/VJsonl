@@ -10,6 +10,7 @@
 #include "LogLevelStyle.h"
 #include "Utils/Timestamp.h"
 
+#include <QBuffer>
 #include <QBrush>
 #include <QColor>
 #include <QFile>
@@ -211,6 +212,10 @@ bool JsonlModel::loadFile(
     const ProgressCallback &progressCallback
 )
 {
+    if (outError != nullptr) {
+        outError->clear();
+    }
+
     QFile file(fileName);
 
     if (!file.open(QIODevice::ReadOnly)) {
@@ -221,16 +226,56 @@ bool JsonlModel::loadFile(
         return false;
     }
 
+    return loadDevice(&file, fileName, progressCallback);
+}
+
+//-------------------------------------------------------------------------------------------------
+bool JsonlModel::loadJsonlData(
+    const QByteArray &data,
+    const QString &sourceFileName,
+    QString *outError,
+    const ProgressCallback &progressCallback
+)
+{
+    if (outError != nullptr) {
+        outError->clear();
+    }
+
+    QBuffer buffer;
+    buffer.setData(data);
+
+    if (!buffer.open(QIODevice::ReadOnly)) {
+        if (outError != nullptr) {
+            *outError = buffer.errorString();
+        }
+
+        return false;
+    }
+
+    return loadDevice(&buffer, sourceFileName, progressCallback);
+}
+
+//-------------------------------------------------------------------------------------------------
+bool JsonlModel::loadDevice(
+    QIODevice *device,
+    const QString &sourceFileName,
+    const ProgressCallback &progressCallback
+)
+{
+    if (device == nullptr || !device->isOpen()) {
+        return false;
+    }
+
     beginResetModel();
 
     _records.clear();
-    _fileName = fileName;
+    _fileName = sourceFileName;
     _invalidRowsCount = 0;
     _levelCounts.clear();
     _memoryStats = {};
     _memoryUsageTotalKb = 0.0;
 
-    const qint64 totalBytes = file.size();
+    const qint64 totalBytes = device->size();
     qint64 readBytes = 0;
     qint64 nextProgressBytes = 0;
     int lineNo = 0;
@@ -239,10 +284,10 @@ bool JsonlModel::loadFile(
         progressCallback(0, totalBytes);
     }
 
-    while (!file.atEnd()) {
+    while (!device->atEnd()) {
         ++lineNo;
 
-        const QByteArray lineBytes = file.readLine();
+        const QByteArray lineBytes = device->readLine();
         readBytes += lineBytes.size();
 
         JsonlRecord record;

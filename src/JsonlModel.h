@@ -9,11 +9,14 @@
 #include "JsonlRecord.h"
 
 #include <QAbstractTableModel>
+#include <QByteArray>
 #include <QMap>
 #include <QStringList>
 #include <QVector>
 
 #include <functional>
+
+class QIODevice;
 //-------------------------------------------------------------------------------------------------
 class JsonlModel final :
     public QAbstractTableModel
@@ -43,12 +46,18 @@ public:
 
     bool     loadFile(const QString &fileName, QString *outError = nullptr,
                 const ProgressCallback &progressCallback = {});
+    bool     loadJsonlData(const QByteArray &data, const QString &sourceFileName,
+                QString *outError = nullptr, const ProgressCallback &progressCallback = {});
 
     const JsonlRecord *recordAt(int row) const;
     QString            fileName() const;
     int                invalidRowsCount() const;
     QMap<QString, int> levelCounts() const;
     MemoryStats        memoryStats() const;
+
+private:
+    bool loadDevice(QIODevice *device, const QString &sourceFileName,
+        const ProgressCallback &progressCallback);
 
 private:
     QVector<JsonlRecord> _records;

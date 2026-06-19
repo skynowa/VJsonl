@@ -67,10 +67,10 @@
 
 ## File Handling
 
-- Add open/load csv file
-    - Load CSV file (*.csv), parse - impl CsvReader (+ tests)
-    - Convert CSV to JSONL - impl ConverterCsvToJsonl (+ tests)
-    - Load JSONL to QTableView
+- [+] Add open/load csv file
+    - [+] Load CSV file (*.csv), parse - impl CsvReader (+ tests)
+    - [+] Convert CSV to JSONL - impl ConverterCsvToJsonl (+ tests)
+    - [+] Load JSONL to QTableView
 - Add reload current file.
 - Add file changed notification.
 - Add watch mode for changed files.

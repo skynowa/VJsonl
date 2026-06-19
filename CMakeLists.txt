@@ -50,6 +50,10 @@ set(VJSON_SOURCES
     src/LogFilterProxyModel.cpp
     src/CodeFormatter.h
     src/CodeFormatter.cpp
+    src/CsvReader.h
+    src/CsvReader.cpp
+    src/ConverterCsvToJsonl.h
+    src/ConverterCsvToJsonl.cpp
     src/Utils/File.h
     src/Utils/File.cpp
     src/Utils/Filter.h

@@ -9,6 +9,8 @@
 #include "AppSettings.h"
 #include "BuildInfo.h"
 #include "CodeFormatter.h"
+#include "ConverterCsvToJsonl.h"
+#include "CsvReader.h"
 #include "Delegates.h"
 #include "Utils/Demangle.h"
 #include "Utils/File.h"
@@ -637,9 +639,9 @@ void MainWindow::openFile()
 {
     const QString fileName = QFileDialog::getOpenFileName(
         this,
-        "Open JSONL",
+        "Open data file",
         openDirectory(),
-        "JSONL files (*.jsonl *.log *.txt);;All files (*)"
+        "Data files (*.jsonl *.log *.txt *.csv);;CSV files (*.csv);;JSONL files (*.jsonl *.log *.txt);;All files (*)"
     );
 
     if (fileName.isEmpty()) {
@@ -665,15 +667,28 @@ void MainWindow::openFile(const QString &fileName)
         _loadProgress->show();
     }
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    const bool ok = _model->loadFile(fileName, &error, [this, showProgress](qint64 current, qint64 total) {
+    const auto progressCallback = [this, showProgress](qint64 current, qint64 total) {
         if (!showProgress || total <= 0) {
             return;
         }
 
         _loadProgress->setValue(static_cast<int>((current * 100) / total));
         QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-    });
+    };
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    bool ok = false;
+
+    if (QFileInfo(fileName).suffix().compare(QStringLiteral("csv"), Qt::CaseInsensitive) == 0) {
+        CsvData csvData;
+        QByteArray jsonlData;
+        ok = CsvReader::readFile(fileName, &csvData, &error)
+            && ConverterCsvToJsonl::convert(csvData, &jsonlData, &error)
+            && _model->loadJsonlData(jsonlData, fileName, &error, progressCallback);
+    } else {
+        ok = _model->loadFile(fileName, &error, progressCallback);
+    }
+
     QApplication::restoreOverrideCursor();
     _loadProgress->hide();
 
