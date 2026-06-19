@@ -109,6 +109,7 @@ private:
     QComboBox             *_moduleFilter {};
     QComboBox             *_levelFilter {};
     QComboBox             *_logNameFilter {};
+    QComboBox             *_descrFilter {};
     QLineEdit             *_queryFilter {};
     QMenu                 *_tsFilterMenu {};
     QToolButton           *_tsFilterButton {};

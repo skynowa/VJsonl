@@ -119,6 +119,10 @@ MainWindow::MainWindow(QWidget *parent) :
     _logNameFilter->addItem(QStringLiteral("All log names"), QString());
     _logNameFilter->setMinimumWidth(0);
 
+    _descrFilter = new QComboBox(this);
+    _descrFilter->addItem(QStringLiteral("All descriptions"), QString());
+    _descrFilter->setMinimumWidth(0);
+
     _queryFilter = new QLineEdit(this);
     _queryFilter->setPlaceholderText(QStringLiteral("Filter query..."));
     _queryFilter->setClearButtonEnabled(true);
@@ -315,6 +319,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _tsFilterButton->setParent(_filterPanel);
     _levelFilter->setParent(_filterPanel);
     _queryFilter->setParent(_filterPanel);
+    _descrFilter->setParent(_filterPanel);
     _msgFilter->setParent(_filterPanel);
     _filter->setParent(_filterPanel);
 
@@ -479,6 +484,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_procNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_moduleFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_logNameFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
+    connect(_descrFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_queryFilter, &QLineEdit::textChanged, this, [this](const QString &text) {
         _proxy->setQueryFilter(text);
         _table->scrollToTop();
@@ -707,6 +713,7 @@ void MainWindow::openFile(const QString &fileName)
     updateColumnFilterItems(_appFilter, QStringLiteral("app"), QStringLiteral("All apps"));
     updateColumnFilterItems(_procNameFilter, QStringLiteral("proc_name"), QStringLiteral("All proc names"));
     updateColumnFilterItems(_moduleFilter, QStringLiteral("module"), QStringLiteral("All modules"));
+    updateColumnFilterItems(_descrFilter, QStringLiteral("descr"), QStringLiteral("All descriptions"));
     updateTimestampFilterBounds();
     _table->sortByColumn(-1, Qt::AscendingOrder);
     _table->resizeColumnsToContents();
@@ -977,6 +984,7 @@ void MainWindow::applyFilters()
     _proxy->setProcNameFilter(filter_utils::selectedFilterValue(_procNameFilter));
     _proxy->setModuleFilter(filter_utils::selectedFilterValue(_moduleFilter));
     _proxy->setLogNameFilter(filter_utils::selectedFilterValue(_logNameFilter));
+    _proxy->setDescrFilter(filter_utils::selectedFilterValue(_descrFilter));
     _proxy->setLevelFilter(filter_utils::selectedFilterValue(_levelFilter).toLower());
 
     QDateTime from = _tsFrom->dateTime();
@@ -1068,6 +1076,7 @@ void MainWindow::updateFilterGeometry()
     placeFilter(_levelFilter, QStringLiteral("level"));
     placeFilter(_msgFilter, QStringLiteral("msg"));
     placeFilter(_queryFilter, QStringLiteral("query"));
+    placeFilter(_descrFilter, QStringLiteral("descr"));
     placeFilter(_filter, QStringLiteral("raw"));
 }
 

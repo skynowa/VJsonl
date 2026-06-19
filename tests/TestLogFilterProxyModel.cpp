@@ -20,11 +20,11 @@ bool writeJsonlFile(QTemporaryFile *file)
         return false;
     }
 
-    file->write(R"({"project":"suppliers","app":"sync","proc_name":"worker","module":"loader","log_name":"access","ts":"2026-06-15T08:00:00.000-0500","level":"info","msg":"Loaded hotel","query":"select * from hotel"})");
+    file->write(R"({"project":"suppliers","app":"sync","proc_name":"worker","module":"loader","log_name":"access","ts":"2026-06-15T08:00:00.000-0500","level":"info","msg":"Loaded hotel","query":"select * from hotel","descr":"hotel import"})");
     file->write("\n");
-    file->write(R"({"project":"booked","app":"cms","proc_name":"api","module":"rooms","log_name":"audit","ts":"2026-06-15T09:30:00.000-0500","level":"error","msg":"Room failed","query":"update rooms set name = 'x'"})");
+    file->write(R"({"project":"booked","app":"cms","proc_name":"api","module":"rooms","log_name":"audit","ts":"2026-06-15T09:30:00.000-0500","level":"error","msg":"Room failed","query":"update rooms set name = 'x'","descr":"room update"})");
     file->write("\n");
-    file->write(R"({"project":"suppliers","app":"sync","proc_name":"worker","module":"loader","log_name":"access","ts":"2026-06-15T11:00:00.000-0500","level":"debug","msg":"Cache warmed","query":"delete from cache"})");
+    file->write(R"({"project":"suppliers","app":"sync","proc_name":"worker","module":"loader","log_name":"access","ts":"2026-06-15T11:00:00.000-0500","level":"debug","msg":"Cache warmed","query":"delete from cache","descr":"cache maintenance"})");
     file->write("\n");
     file->close();
     return true;
@@ -80,6 +80,13 @@ private slots:
         QCOMPARE(proxy.rowCount(), 1);
 
         proxy.setLevelFilter(QString());
+        QCOMPARE(proxy.rowCount(), 3);
+
+        proxy.setDescrFilter(QStringLiteral("ROOM UPDATE"));
+        QCOMPARE(proxy.rowCount(), 1);
+        QCOMPARE(valueAt(proxy, 0, QStringLiteral("project")), QStringLiteral("booked"));
+
+        proxy.setDescrFilter(QString());
         QCOMPARE(proxy.rowCount(), 3);
     }
 

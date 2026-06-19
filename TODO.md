@@ -31,6 +31,7 @@
     - [+] `log_name`
     - `service`
     - [+] `proc_name`
+    - [+] `descr`
 
 ## Navigation
 

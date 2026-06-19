@@ -75,6 +75,12 @@ void LogFilterProxyModel::setModuleFilter(const QString &module)
 }
 
 //-------------------------------------------------------------------------------------------------
+void LogFilterProxyModel::setDescrFilter(const QString &descr)
+{
+    setColumnFilter(QStringLiteral("descr"), descr);
+}
+
+//-------------------------------------------------------------------------------------------------
 void LogFilterProxyModel::setQueryFilter(const QString &query)
 {
     if (_queryTextFilter == query) {
