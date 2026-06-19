@@ -77,6 +77,10 @@
     - bytes read
     - lines read
     - read speed
+- Add open/load csv file (*.csv)
+    - Load CSV, parse
+    - Convert CSV to JSONL
+    - Load JSONL to QTableView
 
 ## Statistics
 
