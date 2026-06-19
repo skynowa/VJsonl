@@ -78,8 +78,8 @@
     - lines read
     - read speed
 - Add open/load csv file (*.csv)
-    - Load CSV, parse
-    - Convert CSV to JSONL
+    - Load CSV, parse - impl CsvReader
+    - Convert CSV to JSONL - impl ConverterCsvToJsonl
     - Load JSONL to QTableView
 
 ## Statistics
