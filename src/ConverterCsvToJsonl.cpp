@@ -10,7 +10,12 @@
 #include <QJsonObject>
 
 //-------------------------------------------------------------------------------------------------
-bool ConverterCsvToJsonl::convert(const CsvData &csvData, QByteArray *outJsonl, QString *outError)
+bool
+ConverterCsvToJsonl::convert(
+    const CsvData &csvData,
+    QByteArray    *outJsonl,
+    QString       *outError
+)
 {
     if (outJsonl == nullptr) {
         if (outError != nullptr) {
