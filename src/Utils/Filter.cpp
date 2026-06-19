@@ -12,7 +12,10 @@
 //-------------------------------------------------------------------------------------------------
 namespace filter_utils
 {
-QString selectedFilterValue(const QComboBox *filter)
+QString
+selectedFilterValue(
+    const QComboBox *filter
+)
 {
     if (filter == nullptr) {
         return {};
@@ -29,7 +32,11 @@ QString selectedFilterValue(const QComboBox *filter)
 }
 
 //-------------------------------------------------------------------------------------------------
-int columnByName(const QAbstractItemModel *model, const QString &name)
+int
+columnByName(
+    const QAbstractItemModel *model,
+    const QString            &name
+)
 {
     if (model == nullptr) {
         return -1;

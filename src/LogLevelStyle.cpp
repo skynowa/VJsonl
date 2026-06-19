@@ -14,7 +14,11 @@
 //-------------------------------------------------------------------------------------------------
 namespace
 {
-QIcon makeIcon(const QColor &color, const QString &label)
+QIcon
+makeIcon(
+    const QColor  &color,
+    const QString &label
+)
 {
     QPixmap pixmap(16, 16);
     pixmap.fill(Qt::transparent);
@@ -39,7 +43,10 @@ QIcon makeIcon(const QColor &color, const QString &label)
 //-------------------------------------------------------------------------------------------------
 namespace LogLevelStyle
 {
-QIcon iconForLevel(const QString &level)
+QIcon
+iconForLevel(
+    const QString &level
+)
 {
     if (level.compare(QStringLiteral("fatal"), Qt::CaseInsensitive) == 0) {
         return makeIcon(QColor(170, 0, 255), QStringLiteral("F"));
@@ -73,7 +80,10 @@ QIcon iconForLevel(const QString &level)
         : makeIcon(QColor(115, 115, 115), level.trimmed());
 }
 //-------------------------------------------------------------------------------------------------
-QString iconHtmlForLevel(const QString &level)
+QString
+iconHtmlForLevel(
+    const QString &level
+)
 {
     const QPixmap pixmap = iconForLevel(level).pixmap(16, 16);
 
@@ -90,7 +100,11 @@ QString iconHtmlForLevel(const QString &level)
         .arg(QString::fromLatin1(bytes.toBase64()));
 }
 //-------------------------------------------------------------------------------------------------
-QString levelCounterHtml(const QString &level, int count)
+QString
+levelCounterHtml(
+    const QString &level,
+    int           count
+)
 {
     const QString iconHtml = iconHtmlForLevel(level);
 

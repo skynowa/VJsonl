@@ -10,7 +10,12 @@
 #include <QSet>
 
 //-------------------------------------------------------------------------------------------------
-bool CsvReader::readFile(const QString &fileName, CsvData *outData, QString *outError)
+bool
+CsvReader::readFile(
+    const QString &fileName,
+    CsvData       *outData,
+    QString       *outError
+)
 {
     QFile file(fileName);
 
@@ -26,7 +31,12 @@ bool CsvReader::readFile(const QString &fileName, CsvData *outData, QString *out
 }
 
 //-------------------------------------------------------------------------------------------------
-bool CsvReader::parse(const QByteArray &data, CsvData *outData, QString *outError)
+bool
+CsvReader::parse(
+    const QByteArray &data,
+    CsvData          *outData,
+    QString          *outError
+)
 {
     if (outData == nullptr) {
         if (outError != nullptr) {

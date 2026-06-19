@@ -14,7 +14,10 @@
 namespace
 {
 //-------------------------------------------------------------------------------------------------
-bool writeJsonlFile(QTemporaryFile *file)
+bool
+writeJsonlFile(
+    QTemporaryFile *file
+)
 {
     if (!file->open()) {
         return false;
@@ -31,7 +34,11 @@ bool writeJsonlFile(QTemporaryFile *file)
 }
 
 //-------------------------------------------------------------------------------------------------
-int columnByName(const QAbstractItemModel &model, const QString &name)
+int
+columnByName(
+    const QAbstractItemModel &model,
+    const QString            &name
+)
 {
     for (int column = 0; column < model.columnCount(); ++column) {
         if (model.headerData(column, Qt::Horizontal).toString() == name) {
@@ -43,7 +50,12 @@ int columnByName(const QAbstractItemModel &model, const QString &name)
 }
 
 //-------------------------------------------------------------------------------------------------
-QString valueAt(const QAbstractItemModel &model, int row, const QString &columnName)
+QString
+valueAt(
+    const QAbstractItemModel &model,
+    int                      row,
+    const QString            &columnName
+)
 {
     const int column = columnByName(model, columnName);
     Q_ASSERT(column >= 0);
@@ -57,7 +69,8 @@ class TestLogFilterProxyModel final : public QObject
     Q_OBJECT
 
 private slots:
-    void filtersByExactColumnsAndClears()
+    void
+    filtersByExactColumnsAndClears()
     {
         JsonlModel model;
         QTemporaryFile file(QDir::temp().filePath(QStringLiteral("vjson-proxy-test-XXXXXX.jsonl")));
@@ -90,7 +103,8 @@ private slots:
         QCOMPARE(proxy.rowCount(), 3);
     }
 
-    void filtersTextColumnsByContains()
+    void
+    filtersTextColumnsByContains()
     {
         JsonlModel model;
         QTemporaryFile file(QDir::temp().filePath(QStringLiteral("vjson-proxy-test-XXXXXX.jsonl")));
@@ -116,7 +130,8 @@ private slots:
         QCOMPARE(proxy.rowCount(), 3);
     }
 
-    void filtersByTimestampRange()
+    void
+    filtersByTimestampRange()
     {
         JsonlModel model;
         QTemporaryFile file(QDir::temp().filePath(QStringLiteral("vjson-proxy-test-XXXXXX.jsonl")));

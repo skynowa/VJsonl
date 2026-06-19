@@ -14,7 +14,10 @@
 //-------------------------------------------------------------------------------------------------
 namespace ThemeManager
 {
-Theme themeFromString(const QString &value)
+Theme
+themeFromString(
+    const QString &value
+)
 {
     if (value.compare(QStringLiteral("lightgray"), Qt::CaseInsensitive) == 0) {
         return Theme::LightGray;
@@ -39,7 +42,10 @@ Theme themeFromString(const QString &value)
     return Theme::Light;
 }
 //-------------------------------------------------------------------------------------------------
-QString themeToString(Theme theme)
+QString
+themeToString(
+    Theme theme
+)
 {
     switch (theme) {
     case Theme::LightGray:
@@ -59,7 +65,11 @@ QString themeToString(Theme theme)
     return QStringLiteral("light");
 }
 //-------------------------------------------------------------------------------------------------
-void applyTheme(QApplication *application, Theme theme)
+void
+applyTheme(
+    QApplication *application,
+    Theme        theme
+)
 {
     if (application == nullptr) {
         return;

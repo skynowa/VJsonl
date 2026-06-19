@@ -13,7 +13,11 @@
 //-------------------------------------------------------------------------------------------------
 namespace text_search_utils
 {
-int highlightAll(QTextEdit *view, const QString &text)
+int
+highlightAll(
+    QTextEdit     *view,
+    const QString &text
+)
 {
     if (view == nullptr) {
         return 0;

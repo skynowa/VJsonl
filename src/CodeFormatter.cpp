@@ -18,13 +18,19 @@
 //-------------------------------------------------------------------------------------------------
 namespace
 {
-QString normalizedSql(QString text)
+QString
+normalizedSql(
+    QString text
+)
 {
     text.replace(QRegularExpression(QStringLiteral("\\s+")), QStringLiteral(" "));
     return text.trimmed();
 }
 
-bool isSqlText(const QString &text)
+bool
+isSqlText(
+    const QString &text
+)
 {
     const QString sql = normalizedSql(text);
 
@@ -52,14 +58,20 @@ bool isSqlText(const QString &text)
     return false;
 }
 
-bool isJsonText(const QString &text)
+bool
+isJsonText(
+    const QString &text
+)
 {
     QJsonParseError error {};
     QJsonDocument::fromJson(text.trimmed().toUtf8(), &error);
     return error.error == QJsonParseError::NoError;
 }
 
-bool isXmlText(const QString &text)
+bool
+isXmlText(
+    const QString &text
+)
 {
     const QString xml = text.trimmed();
 
@@ -76,7 +88,10 @@ bool isXmlText(const QString &text)
     return !reader.hasError();
 }
 
-QString formatSql(QString text)
+QString
+formatSql(
+    QString text
+)
 {
     QString sql = normalizedSql(std::move(text));
 
@@ -120,7 +135,10 @@ QString formatSql(QString text)
     return sql.trimmed();
 }
 
-QString formatJson(const QString &text)
+QString
+formatJson(
+    const QString &text
+)
 {
     QJsonParseError error {};
     const QJsonDocument doc = QJsonDocument::fromJson(text.trimmed().toUtf8(), &error);
@@ -132,7 +150,10 @@ QString formatJson(const QString &text)
     return QString::fromUtf8(doc.toJson(QJsonDocument::Indented));
 }
 
-QString formatXml(const QString &text)
+QString
+formatXml(
+    const QString &text
+)
 {
     QXmlStreamReader reader(text.trimmed());
     QString formatted;
@@ -151,7 +172,11 @@ QString formatXml(const QString &text)
     return reader.hasError() ? text : formatted.trimmed();
 }
 
-qsizetype findJsonEnd(const QString &text, qsizetype start)
+qsizetype
+findJsonEnd(
+    const QString &text,
+    qsizetype     start
+)
 {
     const QChar open = text.at(start);
     const QChar close = open == QLatin1Char('{') ? QLatin1Char('}') : QLatin1Char(']');
@@ -200,7 +225,11 @@ qsizetype findJsonEnd(const QString &text, qsizetype start)
     return -1;
 }
 
-QString formatJsonFragments(QString text, bool *changed)
+QString
+formatJsonFragments(
+    QString text,
+    bool    *changed
+)
 {
     for (qsizetype start = 0; start < text.size(); ++start) {
         const QChar ch = text.at(start);
@@ -230,7 +259,11 @@ QString formatJsonFragments(QString text, bool *changed)
     return text;
 }
 
-QString formatXmlFragments(QString text, bool *changed)
+QString
+formatXmlFragments(
+    QString text,
+    bool    *changed
+)
 {
     qsizetype searchFrom = 0;
 
@@ -267,7 +300,10 @@ QString formatXmlFragments(QString text, bool *changed)
     return text;
 }
 
-qsizetype findSqlStart(const QString &text)
+qsizetype
+findSqlStart(
+    const QString &text
+)
 {
     static const QRegularExpression sqlStart(
         QStringLiteral("\\b(SELECT|UPDATE|INSERT|DELETE|WITH|CREATE|ALTER|DROP)\\b"),
@@ -278,7 +314,11 @@ qsizetype findSqlStart(const QString &text)
     return match.hasMatch() ? match.capturedStart() : -1;
 }
 
-QString formatSqlFragment(const QString &text, bool *changed)
+QString
+formatSqlFragment(
+    const QString &text,
+    bool          *changed
+)
 {
     const qsizetype start = findSqlStart(text);
 
@@ -298,22 +338,35 @@ QString formatSqlFragment(const QString &text, bool *changed)
 //-------------------------------------------------------------------------------------------------
 namespace CodeFormatter
 {
-bool looksLikeJson(const QString &text)
+bool
+looksLikeJson(
+    const QString &text
+)
 {
     return isJsonText(text);
 }
 //-------------------------------------------------------------------------------------------------
-bool looksLikeSql(const QString &text)
+bool
+looksLikeSql(
+    const QString &text
+)
 {
     return isSqlText(text);
 }
 //-------------------------------------------------------------------------------------------------
-bool looksLikeXml(const QString &text)
+bool
+looksLikeXml(
+    const QString &text
+)
 {
     return isXmlText(text);
 }
 //-------------------------------------------------------------------------------------------------
-QString formatFragments(QString text, bool *changed)
+QString
+formatFragments(
+    QString text,
+    bool    *changed
+)
 {
     *changed = false;
 

@@ -9,7 +9,8 @@
 #include <QCoreApplication>
 
 //-------------------------------------------------------------------------------------------------
-QString settingsFileName()
+QString
+settingsFileName()
 {
     return QCoreApplication::applicationDirPath() + QStringLiteral("/VJson.ini");
 }

@@ -14,7 +14,11 @@
 namespace
 {
 //-------------------------------------------------------------------------------------------------
-int columnByName(const JsonlModel &model, const QString &name)
+int
+columnByName(
+    const JsonlModel &model,
+    const QString    &name
+)
 {
     for (int column = 0; column < model.columnCount(); ++column) {
         if (model.headerData(column, Qt::Horizontal).toString() == name) {
@@ -26,7 +30,10 @@ int columnByName(const JsonlModel &model, const QString &name)
 }
 
 //-------------------------------------------------------------------------------------------------
-bool writeJsonlFile(QTemporaryFile *file)
+bool
+writeJsonlFile(
+    QTemporaryFile *file
+)
 {
     if (!file->open()) {
         return false;
@@ -49,7 +56,8 @@ class TestJsonlModel final : public QObject
     Q_OBJECT
 
 private slots:
-    void loadFileParsesRowsAndMetadata()
+    void
+    loadFileParsesRowsAndMetadata()
     {
         JsonlModel model;
         QString error;
@@ -66,7 +74,8 @@ private slots:
         QVERIFY(model.recordAt(-1) == nullptr);
     }
 
-    void dataFormatsSpecialColumns()
+    void
+    dataFormatsSpecialColumns()
     {
         JsonlModel model;
         QTemporaryFile file(QDir::temp().filePath(QStringLiteral("vjson-model-test-XXXXXX.jsonl")));
@@ -98,7 +107,8 @@ private slots:
         QVERIFY(model.data(model.index(2, validColumn), Qt::DecorationRole).isValid());
     }
 
-    void memoryStats()
+    void
+    memoryStats()
     {
         JsonlModel model;
         QTemporaryFile file(QDir::temp().filePath(QStringLiteral("vjson-model-test-XXXXXX.jsonl")));

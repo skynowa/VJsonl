@@ -30,7 +30,8 @@ class TestUtilities final : public QObject
     Q_OBJECT
 
 private slots:
-    void jsonValueToStringConvertsSupportedTypes()
+    void
+    jsonValueToStringConvertsSupportedTypes()
     {
         QCOMPARE(json_utils::jsonValueToString(QJsonValue(QStringLiteral("text"))), QStringLiteral("text"));
         QCOMPARE(json_utils::jsonValueToString(QJsonValue(true)), QStringLiteral("true"));
@@ -39,7 +40,8 @@ private slots:
         QCOMPARE(json_utils::jsonValueToString(QJsonObject {{QStringLiteral("a"), 1}}), QStringLiteral("{\"a\":1}"));
     }
 
-    void timestampParsesAndFormats()
+    void
+    timestampParsesAndFormats()
     {
         const QDateTime timestamp = datetime_utils::parseTimestamp(QStringLiteral("2026-06-15T08:43:08.735921-0500)"));
 
@@ -49,7 +51,8 @@ private slots:
         QCOMPARE(datetime_utils::formatTimestamp(QStringLiteral("not a timestamp")), QStringLiteral("not a timestamp"));
     }
 
-    void codeFormatterDetectsAndFormatsFragments()
+    void
+    codeFormatterDetectsAndFormatsFragments()
     {
         bool changed = false;
 
@@ -63,7 +66,8 @@ private slots:
         QVERIFY(formatted.contains(QStringLiteral("\"a\"")));
     }
 
-    void htmlAndFileHelpers()
+    void
+    htmlAndFileHelpers()
     {
         QVERIFY(html_utils::looksLikeHtml(QStringLiteral("<div>hello</div>")));
         QVERIFY(!html_utils::looksLikeHtml(QStringLiteral("plain text")));
@@ -71,7 +75,8 @@ private slots:
         QCOMPARE(file_utils::humanFileSize(1500), QStringLiteral("1.5 KB"));
     }
 
-    void demanglesKnownCppSymbol()
+    void
+    demanglesKnownCppSymbol()
     {
         const QString demangled = demangle_utils::demangleSymbols(QStringLiteral("_Z3fooi"));
 
@@ -79,7 +84,8 @@ private slots:
         QVERIFY(demangled.contains(QStringLiteral("int")));
     }
 
-    void createsIcons()
+    void
+    createsIcons()
     {
         const QIcon copy = icon_utils::copyIcon();
         const QIcon copyFormatted = icon_utils::copyFormattedIcon();
@@ -90,7 +96,8 @@ private slots:
         QVERIFY(copy.pixmap(16, 16).toImage() != copyFormatted.pixmap(16, 16).toImage());
     }
 
-    void highlightsAllTextMatches()
+    void
+    highlightsAllTextMatches()
     {
         QTextEdit view;
         view.setPlainText(QStringLiteral("error one\nerror two\nERROR"));
@@ -106,7 +113,8 @@ private slots:
         QCOMPARE(text_search_utils::highlightAll(nullptr, QStringLiteral("error")), 0);
     }
 
-    void savesAndRestoresTableColumnOrder()
+    void
+    savesAndRestoresTableColumnOrder()
     {
         QStandardItemModel model(0, 3);
         model.setHorizontalHeaderLabels({QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")});
@@ -131,7 +139,8 @@ private slots:
         );
     }
 
-    void savesAndRestoresHiddenTableColumns()
+    void
+    savesAndRestoresHiddenTableColumns()
     {
         QStandardItemModel model(0, 3);
         model.setHorizontalHeaderLabels({QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")});
@@ -158,7 +167,8 @@ private slots:
         QVERIFY(!table.isColumnHidden(2));
     }
 
-    void populatesColumnVisibilityMenu()
+    void
+    populatesColumnVisibilityMenu()
     {
         QStandardItemModel model(0, 3);
         model.setHorizontalHeaderLabels({QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")});

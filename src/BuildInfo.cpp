@@ -11,7 +11,8 @@
 //-------------------------------------------------------------------------------------------------
 namespace BuildInfo
 {
-QString cxxStandard()
+QString
+cxxStandard()
 {
 #if __cplusplus >= 202302L
     return QStringLiteral("C++23");
@@ -28,12 +29,14 @@ QString cxxStandard()
 #endif
 }
 //-------------------------------------------------------------------------------------------------
-QString buildDate()
+QString
+buildDate()
 {
     return QStringLiteral(__DATE__ " " __TIME__);
 }
 //-------------------------------------------------------------------------------------------------
-QString buildType()
+QString
+buildType()
 {
 #ifdef VJSON_BUILD_TYPE
     const QString type = QStringLiteral(VJSON_BUILD_TYPE);
@@ -50,7 +53,8 @@ QString buildType()
 #endif
 }
 //-------------------------------------------------------------------------------------------------
-QString osInfo()
+QString
+osInfo()
 {
     const QString prettyName = QSysInfo::prettyProductName();
 

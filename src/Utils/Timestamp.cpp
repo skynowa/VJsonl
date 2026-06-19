@@ -12,7 +12,8 @@
 //-------------------------------------------------------------------------------------------------
 namespace
 {
-const QRegularExpression &timestampPattern()
+const QRegularExpression &
+timestampPattern()
 {
     static const QRegularExpression pattern(
         QStringLiteral(R"(^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:?\d{2})?\)?$)")
@@ -21,7 +22,10 @@ const QRegularExpression &timestampPattern()
     return pattern;
 }
 
-int offsetSeconds(const QString &offsetText)
+int
+offsetSeconds(
+    const QString &offsetText
+)
 {
     if (offsetText.isEmpty() || offsetText == QStringLiteral("Z")) {
         return 0;
@@ -50,7 +54,10 @@ int offsetSeconds(const QString &offsetText)
 //-------------------------------------------------------------------------------------------------
 namespace datetime_utils
 {
-QDateTime parseTimestamp(const QString &text)
+QDateTime
+parseTimestamp(
+    const QString &text
+)
 {
     const QRegularExpressionMatch match = timestampPattern().match(text.trimmed());
 
@@ -87,7 +94,10 @@ QDateTime parseTimestamp(const QString &text)
 }
 
 //-------------------------------------------------------------------------------------------------
-QString formatTimestamp(const QString &text)
+QString
+formatTimestamp(
+    const QString &text
+)
 {
     static const QStringList months {
         QStringLiteral("jan"),

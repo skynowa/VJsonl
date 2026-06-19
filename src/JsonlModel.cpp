@@ -25,7 +25,8 @@
 //-------------------------------------------------------------------------------------------------
 namespace
 {
-QIcon invalidRowIcon()
+QIcon
+invalidRowIcon()
 {
     static const QIcon icon = [] {
         QPixmap pixmap(14, 14);
@@ -50,25 +51,37 @@ QIcon invalidRowIcon()
 }
 
 //-------------------------------------------------------------------------------------------------
-JsonlModel::JsonlModel(QObject *parent) :
+JsonlModel::JsonlModel(
+    QObject *parent
+) :
     QAbstractTableModel(parent)
 {
 }
 
 //-------------------------------------------------------------------------------------------------
-int JsonlModel::rowCount(const QModelIndex &parent) const
+int
+JsonlModel::rowCount(
+    const QModelIndex &parent
+) const
 {
     return parent.isValid() ? 0 : static_cast<int>(_records.size());
 }
 
 //-------------------------------------------------------------------------------------------------
-int JsonlModel::columnCount(const QModelIndex &parent) const
+int
+JsonlModel::columnCount(
+    const QModelIndex &parent
+) const
 {
     return parent.isValid() ? 0 : static_cast<int>(_columns.size());
 }
 
 //-------------------------------------------------------------------------------------------------
-QVariant JsonlModel::data(const QModelIndex &index, int role) const
+QVariant
+JsonlModel::data(
+    const QModelIndex &index,
+    int               role
+) const
 {
     if (!index.isValid()) {
         return {};
@@ -177,7 +190,12 @@ QVariant JsonlModel::data(const QModelIndex &index, int role) const
 }
 
 //-------------------------------------------------------------------------------------------------
-QVariant JsonlModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant
+JsonlModel::headerData(
+    int             section,
+    Qt::Orientation orientation,
+    int             role
+) const
 {
     if (role != Qt::DisplayRole && role != Qt::ToolTipRole) {
         return {};
@@ -206,9 +224,10 @@ QVariant JsonlModel::headerData(int section, Qt::Orientation orientation, int ro
 }
 
 //-------------------------------------------------------------------------------------------------
-bool JsonlModel::loadFile(
-    const QString &fileName,
-    QString *outError,
+bool
+JsonlModel::loadFile(
+    const QString          &fileName,
+    QString                *outError,
     const ProgressCallback &progressCallback
 )
 {
@@ -230,10 +249,11 @@ bool JsonlModel::loadFile(
 }
 
 //-------------------------------------------------------------------------------------------------
-bool JsonlModel::loadJsonlData(
-    const QByteArray &data,
-    const QString &sourceFileName,
-    QString *outError,
+bool
+JsonlModel::loadJsonlData(
+    const QByteArray       &data,
+    const QString          &sourceFileName,
+    QString                *outError,
     const ProgressCallback &progressCallback
 )
 {
@@ -256,9 +276,10 @@ bool JsonlModel::loadJsonlData(
 }
 
 //-------------------------------------------------------------------------------------------------
-bool JsonlModel::loadDevice(
-    QIODevice *device,
-    const QString &sourceFileName,
+bool
+JsonlModel::loadDevice(
+    QIODevice              *device,
+    const QString          &sourceFileName,
     const ProgressCallback &progressCallback
 )
 {
@@ -369,7 +390,10 @@ bool JsonlModel::loadDevice(
 }
 
 //-------------------------------------------------------------------------------------------------
-const JsonlRecord *JsonlModel::recordAt(int row) const
+const JsonlRecord *
+JsonlModel::recordAt(
+    int row
+) const
 {
     if (row < 0 || row >= _records.size()) {
         return nullptr;
@@ -379,24 +403,28 @@ const JsonlRecord *JsonlModel::recordAt(int row) const
 }
 
 //-------------------------------------------------------------------------------------------------
-QString JsonlModel::fileName() const
+QString
+JsonlModel::fileName() const
 {
     return _fileName;
 }
 
 //-------------------------------------------------------------------------------------------------
-int JsonlModel::invalidRowsCount() const
+int
+JsonlModel::invalidRowsCount() const
 {
     return _invalidRowsCount;
 }
 //-------------------------------------------------------------------------------------------------
-QMap<QString, int> JsonlModel::levelCounts() const
+QMap<QString, int>
+JsonlModel::levelCounts() const
 {
     return _levelCounts;
 }
 
 //-------------------------------------------------------------------------------------------------
-JsonlModel::MemoryStats JsonlModel::memoryStats() const
+JsonlModel::MemoryStats
+JsonlModel::memoryStats() const
 {
     return _memoryStats;
 }

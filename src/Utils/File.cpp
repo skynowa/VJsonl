@@ -11,7 +11,10 @@
 //-------------------------------------------------------------------------------------------------
 namespace file_utils
 {
-QString humanFileSize(qint64 bytes)
+QString
+humanFileSize(
+    qint64 bytes
+)
 {
     static const QStringList units {
         QStringLiteral("B"),

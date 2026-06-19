@@ -11,7 +11,10 @@
 //-------------------------------------------------------------------------------------------------
 namespace html_utils
 {
-bool looksLikeHtml(const QString &text)
+bool
+looksLikeHtml(
+    const QString &text
+)
 {
     const QString trimmed = text.trimmed();
 

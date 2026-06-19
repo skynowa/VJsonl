@@ -13,7 +13,10 @@
 //-------------------------------------------------------------------------------------------------
 namespace json_utils
 {
-QString jsonValueToString(const QJsonValue &value)
+QString
+jsonValueToString(
+    const QJsonValue &value
+)
 {
     if (value.isUndefined() || value.isNull()) {
         return {};

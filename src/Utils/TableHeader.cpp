@@ -18,7 +18,11 @@
 //-------------------------------------------------------------------------------------------------
 namespace table_header_utils
 {
-QStringList columnOrder(const QHeaderView *header, const QAbstractItemModel *model)
+QStringList
+columnOrder(
+    const QHeaderView        *header,
+    const QAbstractItemModel *model
+)
 {
     QStringList order;
 
@@ -39,7 +43,12 @@ QStringList columnOrder(const QHeaderView *header, const QAbstractItemModel *mod
 }
 
 //-------------------------------------------------------------------------------------------------
-void restoreColumnOrder(QHeaderView *header, const QAbstractItemModel *model, const QStringList &order)
+void
+restoreColumnOrder(
+    QHeaderView              *header,
+    const QAbstractItemModel *model,
+    const QStringList        &order
+)
 {
     if (header == nullptr || model == nullptr) {
         return;
@@ -78,7 +87,11 @@ void restoreColumnOrder(QHeaderView *header, const QAbstractItemModel *model, co
 }
 
 //-------------------------------------------------------------------------------------------------
-QStringList hiddenColumns(const QHeaderView *header, const QAbstractItemModel *model)
+QStringList
+hiddenColumns(
+    const QHeaderView        *header,
+    const QAbstractItemModel *model
+)
 {
     QStringList columns;
 
@@ -102,7 +115,12 @@ QStringList hiddenColumns(const QHeaderView *header, const QAbstractItemModel *m
 }
 
 //-------------------------------------------------------------------------------------------------
-void restoreHiddenColumns(QHeaderView *header, const QAbstractItemModel *model, const QStringList &hiddenColumnNames)
+void
+restoreHiddenColumns(
+    QHeaderView              *header,
+    const QAbstractItemModel *model,
+    const QStringList        &hiddenColumnNames
+)
 {
     if (header == nullptr || model == nullptr) {
         return;
@@ -122,7 +140,11 @@ void restoreHiddenColumns(QHeaderView *header, const QAbstractItemModel *model, 
 }
 
 //-------------------------------------------------------------------------------------------------
-void populateColumnVisibilityMenu(QMenu *menu, QTableView *table)
+void
+populateColumnVisibilityMenu(
+    QMenu      *menu,
+    QTableView *table
+)
 {
     if (menu == nullptr || table == nullptr || table->model() == nullptr) {
         return;

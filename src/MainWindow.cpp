@@ -69,7 +69,9 @@
 #include <QUrl>
 
 //-------------------------------------------------------------------------------------------------
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(
+    QWidget *parent
+) :
     QMainWindow(parent)
 {
     _model = new JsonlModel(this);
@@ -616,7 +618,10 @@ MainWindow::MainWindow(QWidget *parent) :
     updateStatus();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::closeEvent(QCloseEvent *event)
+void
+MainWindow::closeEvent(
+    QCloseEvent *event
+)
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("window/geometry"), saveGeometry());
@@ -627,7 +632,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 //-------------------------------------------------------------------------------------------------
-bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+bool
+MainWindow::eventFilter(
+    QObject *watched,
+    QEvent  *event
+)
 {
     if (
         (watched == _table->viewport() || watched == _table->horizontalHeader())
@@ -641,7 +650,8 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     return QMainWindow::eventFilter(watched, event);
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::openFile()
+void
+MainWindow::openFile()
 {
     const QString fileName = QFileDialog::getOpenFileName(
         this,
@@ -657,7 +667,10 @@ void MainWindow::openFile()
     openFile(fileName);
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::openFile(const QString &fileName)
+void
+MainWindow::openFile(
+    const QString &fileName
+)
 {
     saveColumnOrder();
     saveColumnVisibility();
@@ -743,7 +756,10 @@ void MainWindow::openFile(const QString &fileName)
     updateStatus();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::onCurrentChanged(const QModelIndex &current)
+void
+MainWindow::onCurrentChanged(
+    const QModelIndex &current
+)
 {
     if (!current.isValid()) {
         _activeCellValue.clear();
@@ -769,7 +785,10 @@ void MainWindow::onCurrentChanged(const QModelIndex &current)
     updateStatus();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::updateCellView(const QModelIndex &current)
+void
+MainWindow::updateCellView(
+    const QModelIndex &current
+)
 {
     if (!current.isValid()) {
         _activeCellValue.clear();
@@ -839,27 +858,35 @@ void MainWindow::updateCellView(const QModelIndex &current)
     findInRawView();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::copyActiveCellValue()
+void
+MainWindow::copyActiveCellValue()
 {
     QApplication::clipboard()->setText(_activeCellValue);
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::copyFormattedCellValue()
+void
+MainWindow::copyFormattedCellValue()
 {
     QApplication::clipboard()->setText(_formattedCellValue);
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::copyRawCellValue()
+void
+MainWindow::copyRawCellValue()
 {
     QApplication::clipboard()->setText(_rawCellValue);
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::copyFormattedRawCellValue()
+void
+MainWindow::copyFormattedRawCellValue()
 {
     QApplication::clipboard()->setText(_formattedRawCellValue);
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::findInTextView(QLineEdit *search, QTextEdit *view)
+void
+MainWindow::findInTextView(
+    QLineEdit *search,
+    QTextEdit *view
+)
 {
     const QString text = search->text();
     const int matchCount = text_search_utils::highlightAll(view, text);
@@ -871,19 +898,24 @@ void MainWindow::findInTextView(QLineEdit *search, QTextEdit *view)
 }
 
 //-------------------------------------------------------------------------------------------------
-void MainWindow::findInCellView()
+void
+MainWindow::findInCellView()
 {
     auto *activeTextView = qobject_cast<QTextEdit *>(_cellStack->currentWidget());
     findInTextView(_cellSearch, activeTextView);
 }
 
 //-------------------------------------------------------------------------------------------------
-void MainWindow::findInRawView()
+void
+MainWindow::findInRawView()
 {
     findInTextView(_rawSearch, _rawView);
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::addRecentFile(const QString &fileName)
+void
+MainWindow::addRecentFile(
+    const QString &fileName
+)
 {
     _recentFiles.removeAll(fileName);
     _recentFiles.prepend(fileName);
@@ -899,13 +931,15 @@ void MainWindow::addRecentFile(const QString &fileName)
     updateRecentFilesMenu();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::loadRecentFiles()
+void
+MainWindow::loadRecentFiles()
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     _recentFiles = settings.value(QStringLiteral("recentFiles")).toStringList();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::updateRecentFilesMenu()
+void
+MainWindow::updateRecentFilesMenu()
 {
     if (_recentFilesMenu == nullptr) {
         return;
@@ -939,7 +973,12 @@ void MainWindow::updateRecentFilesMenu()
     });
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &columnName, const QString &allLabel)
+void
+MainWindow::updateColumnFilterItems(
+    QComboBox     *filter,
+    const QString &columnName,
+    const QString &allLabel
+)
 {
     if (filter == nullptr) {
         return;
@@ -977,7 +1016,8 @@ void MainWindow::updateColumnFilterItems(QComboBox *filter, const QString &colum
     applyFilters();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::applyFilters()
+void
+MainWindow::applyFilters()
 {
     _proxy->setProjectFilter(filter_utils::selectedFilterValue(_projectFilter));
     _proxy->setAppFilter(filter_utils::selectedFilterValue(_appFilter));
@@ -1003,7 +1043,8 @@ void MainWindow::applyFilters()
 }
 
 //-------------------------------------------------------------------------------------------------
-void MainWindow::updateTimestampFilterStatus()
+void
+MainWindow::updateTimestampFilterStatus()
 {
     if (_tsFilterButton == nullptr) {
         return;
@@ -1030,7 +1071,8 @@ void MainWindow::updateTimestampFilterStatus()
 }
 
 //-------------------------------------------------------------------------------------------------
-void MainWindow::updateFilterGeometry()
+void
+MainWindow::updateFilterGeometry()
 {
     if (_filterPanel == nullptr || _table == nullptr || _table->model() == nullptr) {
         return;
@@ -1081,7 +1123,8 @@ void MainWindow::updateFilterGeometry()
 }
 
 //-------------------------------------------------------------------------------------------------
-void MainWindow::updateTimestampFilterBounds()
+void
+MainWindow::updateTimestampFilterBounds()
 {
     QDateTime minTimestamp;
     QDateTime maxTimestamp;
@@ -1133,7 +1176,8 @@ void MainWindow::updateTimestampFilterBounds()
 }
 
 //-------------------------------------------------------------------------------------------------
-QString MainWindow::openDirectory() const
+QString
+MainWindow::openDirectory() const
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     const QString defaultDirectory = QDir::homePath() + QStringLiteral("/tmp");
@@ -1142,13 +1186,17 @@ QString MainWindow::openDirectory() const
     return QDir(directory).exists() ? directory : defaultDirectory;
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::saveOpenDirectory(const QString &fileName) const
+void
+MainWindow::saveOpenDirectory(
+    const QString &fileName
+) const
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("open/directory"), QFileInfo(fileName).absolutePath());
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::saveColumnWidths() const
+void
+MainWindow::saveColumnWidths() const
 {
     if (_model->fileName().isEmpty()) {
         return;
@@ -1168,7 +1216,8 @@ void MainWindow::saveColumnWidths() const
     settings.endGroup();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::restoreColumnWidths()
+void
+MainWindow::restoreColumnWidths()
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.beginGroup(QStringLiteral("columns"));
@@ -1186,7 +1235,8 @@ void MainWindow::restoreColumnWidths()
     settings.endGroup();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::saveColumnOrder() const
+void
+MainWindow::saveColumnOrder() const
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(
@@ -1195,14 +1245,16 @@ void MainWindow::saveColumnOrder() const
     );
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::restoreColumnOrder()
+void
+MainWindow::restoreColumnOrder()
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     const QStringList order = settings.value(QStringLiteral("columns/order")).toStringList();
     table_header_utils::restoreColumnOrder(_table->horizontalHeader(), _table->model(), order);
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::saveColumnVisibility() const
+void
+MainWindow::saveColumnVisibility() const
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(
@@ -1211,14 +1263,18 @@ void MainWindow::saveColumnVisibility() const
     );
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::restoreColumnVisibility()
+void
+MainWindow::restoreColumnVisibility()
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     const QStringList hiddenColumnNames = settings.value(QStringLiteral("columns/hidden")).toStringList();
     table_header_utils::restoreHiddenColumns(_table->horizontalHeader(), _table->model(), hiddenColumnNames);
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::showColumnVisibilityMenu(const QPoint &position)
+void
+MainWindow::showColumnVisibilityMenu(
+    const QPoint &position
+)
 {
     QMenu menu(this);
     table_header_utils::populateColumnVisibilityMenu(&menu, _table);
@@ -1232,21 +1288,24 @@ void MainWindow::showColumnVisibilityMenu(const QPoint &position)
     updateFilterGeometry();
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::savePanelLayout() const
+void
+MainWindow::savePanelLayout() const
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("splitters/main"), _mainSplitter->saveState());
     settings.setValue(QStringLiteral("splitters/details"), _detailsSplitter->saveState());
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::restorePanelLayout()
+void
+MainWindow::restorePanelLayout()
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     _mainSplitter->restoreState(settings.value(QStringLiteral("splitters/main")).toByteArray());
     _detailsSplitter->restoreState(settings.value(QStringLiteral("splitters/details")).toByteArray());
 }
 //-------------------------------------------------------------------------------------------------
-void MainWindow::updateStatus()
+void
+MainWindow::updateStatus()
 {
     const QModelIndex current = _table->currentIndex();
     QString currentLine = QStringLiteral("-");

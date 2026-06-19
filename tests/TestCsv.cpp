@@ -15,7 +15,11 @@
 namespace
 {
 //-------------------------------------------------------------------------------------------------
-int columnByName(const JsonlModel &model, const QString &name)
+int
+columnByName(
+    const JsonlModel &model,
+    const QString    &name
+)
 {
     for (int column = 0; column < model.columnCount(); ++column) {
         if (model.headerData(column, Qt::Horizontal, Qt::DisplayRole).toString() == name) {
@@ -33,7 +37,8 @@ class TestCsv final : public QObject
     Q_OBJECT
 
 private slots:
-    void readsQuotedCsvFile()
+    void
+    readsQuotedCsvFile()
     {
         QTemporaryFile file;
         QVERIFY(file.open());
@@ -53,7 +58,8 @@ private slots:
         QCOMPARE(csvData.rows.at(1), QStringList({"booked", "quote \"ok\"", "short", ""}));
     }
 
-    void rejectsMalformedCsv()
+    void
+    rejectsMalformedCsv()
     {
         CsvData csvData;
         QString error;
@@ -68,7 +74,8 @@ private slots:
         QVERIFY(error.contains(QStringLiteral("3 fields")));
     }
 
-    void convertsCsvToJsonlAndLoadsModel()
+    void
+    convertsCsvToJsonlAndLoadsModel()
     {
         CsvData csvData;
         QString error;

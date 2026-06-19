@@ -15,7 +15,10 @@
 namespace
 {
 
-QString demangleSymbol(const QString &symbol)
+QString
+demangleSymbol(
+    const QString &symbol
+)
 {
     const QByteArray symbolBytes = symbol.toUtf8();
     int status = 0;
@@ -36,7 +39,10 @@ QString demangleSymbol(const QString &symbol)
 //-------------------------------------------------------------------------------------------------
 namespace demangle_utils
 {
-QString demangleSymbols(const QString &text)
+QString
+demangleSymbols(
+    const QString &text
+)
 {
     static const QRegularExpression mangledSymbol(QStringLiteral(R"(_Z[A-Za-z0-9_]+)"));
     QString result;

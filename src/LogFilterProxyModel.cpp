@@ -11,13 +11,18 @@
 #include <QAbstractItemModel>
 
 //-------------------------------------------------------------------------------------------------
-LogFilterProxyModel::LogFilterProxyModel(QObject *parent) :
+LogFilterProxyModel::LogFilterProxyModel(
+    QObject *parent
+) :
     QSortFilterProxyModel(parent)
 {
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setTextFilter(const QString &text)
+void
+LogFilterProxyModel::setTextFilter(
+    const QString &text
+)
 {
     if (_textFilter == text) {
         return;
@@ -28,7 +33,10 @@ void LogFilterProxyModel::setTextFilter(const QString &text)
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setMsgTextFilter(const QString &text)
+void
+LogFilterProxyModel::setMsgTextFilter(
+    const QString &text
+)
 {
     if (_msgTextFilter == text) {
         return;
@@ -39,49 +47,73 @@ void LogFilterProxyModel::setMsgTextFilter(const QString &text)
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setLevelFilter(const QString &level)
+void
+LogFilterProxyModel::setLevelFilter(
+    const QString &level
+)
 {
     setColumnFilter(QStringLiteral("level"), level);
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setLogNameFilter(const QString &logName)
+void
+LogFilterProxyModel::setLogNameFilter(
+    const QString &logName
+)
 {
     setColumnFilter(QStringLiteral("log_name"), logName);
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setProjectFilter(const QString &project)
+void
+LogFilterProxyModel::setProjectFilter(
+    const QString &project
+)
 {
     setColumnFilter(QStringLiteral("project"), project);
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setAppFilter(const QString &app)
+void
+LogFilterProxyModel::setAppFilter(
+    const QString &app
+)
 {
     setColumnFilter(QStringLiteral("app"), app);
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setProcNameFilter(const QString &procName)
+void
+LogFilterProxyModel::setProcNameFilter(
+    const QString &procName
+)
 {
     setColumnFilter(QStringLiteral("proc_name"), procName);
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setModuleFilter(const QString &module)
+void
+LogFilterProxyModel::setModuleFilter(
+    const QString &module
+)
 {
     setColumnFilter(QStringLiteral("module"), module);
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setDescrFilter(const QString &descr)
+void
+LogFilterProxyModel::setDescrFilter(
+    const QString &descr
+)
 {
     setColumnFilter(QStringLiteral("descr"), descr);
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setQueryFilter(const QString &query)
+void
+LogFilterProxyModel::setQueryFilter(
+    const QString &query
+)
 {
     if (_queryTextFilter == query) {
         return;
@@ -92,11 +124,12 @@ void LogFilterProxyModel::setQueryFilter(const QString &query)
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setTimestampRange(
+void
+LogFilterProxyModel::setTimestampRange(
     const QDateTime &from,
-    bool hasFrom,
+    bool            hasFrom,
     const QDateTime &to,
-    bool hasTo
+    bool            hasTo
 )
 {
     const bool changed =
@@ -117,7 +150,11 @@ void LogFilterProxyModel::setTimestampRange(
 }
 
 //-------------------------------------------------------------------------------------------------
-void LogFilterProxyModel::setColumnFilter(const QString &columnName, const QString &value)
+void
+LogFilterProxyModel::setColumnFilter(
+    const QString &columnName,
+    const QString &value
+)
 {
     const QString normalizedValue = value.trimmed();
 
@@ -138,7 +175,11 @@ void LogFilterProxyModel::setColumnFilter(const QString &columnName, const QStri
 }
 
 //-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+bool
+LogFilterProxyModel::filterAcceptsRow(
+    int               sourceRow,
+    const QModelIndex &sourceParent
+) const
 {
     for (auto it = _columnFilters.cbegin(); it != _columnFilters.cend(); ++it) {
         if (!columnMatches(sourceRow, sourceParent, it.key(), it.value())) {
@@ -177,7 +218,11 @@ bool LogFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sou
 }
 
 //-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
+bool
+LogFilterProxyModel::lessThan(
+    const QModelIndex &left,
+    const QModelIndex &right
+) const
 {
     if (columnName(left.column()) == QStringLiteral("line")) {
         return sourceModel()->data(left, Qt::DisplayRole).toInt()
@@ -193,13 +238,19 @@ bool LogFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &r
 }
 
 //-------------------------------------------------------------------------------------------------
-QString LogFilterProxyModel::columnName(int column) const
+QString
+LogFilterProxyModel::columnName(
+    int column
+) const
 {
     return sourceModel()->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
 }
 
 //-------------------------------------------------------------------------------------------------
-int LogFilterProxyModel::columnByName(const QString &name) const
+int
+LogFilterProxyModel::columnByName(
+    const QString &name
+) const
 {
     const int columns = sourceModel()->columnCount();
 
@@ -213,11 +264,12 @@ int LogFilterProxyModel::columnByName(const QString &name) const
 }
 
 //-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::columnMatches(
-    int sourceRow,
+bool
+LogFilterProxyModel::columnMatches(
+    int               sourceRow,
     const QModelIndex &sourceParent,
-    const QString &columnName,
-    const QString &value
+    const QString     &columnName,
+    const QString     &value
 ) const
 {
     if (value.isEmpty()) {
@@ -236,11 +288,12 @@ bool LogFilterProxyModel::columnMatches(
 }
 
 //-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::textColumnMatches(
-    int sourceRow,
+bool
+LogFilterProxyModel::textColumnMatches(
+    int               sourceRow,
     const QModelIndex &sourceParent,
-    const QString &columnName,
-    const QString &text
+    const QString     &columnName,
+    const QString     &text
 ) const
 {
     if (text.isEmpty()) {
@@ -259,7 +312,11 @@ bool LogFilterProxyModel::textColumnMatches(
 }
 
 //-------------------------------------------------------------------------------------------------
-bool LogFilterProxyModel::timestampMatches(int sourceRow, const QModelIndex &sourceParent) const
+bool
+LogFilterProxyModel::timestampMatches(
+    int               sourceRow,
+    const QModelIndex &sourceParent
+) const
 {
     if (!_hasTimestampFrom && !_hasTimestampTo) {
         return true;

@@ -14,7 +14,8 @@
 //-------------------------------------------------------------------------------------------------
 namespace icon_utils
 {
-QIcon calendarIcon()
+QIcon
+calendarIcon()
 {
     QPixmap pixmap(16, 16);
     pixmap.fill(Qt::transparent);
@@ -40,7 +41,8 @@ QIcon calendarIcon()
 }
 
 //-------------------------------------------------------------------------------------------------
-QIcon copyIcon()
+QIcon
+copyIcon()
 {
     QPixmap pixmap(16, 16);
     pixmap.fill(Qt::transparent);
@@ -56,7 +58,8 @@ QIcon copyIcon()
 }
 
 //-------------------------------------------------------------------------------------------------
-QIcon copyFormattedIcon()
+QIcon
+copyFormattedIcon()
 {
     QPixmap pixmap(16, 16);
     pixmap.fill(Qt::transparent);

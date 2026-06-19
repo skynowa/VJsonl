@@ -19,7 +19,10 @@
 namespace
 {
 
-bool isLevelColumn(const QModelIndex &index)
+bool
+isLevelColumn(
+    const QModelIndex &index
+)
 {
     return index.model()->headerData(index.column(), Qt::Horizontal, Qt::DisplayRole).toString()
         == QStringLiteral("level");
@@ -28,14 +31,21 @@ bool isLevelColumn(const QModelIndex &index)
 }
 
 //-------------------------------------------------------------------------------------------------
-ActiveCellDelegate::ActiveCellDelegate(QTableView *table, QObject *parent) :
+ActiveCellDelegate::ActiveCellDelegate(
+    QTableView *table,
+    QObject    *parent
+) :
     QStyledItemDelegate(parent),
     _table(table)
 {
 }
 
 //-------------------------------------------------------------------------------------------------
-void ActiveCellDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const
+void
+ActiveCellDelegate::initStyleOption(
+    QStyleOptionViewItem *option,
+    const QModelIndex    &index
+) const
 {
     QStyledItemDelegate::initStyleOption(option, index);
 
@@ -45,7 +55,12 @@ void ActiveCellDelegate::initStyleOption(QStyleOptionViewItem *option, const QMo
 }
 
 //-------------------------------------------------------------------------------------------------
-void ActiveCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void
+ActiveCellDelegate::paint(
+    QPainter                   *painter,
+    const QStyleOptionViewItem &option,
+    const QModelIndex          &index
+) const
 {
     QStyleOptionViewItem activeOption(option);
 

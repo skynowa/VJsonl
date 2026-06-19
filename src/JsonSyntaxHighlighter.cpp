@@ -10,7 +10,9 @@
 #include <QFont>
 
 //-------------------------------------------------------------------------------------------------
-JsonSyntaxHighlighter::JsonSyntaxHighlighter(QTextDocument *parent) :
+JsonSyntaxHighlighter::JsonSyntaxHighlighter(
+    QTextDocument *parent
+) :
     QSyntaxHighlighter(parent),
     _keyPattern(QStringLiteral(R"("([^"\\]|\\.)*"(?=\s*:))")),
     _stringPattern(QStringLiteral(R"("([^"\\]|\\.)*")")),
@@ -54,7 +56,10 @@ JsonSyntaxHighlighter::JsonSyntaxHighlighter(QTextDocument *parent) :
     _punctuationFormat.setForeground(QColor(100, 100, 100));
 }
 //-------------------------------------------------------------------------------------------------
-void JsonSyntaxHighlighter::setMode(Mode mode)
+void
+JsonSyntaxHighlighter::setMode(
+    Mode mode
+)
 {
     if (_mode == mode) {
         return;
@@ -64,7 +69,10 @@ void JsonSyntaxHighlighter::setMode(Mode mode)
     rehighlight();
 }
 //-------------------------------------------------------------------------------------------------
-void JsonSyntaxHighlighter::highlightBlock(const QString &text)
+void
+JsonSyntaxHighlighter::highlightBlock(
+    const QString &text
+)
 {
     switch (_mode) {
     case Mode::Json:
@@ -92,7 +100,10 @@ void JsonSyntaxHighlighter::highlightBlock(const QString &text)
     }
 }
 //-------------------------------------------------------------------------------------------------
-void JsonSyntaxHighlighter::highlightBacktrace(const QString &text)
+void
+JsonSyntaxHighlighter::highlightBacktrace(
+    const QString &text
+)
 {
     const auto applyMatches = [this, &text](const QRegularExpression &pattern, const QTextCharFormat &format) {
         QRegularExpressionMatchIterator matches = pattern.globalMatch(text);
@@ -109,7 +120,10 @@ void JsonSyntaxHighlighter::highlightBacktrace(const QString &text)
     applyMatches(_backtraceFunctionPattern, _keywordFormat);
 }
 //-------------------------------------------------------------------------------------------------
-void JsonSyntaxHighlighter::highlightJson(const QString &text)
+void
+JsonSyntaxHighlighter::highlightJson(
+    const QString &text
+)
 {
     const auto applyMatches = [this, &text](const QRegularExpression &pattern, const QTextCharFormat &format) {
         QRegularExpressionMatchIterator matches = pattern.globalMatch(text);
@@ -127,7 +141,10 @@ void JsonSyntaxHighlighter::highlightJson(const QString &text)
     applyMatches(_keyPattern, _keyFormat);
 }
 //-------------------------------------------------------------------------------------------------
-void JsonSyntaxHighlighter::highlightSql(const QString &text)
+void
+JsonSyntaxHighlighter::highlightSql(
+    const QString &text
+)
 {
     const auto applyMatches = [this, &text](const QRegularExpression &pattern, const QTextCharFormat &format) {
         QRegularExpressionMatchIterator matches = pattern.globalMatch(text);
@@ -144,7 +161,10 @@ void JsonSyntaxHighlighter::highlightSql(const QString &text)
     applyMatches(_sqlLineCommentPattern, _commentFormat);
 }
 //-------------------------------------------------------------------------------------------------
-void JsonSyntaxHighlighter::highlightXml(const QString &text)
+void
+JsonSyntaxHighlighter::highlightXml(
+    const QString &text
+)
 {
     const auto applyMatches = [this, &text](const QRegularExpression &pattern, const QTextCharFormat &format) {
         QRegularExpressionMatchIterator matches = pattern.globalMatch(text);
@@ -161,7 +181,10 @@ void JsonSyntaxHighlighter::highlightXml(const QString &text)
     applyMatches(_xmlCommentPattern, _commentFormat);
 }
 //-------------------------------------------------------------------------------------------------
-void JsonSyntaxHighlighter::highlightHtml(const QString &text)
+void
+JsonSyntaxHighlighter::highlightHtml(
+    const QString &text
+)
 {
     highlightXml(text);
 
