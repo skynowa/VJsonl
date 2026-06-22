@@ -78,6 +78,7 @@ private:
         // QStringLiteral("error"),
         QStringLiteral("msg"),
         QStringLiteral("query"),
+        QStringLiteral("page"),
         QStringLiteral("request"),
         QStringLiteral("descr"),
         QStringLiteral("request_time"),

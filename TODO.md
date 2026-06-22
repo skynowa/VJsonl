@@ -25,6 +25,7 @@
     - [+] `msg`
     - [+] `query`
     - [+] `request`
+    - [+] `page`
     - `request_id`
     - `raw`
 - Add quick filter for error rows only.

@@ -139,6 +139,20 @@ LogFilterProxyModel::setRequestTextFilter(
 
 //-------------------------------------------------------------------------------------------------
 void
+LogFilterProxyModel::setPageTextFilter(
+    const QString &text
+)
+{
+    if (_pageTextFilter == text) {
+        return;
+    }
+
+    _pageTextFilter = text;
+    invalidateFilter();
+}
+
+//-------------------------------------------------------------------------------------------------
+void
 LogFilterProxyModel::setTimestampRange(
     const QDateTime &from,
     bool            hasFrom,
@@ -214,6 +228,10 @@ LogFilterProxyModel::filterAcceptsRow(
     }
 
     if (!textColumnMatches(sourceRow, sourceParent, QStringLiteral("request"), _requestTextFilter)) {
+        return false;
+    }
+
+    if (!textColumnMatches(sourceRow, sourceParent, QStringLiteral("page"), _pageTextFilter)) {
         return false;
     }
 

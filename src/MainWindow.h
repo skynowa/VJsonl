@@ -112,6 +112,7 @@ private:
     QComboBox             *_descrFilter {};
     QLineEdit             *_queryFilter {};
     QLineEdit             *_requestFilter {};
+    QLineEdit             *_pageFilter {};
     QMenu                 *_tsFilterMenu {};
     QToolButton           *_tsFilterButton {};
     QCheckBox             *_tsFromEnabled {};
