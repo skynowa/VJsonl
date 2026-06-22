@@ -611,6 +611,10 @@ MainWindow::MainWindow(
         _filter->selectAll();
     });
 
+    new QShortcut(QKeySequence(Qt::Key_Escape), this, [this] {
+        showMinimized();
+    });
+
     setWindowTitle(QStringLiteral("VJson"));
     resize(1300, 850);
 
