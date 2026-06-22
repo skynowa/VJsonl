@@ -57,6 +57,7 @@
 
 ## Table
 
+- [ ] Sessions list - each session as your own set of columns
 - [?] Auto-detect JSON keys and add them as columns.
 - [+] Allow custom column order.
 - [+] Save column widths.
