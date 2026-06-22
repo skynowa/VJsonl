@@ -43,6 +43,7 @@
 #include <QFont>
 #include <QHeaderView>
 #include <QHBoxLayout>
+#include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QLabel>
 #include <QLineEdit>
@@ -363,6 +364,7 @@ MainWindow::MainWindow(
     exitAction->setShortcut(QKeySequence::Quit);
 
     auto *viewMenu = menuBar()->addMenu(QStringLiteral("View"));
+    _tableSessionsMenu = viewMenu->addMenu(QStringLiteral("Sessions"));
     auto *themeMenu = viewMenu->addMenu(QStringLiteral("Theme"));
     auto *themeGroup = new QActionGroup(this);
     themeGroup->setExclusive(true);
@@ -615,7 +617,7 @@ MainWindow::MainWindow(
         showMinimized();
     });
 
-    setWindowTitle(QStringLiteral("VJson"));
+    updateWindowTitle();
     resize(1300, 850);
 
     QSettings settings(settingsFileName(), QSettings::IniFormat);
@@ -632,11 +634,10 @@ MainWindow::MainWindow(
     restoreColumnOrder();
     restoreColumnVisibility();
     restoreColumnWidths();
+    loadTableSessions();
     QTimer::singleShot(0, this, [this] {
         restorePanelLayout();
-        restoreColumnOrder();
-        restoreColumnVisibility();
-        restoreColumnWidths();
+        applyActiveTableSession();
         updateFilterGeometry();
     });
 
@@ -652,6 +653,7 @@ MainWindow::closeEvent(
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("window/geometry"), saveGeometry());
     savePanelLayout();
+    saveTableSessions();
     saveColumnOrder();
     saveColumnVisibility();
     saveColumnWidths();
@@ -698,6 +700,7 @@ MainWindow::openFile(
     const QString &fileName
 )
 {
+    saveTableSessions();
     saveColumnOrder();
     saveColumnVisibility();
     saveColumnWidths();
@@ -767,18 +770,15 @@ MainWindow::openFile(
         }
     }
 
-    restoreColumnOrder();
-    restoreColumnVisibility();
-    restoreColumnWidths();
+    applyActiveTableSession();
     updateFilterGeometry();
 
     addRecentFile(fileName);
     saveOpenDirectory(fileName);
     _openOriginalFileAction->setEnabled(true);
-    setWindowTitle(
-        QStringLiteral("VJson - %1 (%2)")
-            .arg(QFileInfo(fileName).fileName(), file_utils::humanFileSize(fileSize))
-    );
+    _loadedFileTitle = QStringLiteral("%1 (%2)")
+        .arg(QFileInfo(fileName).fileName(), file_utils::humanFileSize(fileSize));
+    updateWindowTitle();
     updateStatus();
 }
 //-------------------------------------------------------------------------------------------------
@@ -1314,6 +1314,193 @@ MainWindow::showColumnVisibilityMenu(
     menu.exec(_table->horizontalHeader()->mapToGlobal(position));
     saveColumnVisibility();
     updateFilterGeometry();
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::loadTableSessions()
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    _tableSessions.load(&settings);
+
+    if (_tableSessions.activeLayout().columnOrder.isEmpty()) {
+        _tableSessions.setActiveLayout(table_header_utils::captureLayout(_table));
+        _tableSessions.save(&settings);
+    } else {
+        applyActiveTableSession();
+    }
+
+    rebuildTableSessionsMenu();
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::saveTableSessions()
+{
+    _tableSessions.setActiveLayout(table_header_utils::captureLayout(_table));
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    _tableSessions.save(&settings);
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::rebuildTableSessionsMenu()
+{
+    updateWindowTitle();
+
+    if (_tableSessionsMenu == nullptr) {
+        return;
+    }
+
+    delete _tableSessionsActionGroup;
+    _tableSessionsActionGroup = new QActionGroup(_tableSessionsMenu);
+    _tableSessionsActionGroup->setExclusive(true);
+    _tableSessionsMenu->clear();
+
+    const QIcon sessionIcon = icon_utils::sessionIcon();
+    for (const QString &name : _tableSessions.names()) {
+        QAction *action = _tableSessionsMenu->addAction(sessionIcon, name);
+        action->setCheckable(true);
+        action->setChecked(name == _tableSessions.activeName());
+        _tableSessionsActionGroup->addAction(action);
+        connect(action, &QAction::triggered, this, [this, name] {
+            switchTableSession(name);
+        });
+    }
+
+    _tableSessionsMenu->addSeparator();
+    QAction *addAction = _tableSessionsMenu->addAction(QStringLiteral("Add..."));
+    QAction *renameAction = _tableSessionsMenu->addAction(QStringLiteral("Rename..."));
+    QAction *removeAction = _tableSessionsMenu->addAction(QStringLiteral("Remove"));
+    removeAction->setEnabled(_tableSessions.sessionCount() > 1);
+
+    connect(addAction, &QAction::triggered, this, &MainWindow::addTableSession);
+    connect(renameAction, &QAction::triggered, this, &MainWindow::renameTableSession);
+    connect(removeAction, &QAction::triggered, this, &MainWindow::removeTableSession);
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::switchTableSession(
+    const QString &name
+)
+{
+    if (name.compare(_tableSessions.activeName(), Qt::CaseInsensitive) == 0) {
+        return;
+    }
+
+    _tableSessions.setActiveLayout(table_header_utils::captureLayout(_table));
+
+    if (!_tableSessions.setActiveName(name)) {
+        return;
+    }
+
+    applyActiveTableSession();
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    _tableSessions.save(&settings);
+    rebuildTableSessionsMenu();
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::addTableSession()
+{
+    bool accepted = false;
+    const QString name = QInputDialog::getText(
+        this,
+        QStringLiteral("Add session"),
+        QStringLiteral("Session name:"),
+        QLineEdit::Normal,
+        QString(),
+        &accepted
+    ).trimmed();
+
+    if (!accepted || name.isEmpty()) {
+        return;
+    }
+
+    const TableLayout layout = table_header_utils::captureLayout(_table);
+    _tableSessions.setActiveLayout(layout);
+
+    if (!_tableSessions.addSession(name, layout)) {
+        QMessageBox::warning(this, QStringLiteral("Add session"), QStringLiteral("Session name already exists."));
+        return;
+    }
+
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    _tableSessions.save(&settings);
+    rebuildTableSessionsMenu();
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::renameTableSession()
+{
+    bool accepted = false;
+    const QString currentName = _tableSessions.activeName();
+    const QString newName = QInputDialog::getText(
+        this,
+        QStringLiteral("Rename session"),
+        QStringLiteral("Session name:"),
+        QLineEdit::Normal,
+        currentName,
+        &accepted
+    ).trimmed();
+
+    if (!accepted || newName.isEmpty() || newName == currentName) {
+        return;
+    }
+
+    if (!_tableSessions.renameSession(currentName, newName)) {
+        QMessageBox::warning(this, QStringLiteral("Rename session"), QStringLiteral("Session name already exists."));
+        return;
+    }
+
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    _tableSessions.save(&settings);
+    rebuildTableSessionsMenu();
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::removeTableSession()
+{
+    const QString name = _tableSessions.activeName();
+
+    if (
+        QMessageBox::question(
+            this,
+            QStringLiteral("Remove session"),
+            QStringLiteral("Remove session '%1'?").arg(name)
+        ) != QMessageBox::Yes
+    ) {
+        return;
+    }
+
+    if (!_tableSessions.removeSession(name)) {
+        return;
+    }
+
+    applyActiveTableSession();
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    _tableSessions.save(&settings);
+    rebuildTableSessionsMenu();
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::applyActiveTableSession()
+{
+    table_header_utils::applyLayout(_table, _tableSessions.activeLayout());
+    updateFilterGeometry();
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::updateWindowTitle()
+{
+    QStringList parts {QStringLiteral("VJson")};
+
+    if (!_loadedFileTitle.isEmpty()) {
+        parts.push_back(_loadedFileTitle);
+    }
+
+    if (!_tableSessions.activeName().isEmpty()) {
+        parts.push_back(QStringLiteral("Session: %1").arg(_tableSessions.activeName()));
+    }
+
+    setWindowTitle(parts.join(QStringLiteral(" - ")));
 }
 //-------------------------------------------------------------------------------------------------
 void

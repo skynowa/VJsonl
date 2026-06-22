@@ -1,6 +1,6 @@
 /**
  * \file  Utils/TableHeader.cpp
- * \brief Implements helpers for saving and restoring table column order.
+ * \brief Implements helpers for table column layouts and visibility menus.
  */
 
 
@@ -177,6 +177,55 @@ populateColumnVisibilityMenu(
         QObject::connect(action, &QAction::toggled, table, [table, logicalIndex](bool checked) {
             table->setColumnHidden(logicalIndex, !checked);
         });
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+TableLayout
+captureLayout(
+    const QTableView *table
+)
+{
+    TableLayout layout;
+
+    if (table == nullptr || table->model() == nullptr) {
+        return layout;
+    }
+
+    layout.columnOrder = columnOrder(table->horizontalHeader(), table->model());
+    layout.hiddenColumns = hiddenColumns(table->horizontalHeader(), table->model());
+
+    for (int column = 0; column < table->model()->columnCount(); ++column) {
+        const QString name = table->model()->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
+
+        if (!name.isEmpty()) {
+            layout.columnWidths.insert(name, table->columnWidth(column));
+        }
+    }
+
+    return layout;
+}
+
+//-------------------------------------------------------------------------------------------------
+void
+applyLayout(
+    QTableView        *table,
+    const TableLayout &layout
+)
+{
+    if (table == nullptr || table->model() == nullptr) {
+        return;
+    }
+
+    restoreColumnOrder(table->horizontalHeader(), table->model(), layout.columnOrder);
+    restoreHiddenColumns(table->horizontalHeader(), table->model(), layout.hiddenColumns);
+
+    for (auto it = layout.columnWidths.cbegin(); it != layout.columnWidths.cend(); ++it) {
+        const int column = filter_utils::columnByName(table->model(), it.key());
+
+        if (column >= 0 && it.value() > 0) {
+            table->setColumnWidth(column, it.value());
+        }
     }
 }
 }

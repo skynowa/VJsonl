@@ -73,6 +73,8 @@ set(VJSON_SOURCES
     src/Utils/Json.cpp
     src/ThemeManager.h
     src/ThemeManager.cpp
+    src/TableSessionManager.h
+    src/TableSessionManager.cpp
     src/Utils/Timestamp.h
     src/Utils/Timestamp.cpp
     src/Utils/TextSearch.h

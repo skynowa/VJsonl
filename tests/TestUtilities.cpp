@@ -89,11 +89,17 @@ private slots:
     {
         const QIcon copy = icon_utils::copyIcon();
         const QIcon copyFormatted = icon_utils::copyFormattedIcon();
+        const QIcon session = icon_utils::sessionIcon();
 
         QVERIFY(!icon_utils::calendarIcon().isNull());
+        QVERIFY(!session.isNull());
         QVERIFY(!copy.isNull());
         QVERIFY(!copyFormatted.isNull());
         QVERIFY(copy.pixmap(16, 16).toImage() != copyFormatted.pixmap(16, 16).toImage());
+        QVERIFY(
+            session.pixmap(16, 16, QIcon::Normal, QIcon::Off).toImage()
+            != session.pixmap(16, 16, QIcon::Normal, QIcon::On).toImage()
+        );
     }
 
     void
@@ -190,6 +196,32 @@ private slots:
         table.setColumnHidden(2, true);
         table_header_utils::populateColumnVisibilityMenu(&menu, &table);
         QVERIFY(!menu.actions().at(1)->isEnabled());
+    }
+
+    void
+    capturesAndAppliesTableLayout()
+    {
+        QStandardItemModel model(0, 3);
+        model.setHorizontalHeaderLabels({QStringLiteral("a"), QStringLiteral("b"), QStringLiteral("c")});
+
+        QTableView table;
+        table.setModel(&model);
+        table.horizontalHeader()->moveSection(2, 0);
+        table.setColumnHidden(1, true);
+        table.setColumnWidth(0, 175);
+        const TableLayout layout = table_header_utils::captureLayout(&table);
+
+        table.horizontalHeader()->moveSection(0, 2);
+        table.setColumnHidden(1, false);
+        table.setColumnWidth(0, 80);
+        table_header_utils::applyLayout(&table, layout);
+
+        QCOMPARE(
+            table_header_utils::columnOrder(table.horizontalHeader(), &model),
+            QStringList({QStringLiteral("c"), QStringLiteral("a"), QStringLiteral("b")})
+        );
+        QVERIFY(table.isColumnHidden(1));
+        QCOMPARE(table.columnWidth(0), 175);
     }
 };
 

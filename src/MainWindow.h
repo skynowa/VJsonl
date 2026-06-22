@@ -7,6 +7,7 @@
 #pragma once
 
 #include "JsonlModel.h"
+#include "TableSessionManager.h"
 
 #include <QMainWindow>
 #include <QStringList>
@@ -26,6 +27,7 @@ class QTextBrowser;
 class QMenu;
 class QPoint;
 class QAction;
+class QActionGroup;
 class QCloseEvent;
 class QEvent;
 class QSplitter;
@@ -71,6 +73,15 @@ private:
     void saveColumnVisibility() const;
     void restoreColumnVisibility();
     void showColumnVisibilityMenu(const QPoint &position);
+    void loadTableSessions();
+    void saveTableSessions();
+    void rebuildTableSessionsMenu();
+    void switchTableSession(const QString &name);
+    void addTableSession();
+    void renameTableSession();
+    void removeTableSession();
+    void applyActiveTableSession();
+    void updateWindowTitle();
     void savePanelLayout() const;
     void restorePanelLayout();
     void applyFilters();
@@ -120,6 +131,8 @@ private:
     QDateTimeEdit         *_tsFrom {};
     QDateTimeEdit         *_tsTo {};
     QMenu                 *_recentFilesMenu {};
+    QMenu                 *_tableSessionsMenu {};
+    QActionGroup          *_tableSessionsActionGroup {};
     QAction               *_openOriginalFileAction {};
     QAction               *_lightThemeAction {};
     QAction               *_lightGrayThemeAction {};
@@ -132,8 +145,10 @@ private:
     QString                _formattedCellValue;
     QString                _rawCellValue;
     QString                _formattedRawCellValue;
+    QString                _loadedFileTitle;
     QLabel                *_levelsStatusLabel {};
     QLabel                *_statusLabel {};
     QProgressBar          *_loadProgress {};
+    TableSessionManager    _tableSessions;
 };
 //-------------------------------------------------------------------------------------------------

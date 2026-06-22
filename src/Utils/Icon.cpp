@@ -82,5 +82,43 @@ copyFormattedIcon()
 
     return QIcon(pixmap);
 }
+
+//-------------------------------------------------------------------------------------------------
+QIcon
+sessionIcon()
+{
+    QPixmap pixmap(16, 16);
+    pixmap.fill(Qt::transparent);
+
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing, false);
+    painter.setPen(QPen(QColor(75, 85, 95), 1));
+    painter.setBrush(QColor(225, 238, 255));
+    painter.drawRect(QRect(1, 2, 14, 12));
+
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QColor(45, 110, 190));
+    painter.drawRect(QRect(2, 3, 12, 3));
+
+    painter.setPen(QColor(105, 120, 135));
+    painter.drawLine(6, 6, 6, 13);
+    painter.drawLine(10, 6, 10, 13);
+    painter.drawLine(2, 9, 14, 9);
+
+    QPixmap activePixmap = pixmap;
+    QPainter activePainter(&activePixmap);
+    activePainter.setRenderHint(QPainter::Antialiasing);
+    activePainter.setPen(QPen(QColor(25, 105, 45), 1));
+    activePainter.setBrush(QColor(40, 170, 75));
+    activePainter.drawEllipse(QRect(7, 7, 8, 8));
+    activePainter.setPen(QPen(Qt::white, 1.5));
+    activePainter.drawLine(9, 11, 11, 13);
+    activePainter.drawLine(11, 13, 14, 9);
+
+    QIcon icon;
+    icon.addPixmap(pixmap, QIcon::Normal, QIcon::Off);
+    icon.addPixmap(activePixmap, QIcon::Normal, QIcon::On);
+    return icon;
+}
 }
 //-------------------------------------------------------------------------------------------------

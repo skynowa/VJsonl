@@ -14,6 +14,7 @@ namespace icon_utils
 QIcon calendarIcon();
 QIcon copyIcon();
 QIcon copyFormattedIcon();
+QIcon sessionIcon();
 
 }
 //-------------------------------------------------------------------------------------------------
