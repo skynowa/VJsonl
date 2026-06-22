@@ -364,7 +364,6 @@ MainWindow::MainWindow(
     exitAction->setShortcut(QKeySequence::Quit);
 
     auto *viewMenu = menuBar()->addMenu(QStringLiteral("View"));
-    _tableSessionsMenu = viewMenu->addMenu(QStringLiteral("Sessions"));
     auto *themeMenu = viewMenu->addMenu(QStringLiteral("Theme"));
     auto *themeGroup = new QActionGroup(this);
     themeGroup->setExclusive(true);
@@ -392,6 +391,8 @@ MainWindow::MainWindow(
     _darkThemeAction = themeMenu->addAction(QStringLiteral("Dark"));
     _darkThemeAction->setCheckable(true);
     themeGroup->addAction(_darkThemeAction);
+
+    _tableSessionsMenu = menuBar()->addMenu(QStringLiteral("Sessions"));
 
     auto *helpMenu = menuBar()->addMenu(QStringLiteral("Help"));
     auto *aboutAction = helpMenu->addAction(QStringLiteral("About"));
