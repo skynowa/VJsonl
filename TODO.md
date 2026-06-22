@@ -57,7 +57,10 @@
 
 ## Table
 
-- [ ] Sessions list - each session as your own set of columns
+- [ ] Sessions list - each session as own set of columns
+    - [ ] Save / load sessions to config
+    - [ ] Add / Remove / Rename session names
+    - [ ] Apply session to QTableView
 - [?] Auto-detect JSON keys and add them as columns.
 - [+] Allow custom column order.
 - [+] Save column widths.
