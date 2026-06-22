@@ -27,6 +27,7 @@ public:
     void setModuleFilter(const QString &module);
     void setDescrFilter(const QString &descr);
     void setQueryFilter(const QString &query);
+    void setRequestTextFilter(const QString &text);
     void setTimestampRange(const QDateTime &from, bool hasFrom, const QDateTime &to, bool hasTo);
 
 protected:
@@ -47,6 +48,7 @@ private:
     QString                _textFilter;
     QString                _msgTextFilter;
     QString                _queryTextFilter;
+    QString                _requestTextFilter;
     QMap<QString, QString> _columnFilters;
     QDateTime              _timestampFrom;
     QDateTime              _timestampTo;

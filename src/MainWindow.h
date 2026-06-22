@@ -111,6 +111,7 @@ private:
     QComboBox             *_logNameFilter {};
     QComboBox             *_descrFilter {};
     QLineEdit             *_queryFilter {};
+    QLineEdit             *_requestFilter {};
     QMenu                 *_tsFilterMenu {};
     QToolButton           *_tsFilterButton {};
     QCheckBox             *_tsFromEnabled {};

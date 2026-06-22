@@ -24,7 +24,7 @@
     - [+] all columns
     - [+] `msg`
     - [+] `query`
-    - `request`
+    - [+] `request`
     - `request_id`
     - `raw`
 - Add quick filter for error rows only.

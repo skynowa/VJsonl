@@ -130,6 +130,11 @@ MainWindow::MainWindow(
     _queryFilter->setClearButtonEnabled(true);
     _queryFilter->setMinimumWidth(0);
 
+    _requestFilter = new QLineEdit(this);
+    _requestFilter->setPlaceholderText(QStringLiteral("Filter request..."));
+    _requestFilter->setClearButtonEnabled(true);
+    _requestFilter->setMinimumWidth(0);
+
     _tsFilterButton = new QToolButton(this);
     _tsFilterButton->setText(QStringLiteral("off"));
     _tsFilterButton->setIcon(icon_utils::calendarIcon());
@@ -321,6 +326,7 @@ MainWindow::MainWindow(
     _tsFilterButton->setParent(_filterPanel);
     _levelFilter->setParent(_filterPanel);
     _queryFilter->setParent(_filterPanel);
+    _requestFilter->setParent(_filterPanel);
     _descrFilter->setParent(_filterPanel);
     _msgFilter->setParent(_filterPanel);
     _filter->setParent(_filterPanel);
@@ -489,6 +495,11 @@ MainWindow::MainWindow(
     connect(_descrFilter, &QComboBox::currentIndexChanged, this, applyComboFilters);
     connect(_queryFilter, &QLineEdit::textChanged, this, [this](const QString &text) {
         _proxy->setQueryFilter(text);
+        _table->scrollToTop();
+        updateStatus();
+    });
+    connect(_requestFilter, &QLineEdit::textChanged, this, [this](const QString &text) {
+        _proxy->setRequestTextFilter(text);
         _table->scrollToTop();
         updateStatus();
     });
@@ -1118,6 +1129,7 @@ MainWindow::updateFilterGeometry()
     placeFilter(_levelFilter, QStringLiteral("level"));
     placeFilter(_msgFilter, QStringLiteral("msg"));
     placeFilter(_queryFilter, QStringLiteral("query"));
+    placeFilter(_requestFilter, QStringLiteral("request"));
     placeFilter(_descrFilter, QStringLiteral("descr"));
     placeFilter(_filter, QStringLiteral("raw"));
 }
