@@ -23,6 +23,7 @@ Important project conventions:
 - Use `ThemeManager` for theme changes.
 - Use `LogFilterProxyModel` for row filtering.
 - Use `JsonlModel` for model/display-role behavior.
+- Media (icons, images, ...) - store in `resources` instead of code
 
 Avoid:
 
