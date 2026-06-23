@@ -45,4 +45,3 @@ Do not:
 - Use `git add .` when unrelated files are present.
 - Revert unrelated changes.
 - Amend hook-modified commit messages unless the user asks for that exact change.
-
