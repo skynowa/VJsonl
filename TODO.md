@@ -41,9 +41,9 @@
 
 ## Navigation
 
-- Add bookmarks for important rows.
-- Add previous/next bookmark navigation.
-- Add selection history back/forward.
+- [-] Add bookmarks for important rows.
+- [-] Add previous/next bookmark navigation.
+- [-] Add selection history back/forward.
 - [?] Add keyboard shortcuts for common navigation actions.
 
 ## Value Panel
@@ -83,11 +83,11 @@
     - [+] Convert CSV to JSONL - impl ConverterCsvToJsonl (+ tests)
     - [+] Load JSONL to QTableView
 - Add reload current file.
-- Add file changed notification.
-- Add watch mode for changed files.
-- Add tail mode for append-only logs.
-- Add cancel button for large file loading.
-- Move large file loading to a background worker thread.
+- [-] Add file changed notification.
+- [-] Add watch mode for changed files.
+- [-] Add tail mode for append-only logs.
+- [-] Add cancel button for large file loading.
+- [-] Move large file loading to a background worker thread.
 - [n/a] Add loading statistics:
     - bytes read
     - lines read
