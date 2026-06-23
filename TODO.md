@@ -16,6 +16,10 @@
 - [n/a] Add drag and drop file opening.
 - [?] Add auto-open last file on startup.
 
+## Application
+
+- [ ] Add main icon
+
 ## Filtering
 
 - [n/a] Add filter mode: contains / regex / exact.

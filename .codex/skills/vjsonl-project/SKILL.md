@@ -30,4 +30,3 @@ Avoid:
 - Introducing new UI frameworks.
 - Bypassing existing model/proxy responsibilities.
 - Adding broad refactors while implementing a narrow feature.
-
