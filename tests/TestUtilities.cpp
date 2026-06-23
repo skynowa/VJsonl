@@ -91,10 +91,28 @@ private slots:
         const QIcon copy = icon_utils::copyIcon();
         const QIcon copyFormatted = icon_utils::copyFormattedIcon();
         const QIcon session = icon_utils::sessionIcon();
+        const QStringList iconResources {
+            QStringLiteral(":/icons/calendar.png"),
+            QStringLiteral(":/icons/copy-formatted.png"),
+            QStringLiteral(":/icons/copy.png"),
+            QStringLiteral(":/icons/invalid-row.png"),
+            QStringLiteral(":/icons/level-debug.png"),
+            QStringLiteral(":/icons/level-error.png"),
+            QStringLiteral(":/icons/level-fatal.png"),
+            QStringLiteral(":/icons/level-info.png"),
+            QStringLiteral(":/icons/level-trace.png"),
+            QStringLiteral(":/icons/level-warn.png"),
+            QStringLiteral(":/icons/session-active.png"),
+            QStringLiteral(":/icons/session.png"),
+            QStringLiteral(":/icons/vjson.png"),
+        };
 
-        QVERIFY(QFile::exists(QStringLiteral(":/icons/vjson.png")));
+        for (const QString &iconResource : iconResources) {
+            QVERIFY2(QFile::exists(iconResource), qPrintable(iconResource));
+        }
         QVERIFY(!icon_utils::appIcon().pixmap(32, 32).isNull());
         QVERIFY(!icon_utils::calendarIcon().isNull());
+        QVERIFY(!icon_utils::invalidRowIcon().isNull());
         QVERIFY(!session.isNull());
         QVERIFY(!copy.isNull());
         QVERIFY(!copyFormatted.isNull());

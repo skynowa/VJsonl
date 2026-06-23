@@ -1,5 +1,17 @@
 <RCC>
     <qresource prefix="/icons">
+        <file alias="calendar.png">icons/calendar.png</file>
+        <file alias="copy-formatted.png">icons/copy-formatted.png</file>
+        <file alias="copy.png">icons/copy.png</file>
+        <file alias="invalid-row.png">icons/invalid-row.png</file>
+        <file alias="level-debug.png">icons/level-debug.png</file>
+        <file alias="level-error.png">icons/level-error.png</file>
+        <file alias="level-fatal.png">icons/level-fatal.png</file>
+        <file alias="level-info.png">icons/level-info.png</file>
+        <file alias="level-trace.png">icons/level-trace.png</file>
+        <file alias="level-warn.png">icons/level-warn.png</file>
+        <file alias="session-active.png">icons/session-active.png</file>
+        <file alias="session.png">icons/session.png</file>
         <file alias="vjson.png">icons/vjson.png</file>
     </qresource>
 </RCC>

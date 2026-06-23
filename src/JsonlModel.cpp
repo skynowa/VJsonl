@@ -7,6 +7,7 @@
 #include "JsonlModel.h"
 
 #include "Utils/File.h"
+#include "Utils/Icon.h"
 #include "LogLevelStyle.h"
 #include "Utils/Timestamp.h"
 
@@ -16,39 +17,8 @@
 #include <QFile>
 #include <QIcon>
 #include <QJsonParseError>
-#include <QPainter>
-#include <QPen>
-#include <QPixmap>
 
 #include <utility>
-
-//-------------------------------------------------------------------------------------------------
-namespace
-{
-QIcon
-invalidRowIcon()
-{
-    static const QIcon icon = [] {
-        QPixmap pixmap(14, 14);
-        pixmap.fill(Qt::transparent);
-
-        QPainter painter(&pixmap);
-        painter.setRenderHint(QPainter::Antialiasing);
-
-        QPen pen(QColor(210, 0, 0));
-        pen.setWidth(3);
-        pen.setCapStyle(Qt::RoundCap);
-        painter.setPen(pen);
-        painter.drawLine(3, 3, 11, 11);
-        painter.drawLine(11, 3, 3, 11);
-
-        return QIcon(pixmap);
-    }();
-
-    return icon;
-}
-
-}
 
 //-------------------------------------------------------------------------------------------------
 JsonlModel::JsonlModel(
@@ -128,7 +98,7 @@ JsonlModel::data(
     }
 
     if (role == Qt::DecorationRole && column == QStringLiteral("valid") && !record.valid) {
-        return invalidRowIcon();
+        return icon_utils::invalidRowIcon();
     }
 
     auto cellText = [&record, &column]() -> QString {

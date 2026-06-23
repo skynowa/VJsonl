@@ -15,6 +15,7 @@ QIcon appIcon();
 QIcon calendarIcon();
 QIcon copyIcon();
 QIcon copyFormattedIcon();
+QIcon invalidRowIcon();
 QIcon sessionIcon();
 
 }

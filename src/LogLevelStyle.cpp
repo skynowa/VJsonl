@@ -8,12 +8,30 @@
 
 #include <QBuffer>
 #include <QColor>
+#include <QFont>
 #include <QPainter>
 #include <QPixmap>
 
 //-------------------------------------------------------------------------------------------------
+static void
+initResources()
+{
+    Q_INIT_RESOURCE(VJson);
+}
+
+//-------------------------------------------------------------------------------------------------
 namespace
 {
+QIcon
+resourceIcon(
+    const QString &name
+)
+{
+    initResources();
+    return QIcon(QStringLiteral(":/icons/%1").arg(name));
+}
+
+//-------------------------------------------------------------------------------------------------
 QIcon
 makeIcon(
     const QColor  &color,
@@ -49,30 +67,30 @@ iconForLevel(
 )
 {
     if (level.compare(QStringLiteral("fatal"), Qt::CaseInsensitive) == 0) {
-        return makeIcon(QColor(170, 0, 255), QStringLiteral("F"));
+        return resourceIcon(QStringLiteral("level-fatal.png"));
     }
 
     if (level.compare(QStringLiteral("error"), Qt::CaseInsensitive) == 0) {
-        return makeIcon(QColor(200, 0, 0), QStringLiteral("E"));
+        return resourceIcon(QStringLiteral("level-error.png"));
     }
 
     if (
         level.compare(QStringLiteral("warn"), Qt::CaseInsensitive) == 0
         || level.compare(QStringLiteral("warning"), Qt::CaseInsensitive) == 0
     ) {
-        return makeIcon(QColor(220, 145, 0), QStringLiteral("W"));
+        return resourceIcon(QStringLiteral("level-warn.png"));
     }
 
     if (level.compare(QStringLiteral("debug"), Qt::CaseInsensitive) == 0) {
-        return makeIcon(QColor(35, 150, 75), QStringLiteral("D"));
+        return resourceIcon(QStringLiteral("level-debug.png"));
     }
 
     if (level.compare(QStringLiteral("info"), Qt::CaseInsensitive) == 0) {
-        return makeIcon(QColor(40, 115, 210), QStringLiteral("I"));
+        return resourceIcon(QStringLiteral("level-info.png"));
     }
 
     if (level.compare(QStringLiteral("trace"), Qt::CaseInsensitive) == 0) {
-        return makeIcon(QColor(115, 115, 115), QStringLiteral("T"));
+        return resourceIcon(QStringLiteral("level-trace.png"));
     }
 
     return level.trimmed().isEmpty()
