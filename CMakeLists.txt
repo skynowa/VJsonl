@@ -81,6 +81,7 @@ set(VJSON_SOURCES
     src/Utils/TextSearch.cpp
     src/Utils/TableHeader.h
     src/Utils/TableHeader.cpp
+    resources/VJson.qrc
 )
 
 add_library(VJsonLib STATIC

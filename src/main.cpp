@@ -5,6 +5,7 @@
 
 
 #include "MainWindow.h"
+#include "Utils/Icon.h"
 
 #include <QApplication>
 
@@ -16,6 +17,7 @@ main(
 )
 {
     QApplication app(argc, argv);
+    app.setWindowIcon(icon_utils::appIcon());
 
     MainWindow window;
     window.show();

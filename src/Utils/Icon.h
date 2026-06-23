@@ -11,6 +11,7 @@
 namespace icon_utils
 {
 
+QIcon appIcon();
 QIcon calendarIcon();
 QIcon copyIcon();
 QIcon copyFormattedIcon();

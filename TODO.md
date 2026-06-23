@@ -18,7 +18,7 @@
 
 ## Application
 
-- [ ] Add main icon
+- [+] Add main icon
 
 ## Filtering
 

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="vjson.png">icons/vjson.png</file>
+    </qresource>
+</RCC>

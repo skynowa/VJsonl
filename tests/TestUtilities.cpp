@@ -15,6 +15,7 @@
 #include "Utils/Timestamp.h"
 
 #include <QAction>
+#include <QFile>
 #include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -91,6 +92,8 @@ private slots:
         const QIcon copyFormatted = icon_utils::copyFormattedIcon();
         const QIcon session = icon_utils::sessionIcon();
 
+        QVERIFY(QFile::exists(QStringLiteral(":/icons/vjson.png")));
+        QVERIFY(!icon_utils::appIcon().pixmap(32, 32).isNull());
         QVERIFY(!icon_utils::calendarIcon().isNull());
         QVERIFY(!session.isNull());
         QVERIFY(!copy.isNull());
