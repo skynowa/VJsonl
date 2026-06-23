@@ -22,4 +22,3 @@ Output style:
 
 - Findings first for reviews.
 - Short implementation summary for code changes.
-

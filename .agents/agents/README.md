@@ -11,4 +11,3 @@ Suggested naming:
 ```
 
 Use `TEMPLATE.md` as a starting point.
-

@@ -7,4 +7,3 @@ Examples:
 - `review-ui-change.md`
 - `prepare-commit.md`
 - `test-plan.md`
-

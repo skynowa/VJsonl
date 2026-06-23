@@ -10,4 +10,3 @@ Review the UI change for:
 - Qt Test coverage opportunities
 
 Run `./run-tests.sh` after code changes.
-

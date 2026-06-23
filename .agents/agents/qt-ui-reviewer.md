@@ -20,4 +20,3 @@ Constraints:
 
 - Do not request broad UI rewrites.
 - Prefer small Qt Widgets fixes that match the existing code.
-
