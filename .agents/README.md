@@ -9,4 +9,3 @@ Suggested structure:
 - `prompts/` - reusable prompts/checklists/snippets.
 
 These files are intentionally project-local, so they can evolve with the codebase.
-

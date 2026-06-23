@@ -20,4 +20,3 @@ Rules:
 - Keep changes scoped.
 - Match existing Qt/C++20 patterns.
 - Do not change unrelated behavior.
-
