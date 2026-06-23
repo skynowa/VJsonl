@@ -1,13 +1,12 @@
 # VJsonl Agent Notes
 
-This project is a Qt 6 / C++20 JSONL log viewer.
+## Project about
 
-## Build And Test
+JSONL / CSV log viewer.
 
-- Use `./run-tests.sh` for the normal verification loop.
-- The project builds with strict compiler warnings as errors.
-- Keep changes compatible with C++20 and Qt 6 Widgets.
-- Do not commit `build/`, `build-codex/`, `build-tests/`, `CMakeLists.txt.user`, or `*.log`.
+- UI: Qt 6
+- Language: C++20
+- Build system: CMake
 
 ## Editing Rules
 
@@ -35,3 +34,15 @@ This project is a Qt 6 / C++20 JSONL log viewer.
 - Use `LogFilterProxyModel` for row filtering.
 - Use `JsonlModel` for model/display-role behavior.
 - Use `QSettings` for theme, window, panel, table, and other persisted UI state.
+
+## Build And Test
+
+- Use `./run-tests.sh` for the normal verification loop.
+- The project builds with strict compiler warnings as errors.
+- Keep changes compatible with C++20 and Qt 6 Widgets.
+- Do not commit `build/`, `build-codex/`, `build-tests/`, `CMakeLists.txt.user`, or `*.log`.
+
+## Tests
+
+- Qt Test under `tests/`
+- Run: `run-tests.sh`
