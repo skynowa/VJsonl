@@ -41,15 +41,25 @@ class MainWindow final :
     Q_OBJECT
 
 public:
+    // Construction
     explicit MainWindow(QWidget *parent = nullptr);
 
 protected:
+    // Lifecycle and event handling
     void closeEvent(QCloseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
+    // File loading and recent files
     void openFile();
     void openFile(const QString &fileName);
+    QString openDirectory() const;
+    void saveOpenDirectory(const QString &fileName) const;
+    void addRecentFile(const QString &fileName);
+    void loadRecentFiles();
+    void updateRecentFilesMenu();
+
+    // Cell preview, raw preview, copy, and search actions
     void onCurrentChanged(const QModelIndex &current);
     void updateCellView(const QModelIndex &current);
     void copyActiveCellValue();
@@ -59,13 +69,16 @@ private:
     void findInTextView(QLineEdit *search, QTextEdit *view);
     void findInCellView();
     void findInRawView();
-    void addRecentFile(const QString &fileName);
-    void loadRecentFiles();
-    void updateRecentFilesMenu();
+
+    // Table filters and filter panel geometry
     void updateColumnFilterItems(QComboBox *filter, const QString &columnName,
             const QString &allLabel);
-    QString openDirectory() const;
-    void saveOpenDirectory(const QString &fileName) const;
+    void applyFilters();
+    void updateTimestampFilterStatus();
+    void updateFilterGeometry();
+    void updateTimestampFilterBounds();
+
+    // Column layout and visibility persistence
     void saveColumnWidths() const;
     void restoreColumnWidths();
     void saveColumnOrder() const;
@@ -73,6 +86,8 @@ private:
     void saveColumnVisibility() const;
     void restoreColumnVisibility();
     void showColumnVisibilityMenu(const QPoint &position);
+
+    // Table sessions
     void loadTableSessions();
     void saveTableSessions();
     void rebuildTableSessionsMenu();
@@ -81,39 +96,44 @@ private:
     void renameTableSession();
     void removeTableSession();
     void applyActiveTableSession();
+
+    // Window, panel layout, and status
     void updateWindowTitle();
     void savePanelLayout() const;
     void restorePanelLayout();
-    void applyFilters();
-    void updateTimestampFilterStatus();
-    void updateFilterGeometry();
-    void updateTimestampFilterBounds();
     void updateStatus();
 
 private:
+    // Data model and table view
     JsonlModel            *_model {};
     LogFilterProxyModel   *_proxy {};
     QTableView            *_table {};
+
+    // Value preview panel and controls
     QTextEdit             *_cellView {};
     QTextEdit             *_rawView {};
     JsonSyntaxHighlighter *_cellJsonHighlighter {};
     JsonSyntaxHighlighter *_rawJsonHighlighter {};
     QTextBrowser          *_htmlPreviewView {};
     QStackedWidget        *_cellStack {};
-    QSplitter             *_mainSplitter {};
-    QSplitter             *_detailsSplitter {};
-    QWidget               *_filterPanel {};
     QCheckBox             *_format {};
     QCheckBox             *_wrapCellLine {};
     QCheckBox             *_htmlPreview {};
-    QLineEdit             *_filter {};
-    QLineEdit             *_msgFilter {};
     QLineEdit             *_cellSearch {};
     QLineEdit             *_rawSearch {};
     QToolButton           *_copyValueButton {};
     QToolButton           *_copyFormattedValueButton {};
     QToolButton           *_copyRawValueButton {};
     QToolButton           *_copyFormattedRawValueButton {};
+
+    // Panel containers
+    QSplitter             *_mainSplitter {};
+    QSplitter             *_detailsSplitter {};
+
+    // Filter controls
+    QWidget               *_filterPanel {};
+    QLineEdit             *_filter {};
+    QLineEdit             *_msgFilter {};
     QComboBox             *_projectFilter {};
     QComboBox             *_appFilter {};
     QComboBox             *_procNameFilter {};
@@ -130,6 +150,8 @@ private:
     QCheckBox             *_tsToEnabled {};
     QDateTimeEdit         *_tsFrom {};
     QDateTimeEdit         *_tsTo {};
+
+    // Menus and actions
     QMenu                 *_recentFilesMenu {};
     QMenu                 *_tableSessionsMenu {};
     QActionGroup          *_tableSessionsActionGroup {};
@@ -140,12 +162,16 @@ private:
     QAction               *_mediumGrayThemeAction {};
     QAction               *_darkGreyThemeAction {};
     QAction               *_darkThemeAction {};
+
+    // Runtime state
     QStringList            _recentFiles;
     QString                _activeCellValue;
     QString                _formattedCellValue;
     QString                _rawCellValue;
     QString                _formattedRawCellValue;
     QString                _loadedFileTitle;
+
+    // Status and persisted table sessions
     QLabel                *_levelsStatusLabel {};
     QLabel                *_statusLabel {};
     QProgressBar          *_loadProgress {};

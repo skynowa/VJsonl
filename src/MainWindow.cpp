@@ -70,6 +70,8 @@
 #include <QUrl>
 
 //-------------------------------------------------------------------------------------------------
+// Construction
+//-------------------------------------------------------------------------------------------------
 MainWindow::MainWindow(
     QWidget *parent
 ) :
@@ -645,6 +647,9 @@ MainWindow::MainWindow(
     updateFilterGeometry();
     updateStatus();
 }
+
+//-------------------------------------------------------------------------------------------------
+// Lifecycle and event handling
 //-------------------------------------------------------------------------------------------------
 void
 MainWindow::closeEvent(
@@ -678,6 +683,9 @@ MainWindow::eventFilter(
 
     return QMainWindow::eventFilter(watched, event);
 }
+
+//-------------------------------------------------------------------------------------------------
+// File loading
 //-------------------------------------------------------------------------------------------------
 void
 MainWindow::openFile()
@@ -782,6 +790,28 @@ MainWindow::openFile(
     updateWindowTitle();
     updateStatus();
 }
+//-------------------------------------------------------------------------------------------------
+QString
+MainWindow::openDirectory() const
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    const QString defaultDirectory = QDir::homePath() + QStringLiteral("/tmp");
+    const QString directory = settings.value(QStringLiteral("open/directory"), defaultDirectory).toString();
+
+    return QDir(directory).exists() ? directory : defaultDirectory;
+}
+//-------------------------------------------------------------------------------------------------
+void
+MainWindow::saveOpenDirectory(
+    const QString &fileName
+) const
+{
+    QSettings settings(settingsFileName(), QSettings::IniFormat);
+    settings.setValue(QStringLiteral("open/directory"), QFileInfo(fileName).absolutePath());
+}
+
+//-------------------------------------------------------------------------------------------------
+// Cell preview, raw preview, copy, and search actions
 //-------------------------------------------------------------------------------------------------
 void
 MainWindow::onCurrentChanged(
@@ -938,6 +968,9 @@ MainWindow::findInRawView()
 {
     findInTextView(_rawSearch, _rawView);
 }
+
+//-------------------------------------------------------------------------------------------------
+// Recent files menu and persistence
 //-------------------------------------------------------------------------------------------------
 void
 MainWindow::addRecentFile(
@@ -999,6 +1032,9 @@ MainWindow::updateRecentFilesMenu()
         updateRecentFilesMenu();
     });
 }
+
+//-------------------------------------------------------------------------------------------------
+// Table filters and filter panel geometry
 //-------------------------------------------------------------------------------------------------
 void
 MainWindow::updateColumnFilterItems(
@@ -1205,24 +1241,7 @@ MainWindow::updateTimestampFilterBounds()
 }
 
 //-------------------------------------------------------------------------------------------------
-QString
-MainWindow::openDirectory() const
-{
-    QSettings settings(settingsFileName(), QSettings::IniFormat);
-    const QString defaultDirectory = QDir::homePath() + QStringLiteral("/tmp");
-    const QString directory = settings.value(QStringLiteral("open/directory"), defaultDirectory).toString();
-
-    return QDir(directory).exists() ? directory : defaultDirectory;
-}
-//-------------------------------------------------------------------------------------------------
-void
-MainWindow::saveOpenDirectory(
-    const QString &fileName
-) const
-{
-    QSettings settings(settingsFileName(), QSettings::IniFormat);
-    settings.setValue(QStringLiteral("open/directory"), QFileInfo(fileName).absolutePath());
-}
+// Column layout and visibility persistence
 //-------------------------------------------------------------------------------------------------
 void
 MainWindow::saveColumnWidths() const
@@ -1316,6 +1335,9 @@ MainWindow::showColumnVisibilityMenu(
     saveColumnVisibility();
     updateFilterGeometry();
 }
+
+//-------------------------------------------------------------------------------------------------
+// Table sessions
 //-------------------------------------------------------------------------------------------------
 void
 MainWindow::loadTableSessions()
@@ -1487,6 +1509,9 @@ MainWindow::applyActiveTableSession()
     table_header_utils::applyLayout(_table, _tableSessions.activeLayout());
     updateFilterGeometry();
 }
+
+//-------------------------------------------------------------------------------------------------
+// Window, panel layout, and status
 //-------------------------------------------------------------------------------------------------
 void
 MainWindow::updateWindowTitle()
