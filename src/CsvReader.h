@@ -21,6 +21,7 @@ struct CsvData final
 class CsvReader final
 {
 public:
+    // CSV loading and parsing
     static bool readFile(const QString &fileName, CsvData *outData, QString *outError = nullptr);
     static bool parse(const QByteArray &data, CsvData *outData, QString *outError = nullptr);
 };

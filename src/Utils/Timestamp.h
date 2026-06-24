@@ -12,6 +12,7 @@
 namespace datetime_utils
 {
 
+// Timestamp parsing and display formatting
 QDateTime parseTimestamp(const QString &text);
 QString   formatTimestamp(const QString &text);
 

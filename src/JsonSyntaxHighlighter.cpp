@@ -10,6 +10,8 @@
 #include <QFont>
 
 //-------------------------------------------------------------------------------------------------
+// Construction
+//-------------------------------------------------------------------------------------------------
 JsonSyntaxHighlighter::JsonSyntaxHighlighter(
     QTextDocument *parent
 ) :
@@ -55,6 +57,9 @@ JsonSyntaxHighlighter::JsonSyntaxHighlighter(
     _pathFormat.setForeground(QColor(100, 100, 100));
     _punctuationFormat.setForeground(QColor(100, 100, 100));
 }
+
+//-------------------------------------------------------------------------------------------------
+// Highlighter mode
 //-------------------------------------------------------------------------------------------------
 void
 JsonSyntaxHighlighter::setMode(
@@ -68,6 +73,9 @@ JsonSyntaxHighlighter::setMode(
     _mode = mode;
     rehighlight();
 }
+
+//-------------------------------------------------------------------------------------------------
+// QSyntaxHighlighter interface
 //-------------------------------------------------------------------------------------------------
 void
 JsonSyntaxHighlighter::highlightBlock(
@@ -99,6 +107,9 @@ JsonSyntaxHighlighter::highlightBlock(
         break;
     }
 }
+
+//-------------------------------------------------------------------------------------------------
+// Mode-specific highlighters
 //-------------------------------------------------------------------------------------------------
 void
 JsonSyntaxHighlighter::highlightBacktrace(

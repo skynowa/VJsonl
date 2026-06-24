@@ -14,7 +14,10 @@ class QComboBox;
 namespace filter_utils
 {
 
+// Filter widget state
 QString selectedFilterValue(const QComboBox *filter);
+
+// Model column lookup
 int     columnByName(const QAbstractItemModel *model, const QString &name);
 
 }

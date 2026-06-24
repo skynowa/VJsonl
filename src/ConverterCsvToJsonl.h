@@ -12,6 +12,7 @@
 class ConverterCsvToJsonl final
 {
 public:
+    // Conversion
     static bool convert(const CsvData &csvData, QByteArray *outJsonl, QString *outError = nullptr);
 };
 //-------------------------------------------------------------------------------------------------

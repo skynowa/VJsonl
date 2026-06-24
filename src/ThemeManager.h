@@ -13,6 +13,7 @@ class QApplication;
 namespace ThemeManager
 {
 
+// Supported application themes
 enum class Theme
 {
     Light,
@@ -23,6 +24,7 @@ enum class Theme
     Dark
 };
 
+// Theme conversion and application
 Theme   themeFromString(const QString &value);
 QString themeToString(Theme theme);
 void    applyTheme(QApplication *application, Theme theme);

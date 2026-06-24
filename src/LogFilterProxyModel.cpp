@@ -11,6 +11,8 @@
 #include <QAbstractItemModel>
 
 //-------------------------------------------------------------------------------------------------
+// Construction
+//-------------------------------------------------------------------------------------------------
 LogFilterProxyModel::LogFilterProxyModel(
     QObject *parent
 ) :
@@ -18,6 +20,8 @@ LogFilterProxyModel::LogFilterProxyModel(
 {
 }
 
+//-------------------------------------------------------------------------------------------------
+// Global and column-specific filter setters
 //-------------------------------------------------------------------------------------------------
 void
 LogFilterProxyModel::setTextFilter(
@@ -203,6 +207,8 @@ LogFilterProxyModel::setColumnFilter(
 }
 
 //-------------------------------------------------------------------------------------------------
+// QSortFilterProxyModel interface
+//-------------------------------------------------------------------------------------------------
 bool
 LogFilterProxyModel::filterAcceptsRow(
     int               sourceRow,
@@ -274,6 +280,8 @@ LogFilterProxyModel::lessThan(
 }
 
 //-------------------------------------------------------------------------------------------------
+// Filter storage and column lookup helpers
+//-------------------------------------------------------------------------------------------------
 QString
 LogFilterProxyModel::columnName(
     int column
@@ -299,6 +307,8 @@ LogFilterProxyModel::columnByName(
     return -1;
 }
 
+//-------------------------------------------------------------------------------------------------
+// Row matching helpers
 //-------------------------------------------------------------------------------------------------
 bool
 LogFilterProxyModel::columnMatches(

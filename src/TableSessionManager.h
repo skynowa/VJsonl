@@ -24,22 +24,27 @@ struct TableSession final
 class TableSessionManager final
 {
 public:
+    // Persistence
     void load(QSettings *settings);
     void save(QSettings *settings) const;
 
+    // Session metadata
     QStringList names() const;
     QString     activeName() const;
     int         sessionCount() const;
 
+    // Session management
     bool addSession(const QString &name, const TableLayout &layout);
     bool renameSession(const QString &oldName, const QString &newName);
     bool removeSession(const QString &name);
     bool setActiveName(const QString &name);
 
+    // Active session layout
     TableLayout activeLayout() const;
     void        setActiveLayout(const TableLayout &layout);
 
 private:
+    // Lookup helpers
     int indexOf(const QString &name) const;
 
 private:

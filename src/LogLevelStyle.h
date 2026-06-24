@@ -12,8 +12,11 @@
 namespace LogLevelStyle
 {
 
+// Level icon rendering
 QIcon   iconForLevel(const QString &level);
 QString iconHtmlForLevel(const QString &level);
+
+// Status-bar counter rendering
 QString levelCounterHtml(const QString &level, int count);
 
 }

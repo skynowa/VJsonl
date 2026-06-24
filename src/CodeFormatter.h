@@ -11,9 +11,12 @@
 namespace CodeFormatter
 {
 
+// Format detection
 bool    looksLikeJson(const QString &text);
 bool    looksLikeSql(const QString &text);
 bool    looksLikeXml(const QString &text);
+
+// Structured fragment formatting
 QString formatFragments(QString text, bool *changed);
 
 }

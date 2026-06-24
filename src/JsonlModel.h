@@ -26,6 +26,7 @@ class JsonlModel final :
 public:
     using ProgressCallback = std::function<void(qint64 current, qint64 total)>;
 
+    // Statistics collected while loading data
     struct MemoryStats
     {
         bool   hasValues {};
@@ -37,6 +38,7 @@ public:
 
     explicit JsonlModel(QObject *parent = nullptr);
 
+    // QAbstractTableModel interface
     int      rowCount(const QModelIndex &parent = {}) const override;
     int      columnCount(const QModelIndex &parent = {}) const override;
 
@@ -44,11 +46,13 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole)
                 const override;
 
+    // Data loading
     bool     loadFile(const QString &fileName, QString *outError = nullptr,
                 const ProgressCallback &progressCallback = {});
     bool     loadJsonlData(const QByteArray &data, const QString &sourceFileName,
                 QString *outError = nullptr, const ProgressCallback &progressCallback = {});
 
+    // Loaded data accessors
     const JsonlRecord *recordAt(int row) const;
     QString            fileName() const;
     int                invalidRowsCount() const;
@@ -60,6 +64,7 @@ private:
         const ProgressCallback &progressCallback);
 
 private:
+    // Loaded records and table shape
     QVector<JsonlRecord> _records;
     QStringList          _columns {
         // QStringLiteral("line"),
@@ -89,6 +94,8 @@ private:
         QStringLiteral("backtrace"),
         QStringLiteral("raw")
     };
+
+    // Loaded file metadata and aggregate statistics
     QString              _fileName;
     int                  _invalidRowsCount {};
     QMap<QString, int>   _levelCounts;

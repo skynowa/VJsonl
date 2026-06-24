@@ -15,15 +15,19 @@ class ActiveCellDelegate final :
     public QStyledItemDelegate
 {
 public:
+    // Construction
     explicit ActiveCellDelegate(QTableView *table, QObject *parent = nullptr);
 
+    // QStyledItemDelegate interface
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)
             const override;
 
 protected:
+    // Style preparation
     void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
 
 private:
+    // Associated table view
     QTableView *_table {};
 };
 //-------------------------------------------------------------------------------------------------

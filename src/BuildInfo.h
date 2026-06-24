@@ -11,6 +11,7 @@
 namespace BuildInfo
 {
 
+// Build/runtime values shown in About
 QString cxxStandard();
 QString buildDate();
 QString buildType();
