@@ -24,6 +24,8 @@
 
 - [n/a] Add filter mode: contains / regex / exact.
 - [?] Add negative filter mode.
+- Add clear all filters action.
+- Add saved filter presets.
 - Add column-specific filter:
     - [+] all columns
     - [+] `msg`
@@ -52,6 +54,7 @@
 - [+] Add `Copy formatted value` button.
 - [?] Add `Save value to file`.
 - [?] Add `Raw / Formatted / Preview` mode selector.
+- Add line/column metadata for the selected value.
 - [+] Highlight all search matches, not only the first match.
 - [n/a] Add next/previous match navigation in the value panel.
 - [n/a] Add JSON tree view.
@@ -82,6 +85,8 @@
     - [+] Load CSV file (*.csv), parse - impl CsvReader (+ tests)
     - [+] Convert CSV to JSONL - impl ConverterCsvToJsonl (+ tests)
     - [+] Load JSONL to QTableView
+- Add open/load compressed `.jsonl.gz` files.
+- Add multi-file open and merge into one view.
 - Add reload current file.
 - [-] Add file changed notification.
 - [-] Add watch mode for changed files.
@@ -106,10 +111,19 @@
     - top `log_name`
     - top `service`
     - top `proc_name`
+- Add invalid rows summary panel:
+    - line number
+    - parse error
+    - raw line preview
 - [+] Add memory statistics for `mem_usage_kb`:
     - [+] min
     - [+] max
     - [+] average
+- Add request time statistics for `request_time`:
+    - min
+    - max
+    - average
+    - p95
 - [?] Add simple timeline by `ts`.
 - [?] Add error timeline by `ts`.
 
@@ -120,6 +134,7 @@
 - Avoid storing parsed JSON documents for plain-text log lines.
 - Add optional parsing only for visible rows.
 - Add memory usage indicator for the viewer itself.
+- Add cached normalized text for faster repeated filtering.
 
 ## Documentation
 
