@@ -85,9 +85,9 @@
     - [+] Load CSV file (*.csv), parse - impl CsvReader (+ tests)
     - [+] Convert CSV to JSONL - impl ConverterCsvToJsonl (+ tests)
     - [+] Load JSONL to QTableView
-- Add open/load compressed `.jsonl.gz` files.
-- Add multi-file open and merge into one view.
-- Add reload current file.
+- [<] Add open/load compressed `.jsonl.gz` files.
+- [-] Add multi-file open and merge into one view.
+- [<] Add reload current file.
 - [-] Add file changed notification.
 - [-] Add watch mode for changed files.
 - [-] Add tail mode for append-only logs.
@@ -138,7 +138,7 @@
 
 ## Documentation
 
-- Keep `Features.md` updated after each feature.
-- Keep `ChangeLog.md` updated after each user-visible change.
-- Add screenshots for main workflows.
-- Add test data descriptions for files in `sample/`.
+- [<] Keep `Features.md` updated after each feature.
+- [<] Keep `ChangeLog.md` updated after each user-visible change.
+- [<] Add screenshots for main workflows.
+- [<] Add test data descriptions for files in `sample/`.
