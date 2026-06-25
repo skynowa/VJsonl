@@ -1,4 +1,0 @@
-interface:
-  display_name: "Implement TODO Task"
-  short_description: "Implement and mark a requested TODO task"
-  default_prompt: "Use $todo-impl to implement and mark this TODO.md task:"
