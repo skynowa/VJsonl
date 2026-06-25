@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add TODO Feature"
+  short_description: "Add useful feature ideas to TODO.md"
+  default_prompt: "Use $todo-new to add useful feature ideas to TODO.md:"
