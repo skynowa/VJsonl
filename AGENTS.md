@@ -10,6 +10,8 @@ JSONL / CSV log viewer.
 
 ## Editing Rules
 
+- Before editing code, read `/home/skynowa/.codex/.agents/rules/README.md` and every relevant rule listed there.
+- For Qt/C++ work, include `Qt.md`, `CodeStyle.md`, `CodeQuality.md`, `CppStack.md`, and related task rules.
 - Inspect the relevant files before changing code.
 - Prefer small, local changes that match the existing Qt Widgets style.
 - Keep UI changes consistent with existing `MainWindow` layout patterns.
