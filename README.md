@@ -39,3 +39,8 @@ cmake --build build -j
 ## Notes
 
 This MVP loads the full file into memory. It is OK for normal log files and hundreds of thousands of lines. For multi-GB logs, use chunked/lazy loading.
+
+## Similar apps
+
+- [json-log-viewer](https://github.com/gistia/json-log-viewer)
+- [jq](https://jqlang.org)
