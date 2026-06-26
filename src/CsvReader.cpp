@@ -7,6 +7,7 @@
 #include "CsvReader.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QSet>
 
 //-------------------------------------------------------------------------------------------------
@@ -20,6 +21,17 @@ CsvReader::readFile(
 )
 {
     QFile file(fileName);
+    const qint64 fileSize = QFileInfo(fileName).size();
+
+    if (fileSize > maxInputBytes) {
+        if (outError != nullptr) {
+            *outError = QStringLiteral("CSV file is too large: %1 bytes; limit is %2 bytes")
+                .arg(fileSize)
+                .arg(maxInputBytes);
+        }
+
+        return false;
+    }
 
     if (!file.open(QIODevice::ReadOnly)) {
         if (outError != nullptr) {
@@ -29,7 +41,17 @@ CsvReader::readFile(
         return false;
     }
 
-    return parse(file.readAll(), outData, outError);
+    const QByteArray data = file.readAll();
+
+    if (file.error() != QFileDevice::NoError) {
+        if (outError != nullptr) {
+            *outError = file.errorString();
+        }
+
+        return false;
+    }
+
+    return parse(data, outData, outError);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -56,10 +78,6 @@ CsvReader::parse(
 
     QString text = QString::fromUtf8(data);
 
-    if (text.startsWith(QChar::ByteOrderMark)) {
-        text.remove(0, 1);
-    }
-
     QVector<QStringList> records;
     QStringList row;
     QString field;
@@ -75,6 +93,16 @@ CsvReader::parse(
         return false;
     };
 
+    if (text.size() > maxInputBytes) {
+        return fail(QStringLiteral("CSV input is too large: %1 characters; limit is %2 characters")
+            .arg(text.size())
+            .arg(maxInputBytes));
+    }
+
+    if (text.startsWith(QChar::ByteOrderMark)) {
+        text.remove(0, 1);
+    }
+
     auto finishField = [&] {
         row.push_back(field);
         field.clear();
@@ -89,7 +117,7 @@ CsvReader::parse(
     };
 
     for (qsizetype index = 0; index < text.size(); ++index) {
-        const QChar character = text.at(index);
+        const auto character = text.at(index);
 
         if (inQuotes) {
             if (character == QLatin1Char('"')) {
@@ -160,6 +188,10 @@ CsvReader::parse(
             field += character;
             fieldStarted = true;
         }
+
+        if (field.size() > maxFieldCharacters) {
+            return fail(QStringLiteral("CSV field at position %1 is too large").arg(index + 1));
+        }
     }
 
     if (inQuotes) {
@@ -172,6 +204,12 @@ CsvReader::parse(
 
     if (records.isEmpty()) {
         return fail(QStringLiteral("CSV file has no header row"));
+    }
+
+    if (records.size() > maxRows + 1) {
+        return fail(QStringLiteral("CSV row count %1 exceeds limit %2")
+            .arg(records.size() - 1)
+            .arg(maxRows));
     }
 
     outData->headers = records.takeFirst();

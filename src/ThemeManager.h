@@ -21,7 +21,7 @@ enum class Theme
     Grey,
     MediumGray,
     DarkGrey,
-    Dark
+    Dark,
 };
 
 // Theme conversion and application

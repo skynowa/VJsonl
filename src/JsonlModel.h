@@ -10,7 +10,7 @@
 
 #include <QAbstractTableModel>
 #include <QByteArray>
-#include <QMap>
+#include <QHash>
 #include <QStringList>
 #include <QVector>
 
@@ -37,6 +37,7 @@ public:
     };
 
     explicit JsonlModel(QObject *parent = nullptr);
+    Q_DISABLE_COPY_MOVE(JsonlModel)
 
     // QAbstractTableModel interface
     int      rowCount(const QModelIndex &parent = {}) const override;
@@ -56,11 +57,11 @@ public:
     const JsonlRecord *recordAt(int row) const;
     QString            fileName() const;
     int                invalidRowsCount() const;
-    QMap<QString, int> levelCounts() const;
+    QHash<QString, int> levelCounts() const;
     MemoryStats        memoryStats() const;
 
 private:
-    bool loadDevice(QIODevice *device, const QString &sourceFileName,
+    bool loadDevice(QIODevice *device, const QString &sourceFileName, QString *outError,
         const ProgressCallback &progressCallback);
 
 private:
@@ -98,7 +99,7 @@ private:
     // Loaded file metadata and aggregate statistics
     QString              _fileName;
     int                  _invalidRowsCount {};
-    QMap<QString, int>   _levelCounts;
+    QHash<QString, int>  _levelCounts;
     MemoryStats          _memoryStats;
     double               _memoryUsageTotalKb {};
 };

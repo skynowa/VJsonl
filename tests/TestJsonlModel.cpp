@@ -123,6 +123,23 @@ private slots:
         QCOMPARE(stats.maxKb, 174080);
         QCOMPARE(stats.averageKb, 88064.0);
     }
+
+    void
+    nonObjectJsonRowsAreInvalid()
+    {
+        JsonlModel model;
+        QString error;
+
+        QVERIFY(model.loadJsonlData(QByteArray("[1,2,3]\n"), QStringLiteral("array.jsonl"), &error));
+        QCOMPARE(error, QString());
+        QCOMPARE(model.rowCount(), 1);
+        QCOMPARE(model.invalidRowsCount(), 1);
+
+        const auto *record = model.recordAt(0);
+        QVERIFY(record != nullptr);
+        QVERIFY(!record->valid);
+        QCOMPARE(record->error, QStringLiteral("JSON row is not an object"));
+    }
 };
 
 //-------------------------------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 
 #include "Utils/Json.h"
 
+#include <QDateTime>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QString>
@@ -17,6 +18,7 @@ struct JsonlRecord final
     int           lineNo {};
     QString       raw;
     QJsonDocument doc;
+    QDateTime     timestamp;
     bool          valid {};
     QString       error;
 

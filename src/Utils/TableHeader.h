@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <QMap>
+#include <QHash>
 #include <QStringList>
 
 class QAbstractItemModel;
@@ -18,7 +18,7 @@ struct TableLayout final
 {
     QStringList        columnOrder;
     QStringList        hiddenColumns;
-    QMap<QString, int> columnWidths;
+    QHash<QString, int> columnWidths;
 };
 
 //-------------------------------------------------------------------------------------------------

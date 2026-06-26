@@ -58,7 +58,12 @@ valueAt(
 )
 {
     const int column = columnByName(model, columnName);
-    Q_ASSERT(column >= 0);
+
+    if (column < 0) {
+        QTest::qFail(qPrintable(QStringLiteral("Missing column '%1'").arg(columnName)), __FILE__, __LINE__);
+        return {};
+    }
+
     return model.data(model.index(row, column)).toString();
 }
 }
@@ -173,6 +178,30 @@ private slots:
 
         QCOMPARE(proxy.rowCount(), 1);
         QCOMPARE(valueAt(proxy, 0, QStringLiteral("msg")), QStringLiteral("Room failed"));
+    }
+
+    void
+    sortsTextColumnsCaseInsensitively()
+    {
+        JsonlModel model;
+        QString error;
+        const QByteArray data(
+            "{\"msg\":\"beta\"}\n"
+            "{\"msg\":\"Alpha\"}\n"
+            "{\"msg\":\"gamma\"}\n"
+        );
+
+        QVERIFY2(model.loadJsonlData(data, QStringLiteral("sort.jsonl"), &error), qPrintable(error));
+
+        LogFilterProxyModel proxy;
+        proxy.setSourceModel(&model);
+        const int msgColumn = columnByName(proxy, QStringLiteral("msg"));
+        QVERIFY(msgColumn >= 0);
+
+        proxy.sort(msgColumn, Qt::AscendingOrder);
+        QCOMPARE(valueAt(proxy, 0, QStringLiteral("msg")), QStringLiteral("Alpha"));
+        QCOMPARE(valueAt(proxy, 1, QStringLiteral("msg")), QStringLiteral("beta"));
+        QCOMPARE(valueAt(proxy, 2, QStringLiteral("msg")), QStringLiteral("gamma"));
     }
 };
 

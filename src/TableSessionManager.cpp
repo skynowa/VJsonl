@@ -6,6 +6,7 @@
 
 #include "TableSessionManager.h"
 
+#include <QHash>
 #include <QSettings>
 #include <QVariantMap>
 
@@ -15,11 +16,12 @@ namespace
 {
 //-------------------------------------------------------------------------------------------------
 constexpr auto defaultSessionName = "Default";
+constexpr int tableSessionsSchemaVersion = 1;
 
 //-------------------------------------------------------------------------------------------------
 QVariantMap
 widthsToVariantMap(
-    const QMap<QString, int> &widths
+    const QHash<QString, int> &widths
 )
 {
     QVariantMap result;
@@ -32,12 +34,12 @@ widthsToVariantMap(
 }
 
 //-------------------------------------------------------------------------------------------------
-QMap<QString, int>
+QHash<QString, int>
 widthsFromVariantMap(
     const QVariantMap &values
 )
 {
-    QMap<QString, int> result;
+    QHash<QString, int> result;
 
     for (auto it = values.cbegin(); it != values.cend(); ++it) {
         bool ok = false;
@@ -65,25 +67,33 @@ TableSessionManager::load(
 
     if (settings != nullptr) {
         settings->beginGroup(QStringLiteral("tableSessions"));
-        _activeName = settings->value(QStringLiteral("active")).toString();
-        const int count = settings->beginReadArray(QStringLiteral("items"));
+        const int version = settings->value(
+            QStringLiteral("schemaVersion"),
+            tableSessionsSchemaVersion
+        ).toInt();
 
-        for (int index = 0; index < count; ++index) {
-            settings->setArrayIndex(index);
-            TableSession session;
-            session.name = settings->value(QStringLiteral("name")).toString().trimmed();
-            session.layout.columnOrder = settings->value(QStringLiteral("order")).toStringList();
-            session.layout.hiddenColumns = settings->value(QStringLiteral("hidden")).toStringList();
-            session.layout.columnWidths = widthsFromVariantMap(
-                settings->value(QStringLiteral("widths")).toMap()
-            );
+        if (version == tableSessionsSchemaVersion) {
+            _activeName = settings->value(QStringLiteral("active")).toString();
+            const int count = settings->beginReadArray(QStringLiteral("items"));
 
-            if (!session.name.isEmpty() && indexOf(session.name) < 0) {
-                _sessions.push_back(std::move(session));
+            for (int index = 0; index < count; ++index) {
+                settings->setArrayIndex(index);
+                TableSession session;
+                session.name = settings->value(QStringLiteral("name")).toString().trimmed();
+                session.layout.columnOrder = settings->value(QStringLiteral("order")).toStringList();
+                session.layout.hiddenColumns = settings->value(QStringLiteral("hidden")).toStringList();
+                session.layout.columnWidths = widthsFromVariantMap(
+                    settings->value(QStringLiteral("widths")).toMap()
+                );
+
+                if (!session.name.isEmpty() && indexOf(session.name) < 0) {
+                    _sessions.push_back(std::move(session));
+                }
             }
+
+            settings->endArray();
         }
 
-        settings->endArray();
         settings->endGroup();
     }
 
@@ -108,6 +118,7 @@ TableSessionManager::save(
 
     settings->beginGroup(QStringLiteral("tableSessions"));
     settings->remove(QString());
+    settings->setValue(QStringLiteral("schemaVersion"), tableSessionsSchemaVersion);
     settings->setValue(QStringLiteral("active"), _activeName);
     settings->beginWriteArray(QStringLiteral("items"), static_cast<int>(_sessions.size()));
 

@@ -2,7 +2,26 @@
 
 **Scope**: files: `/home/skynowa/Projects/VJsonl/src`, `/home/skynowa/Projects/VJsonl/tests`
 **Files reviewed**: 49
-**Issues found**: 41 (27 from lint, 14 from deep analysis)
+**Original issues found**: 41 (27 from lint, 14 from deep analysis)
+**Resolution status**: Fixed in this working tree.
+
+## Resolution Summary
+
+- Deterministic Qt review linter findings are fixed; rerunning `qt_review_lint.py` over the whole project now exits cleanly.
+- Model loading now avoids progress callbacks inside a model reset, validates model indexes, treats non-object JSON rows as invalid, records typed timestamps once, and checks file-device read errors where supported.
+- CSV loading now checks read errors and enforces file, row, and field-size limits before full materialization.
+- Proxy sorting is case-insensitive for text fallback sorting and timestamp filtering uses the typed timestamp role instead of reparsing display strings.
+- Session menu rebuilds are deferred out of action-trigger signal delivery.
+- QObject-derived classes explicitly disable copy/move.
+- Formatting work is no longer performed unconditionally on every selection change; formatted copies compute lazily when needed.
+- Level icon HTML and SQL formatter regexes are cached.
+- Table-session settings now include schema validation, and settings writes are synced and checked through `syncSettings()`.
+- Focused tests were added or tightened for non-object JSON rows, case-insensitive sorting, table-session schema validation, JSON parse validation in CSV tests, and the release-safe proxy test helper.
+
+**Verification**:
+
+- `./run-tests.sh` passed: 5/5 tests.
+- `python3 /home/skynowa/Projects/Github/AISkills/agent-skills/skills/qt-cpp-review/references/lint-scripts/qt_review_lint.py <all source/test C++ files>` passed with no output.
 
 ---
 

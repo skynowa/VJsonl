@@ -7,7 +7,7 @@
 #pragma once
 
 #include <QDateTime>
-#include <QMap>
+#include <QHash>
 #include <QSortFilterProxyModel>
 #include <QString>
 //-------------------------------------------------------------------------------------------------
@@ -16,6 +16,7 @@ class LogFilterProxyModel final :
 {
 public:
     explicit LogFilterProxyModel(QObject *parent = nullptr);
+    Q_DISABLE_COPY_MOVE(LogFilterProxyModel)
 
     // Global and column-specific filter setters
     void setTextFilter(const QString &text);
@@ -42,6 +43,7 @@ private:
     void setColumnFilter(const QString &columnName, const QString &value);
     QString columnName(int column) const;
     int  columnByName(const QString &name) const;
+    int  timestampColumn() const;
 
     // Row matching helpers
     bool columnMatches(int sourceRow, const QModelIndex &sourceParent, const QString &columnName,
@@ -59,12 +61,13 @@ private:
     QString                _pageTextFilter;
 
     // Exact-match column filters
-    QMap<QString, QString> _columnFilters;
+    QHash<QString, QString> _columnFilters;
 
     // Timestamp range filter
     QDateTime              _timestampFrom;
     QDateTime              _timestampTo;
     bool                   _hasTimestampFrom {};
     bool                   _hasTimestampTo {};
+    mutable int            _timestampColumn { -2 };
 };
 //-------------------------------------------------------------------------------------------------

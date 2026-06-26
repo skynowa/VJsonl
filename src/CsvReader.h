@@ -21,6 +21,10 @@ struct CsvData final
 class CsvReader final
 {
 public:
+    static constexpr qsizetype maxInputBytes = 64 * 1024 * 1024;
+    static constexpr qsizetype maxRows = 500000;
+    static constexpr qsizetype maxFieldCharacters = 1024 * 1024;
+
     // CSV loading and parsing
     static bool readFile(const QString &fileName, CsvData *outData, QString *outError = nullptr);
     static bool parse(const QByteArray &data, CsvData *outData, QString *outError = nullptr);

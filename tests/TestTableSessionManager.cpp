@@ -58,6 +58,28 @@ private slots:
         QCOMPARE(restored.activeLayout().hiddenColumns, defaultLayout.hiddenColumns);
         QVERIFY(!restored.removeSession(QStringLiteral("Default")));
     }
+
+    void
+    ignoresUnsupportedPersistedSchemaVersion()
+    {
+        QTemporaryDir directory;
+        QVERIFY(directory.isValid());
+        QSettings settings(directory.filePath(QStringLiteral("sessions.ini")), QSettings::IniFormat);
+        settings.beginGroup(QStringLiteral("tableSessions"));
+        settings.setValue(QStringLiteral("schemaVersion"), 999);
+        settings.setValue(QStringLiteral("active"), QStringLiteral("Broken"));
+        settings.beginWriteArray(QStringLiteral("items"), 1);
+        settings.setArrayIndex(0);
+        settings.setValue(QStringLiteral("name"), QStringLiteral("Broken"));
+        settings.endArray();
+        settings.endGroup();
+        settings.sync();
+
+        TableSessionManager manager;
+        manager.load(&settings);
+        QCOMPARE(manager.names(), QStringList({QStringLiteral("Default")}));
+        QCOMPARE(manager.activeName(), QStringLiteral("Default"));
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
