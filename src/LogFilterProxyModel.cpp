@@ -18,6 +18,7 @@ LogFilterProxyModel::LogFilterProxyModel(
 ) :
     QSortFilterProxyModel(parent)
 {
+    setSortCaseSensitivity(Qt::CaseInsensitive);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -178,6 +179,7 @@ LogFilterProxyModel::setTimestampRange(
     _timestampTo = to;
     _hasTimestampFrom = hasFrom;
     _hasTimestampTo = hasTo;
+    _timestampColumn = -2;
     invalidateFilter();
 }
 
@@ -276,7 +278,10 @@ LogFilterProxyModel::lessThan(
             < sourceModel()->data(right, Qt::ToolTipRole).toString();
     }
 
-    return QSortFilterProxyModel::lessThan(left, right);
+    return sourceModel()->data(left, Qt::DisplayRole).toString().compare(
+        sourceModel()->data(right, Qt::DisplayRole).toString(),
+        Qt::CaseInsensitive
+    ) < 0;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -305,6 +310,17 @@ LogFilterProxyModel::columnByName(
     }
 
     return -1;
+}
+
+//-------------------------------------------------------------------------------------------------
+int
+LogFilterProxyModel::timestampColumn() const
+{
+    if (_timestampColumn == -2) {
+        _timestampColumn = columnByName(QStringLiteral("ts"));
+    }
+
+    return _timestampColumn;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -368,14 +384,18 @@ LogFilterProxyModel::timestampMatches(
         return true;
     }
 
-    const int column = columnByName(QStringLiteral("ts"));
+    const int column = timestampColumn();
 
     if (column < 0) {
         return false;
     }
 
     const QModelIndex index = sourceModel()->index(sourceRow, column, sourceParent);
-    const QDateTime timestamp = datetime_utils::parseTimestamp(sourceModel()->data(index, Qt::ToolTipRole).toString());
+    QDateTime timestamp = sourceModel()->data(index, Qt::UserRole).toDateTime();
+
+    if (!timestamp.isValid()) {
+        timestamp = datetime_utils::parseTimestamp(sourceModel()->data(index, Qt::ToolTipRole).toString());
+    }
 
     if (!timestamp.isValid()) {
         return false;

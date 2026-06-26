@@ -17,7 +17,7 @@ bool    looksLikeSql(const QString &text);
 bool    looksLikeXml(const QString &text);
 
 // Structured fragment formatting
-QString formatFragments(QString text, bool *changed);
+QString formatFragments(QString text, bool &changed);
 
 }
 //-------------------------------------------------------------------------------------------------

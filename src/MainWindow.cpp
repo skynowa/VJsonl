@@ -55,6 +55,7 @@
 #include <QShortcut>
 #include <QSizePolicy>
 #include <QScrollBar>
+#include <QSet>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
@@ -68,6 +69,8 @@
 #include <QWidgetAction>
 #include <QWidget>
 #include <QUrl>
+
+#include <algorithm>
 
 //-------------------------------------------------------------------------------------------------
 // Construction
@@ -157,13 +160,13 @@ MainWindow::MainWindow(
     tsFilterLayout->setSpacing(2);
 
     _tsFromEnabled = new QCheckBox(QStringLiteral("from"), tsFilterWidget);
-    _tsFrom = new QDateTimeEdit(QDateTime::currentDateTime(), tsFilterWidget);
+    _tsFrom = new QDateTimeEdit(QDateTime::currentDateTimeUtc(), tsFilterWidget);
     _tsFrom->setCalendarPopup(true);
     _tsFrom->setDisplayFormat(QStringLiteral("yyyy-MM-dd HH:mm:ss.zzz"));
     _tsFrom->setEnabled(false);
 
     _tsToEnabled = new QCheckBox(QStringLiteral("to"), tsFilterWidget);
-    _tsTo = new QDateTimeEdit(QDateTime::currentDateTime(), tsFilterWidget);
+    _tsTo = new QDateTimeEdit(QDateTime::currentDateTimeUtc(), tsFilterWidget);
     _tsTo->setCalendarPopup(true);
     _tsTo->setDisplayFormat(QStringLiteral("yyyy-MM-dd HH:mm:ss.zzz"));
     _tsTo->setEnabled(false);
@@ -215,7 +218,7 @@ MainWindow::MainWindow(
 
     _format = new QCheckBox(QStringLiteral("Format"), this);
     _format->setEnabled(false);
-    _format->setChecked(true);
+    _format->setChecked(false);
 
     _wrapCellLine = new QCheckBox(QStringLiteral("Wrap line"), this);
     _wrapCellLine->setChecked(true);
@@ -325,7 +328,7 @@ MainWindow::MainWindow(
 
     _filterPanel = new QWidget(this);
     _filterPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    _filterPanel->setFixedHeight(qMax(_projectFilter->sizeHint().height(), _filter->sizeHint().height()));
+    _filterPanel->setFixedHeight((std::max)(_projectFilter->sizeHint().height(), _filter->sizeHint().height()));
     _projectFilter->setParent(_filterPanel);
     _appFilter->setParent(_filterPanel);
     _procNameFilter->setParent(_filterPanel);
@@ -429,31 +432,37 @@ MainWindow::MainWindow(
         ThemeManager::applyTheme(qApp, ThemeManager::Theme::Light);
         QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::Light));
+        syncSettings(&settings);
     });
     connect(_lightGrayThemeAction, &QAction::triggered, this, [this] {
         ThemeManager::applyTheme(qApp, ThemeManager::Theme::LightGray);
         QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::LightGray));
+        syncSettings(&settings);
     });
     connect(_greyThemeAction, &QAction::triggered, this, [this] {
         ThemeManager::applyTheme(qApp, ThemeManager::Theme::Grey);
         QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::Grey));
+        syncSettings(&settings);
     });
     connect(_mediumGrayThemeAction, &QAction::triggered, this, [this] {
         ThemeManager::applyTheme(qApp, ThemeManager::Theme::MediumGray);
         QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::MediumGray));
+        syncSettings(&settings);
     });
     connect(_darkGreyThemeAction, &QAction::triggered, this, [this] {
         ThemeManager::applyTheme(qApp, ThemeManager::Theme::DarkGrey);
         QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::DarkGrey));
+        syncSettings(&settings);
     });
     connect(_darkThemeAction, &QAction::triggered, this, [this] {
         ThemeManager::applyTheme(qApp, ThemeManager::Theme::Dark);
         QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("ui/theme"), ThemeManager::themeToString(ThemeManager::Theme::Dark));
+        syncSettings(&settings);
     });
     connect(aboutAction, &QAction::triggered, this, [this] {
         QMessageBox::about(
@@ -663,6 +672,7 @@ MainWindow::closeEvent(
     saveColumnOrder();
     saveColumnVisibility();
     saveColumnWidths();
+    syncSettings(&settings);
     QMainWindow::closeEvent(event);
 }
 //-------------------------------------------------------------------------------------------------
@@ -754,17 +764,55 @@ MainWindow::openFile(
         return;
     }
 
+    struct ColumnFilterTarget
+    {
+        QComboBox *filter {};
+        QString    columnName;
+        QString    allLabel;
+    };
+
+    const QVector<ColumnFilterTarget> columnFilterTargets {
+        {_logNameFilter, QStringLiteral("log_name"), QStringLiteral("All log names")},
+        {_projectFilter, QStringLiteral("project"), QStringLiteral("All projects")},
+        {_appFilter, QStringLiteral("app"), QStringLiteral("All apps")},
+        {_procNameFilter, QStringLiteral("proc_name"), QStringLiteral("All proc names")},
+        {_moduleFilter, QStringLiteral("module"), QStringLiteral("All modules")},
+        {_descrFilter, QStringLiteral("descr"), QStringLiteral("All descriptions")},
+    };
+    QHash<QString, QStringList> columnFilterValues;
+    QHash<QString, QSet<QString>> columnFilterKeys;
+
+    for (int row = 0; row < _model->rowCount(); ++row) {
+        const auto *record = _model->recordAt(row);
+
+        if (record == nullptr) {
+            continue;
+        }
+
+        for (const ColumnFilterTarget &target : columnFilterTargets) {
+            const QString value = record->value(target.columnName);
+            const QString key = value.toCaseFolded();
+
+            if (!value.isEmpty() && !columnFilterKeys[target.columnName].contains(key)) {
+                columnFilterKeys[target.columnName].insert(key);
+                columnFilterValues[target.columnName].push_back(value);
+            }
+        }
+    }
+
     _cellView->clear();
     _rawView->clear();
     _htmlPreviewView->clear();
     _format->setEnabled(false);
     _htmlPreview->setEnabled(false);
-    updateColumnFilterItems(_logNameFilter, QStringLiteral("log_name"), QStringLiteral("All log names"));
-    updateColumnFilterItems(_projectFilter, QStringLiteral("project"), QStringLiteral("All projects"));
-    updateColumnFilterItems(_appFilter, QStringLiteral("app"), QStringLiteral("All apps"));
-    updateColumnFilterItems(_procNameFilter, QStringLiteral("proc_name"), QStringLiteral("All proc names"));
-    updateColumnFilterItems(_moduleFilter, QStringLiteral("module"), QStringLiteral("All modules"));
-    updateColumnFilterItems(_descrFilter, QStringLiteral("descr"), QStringLiteral("All descriptions"));
+
+    for (const ColumnFilterTarget &target : columnFilterTargets) {
+        QStringList values = columnFilterValues.value(target.columnName);
+        values.sort(Qt::CaseInsensitive);
+        setColumnFilterItems(target.filter, target.allLabel, values);
+    }
+
+    applyFilters();
     updateTimestampFilterBounds();
     _table->sortByColumn(-1, Qt::AscendingOrder);
     _table->resizeColumnsToContents();
@@ -808,6 +856,7 @@ MainWindow::saveOpenDirectory(
 {
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("open/directory"), QFileInfo(fileName).absolutePath());
+    syncSettings(&settings);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -872,16 +921,28 @@ MainWindow::updateCellView(
     const QString text = current.data(Qt::DisplayRole).toString();
     _activeCellValue = text;
     const QString previewText = columnName == QStringLiteral("backtrace") ? demangle_utils::demangleSymbols(text) : text;
-    bool canFormat = false;
-    const QString formatted = CodeFormatter::formatFragments(previewText, &canFormat);
-    _formattedCellValue = canFormat ? formatted : QString();
-    const QString displayText = canFormat && _format->isChecked() ? formatted : previewText;
+    bool canFormat = !previewText.isEmpty();
+    QString displayText = previewText;
+    _formattedCellValue.clear();
+
+    if (_format->isChecked()) {
+        const QString formatted = CodeFormatter::formatFragments(previewText, canFormat);
+        _formattedCellValue = canFormat ? formatted : QString();
+        displayText = canFormat ? formatted : previewText;
+    }
+
     const bool canPreviewHtml = html_utils::looksLikeHtml(previewText);
-    bool canFormatRaw = false;
     const QString rawText = record != nullptr ? record->raw : QString();
-    const QString formattedRaw = CodeFormatter::formatFragments(rawText, &canFormatRaw);
+    bool canFormatRaw = !rawText.isEmpty();
+    QString rawDisplayText = rawText;
     _rawCellValue = rawText;
-    _formattedRawCellValue = canFormatRaw ? formattedRaw : QString();
+    _formattedRawCellValue.clear();
+
+    if (_format->isChecked()) {
+        const QString formattedRaw = CodeFormatter::formatFragments(rawText, canFormatRaw);
+        _formattedRawCellValue = canFormatRaw ? formattedRaw : QString();
+        rawDisplayText = canFormatRaw ? formattedRaw : rawText;
+    }
 
     _format->setEnabled(canFormat);
     _htmlPreview->setEnabled(canPreviewHtml);
@@ -892,7 +953,7 @@ MainWindow::updateCellView(
 
     _cellView->setPlainText(displayText);
     _htmlPreviewView->setHtml(previewText);
-    _rawView->setPlainText(canFormatRaw ? formattedRaw : rawText);
+    _rawView->setPlainText(rawDisplayText);
     _cellStack->setCurrentWidget(canPreviewHtml && _htmlPreview->isChecked() ? _htmlPreviewView : _cellView);
     const auto cellHighlightMode =
         _cellStack->currentWidget() != _cellView
@@ -904,10 +965,10 @@ MainWindow::updateCellView(
             : CodeFormatter::looksLikeXml(displayText)  ? JsonSyntaxHighlighter::Mode::Xml
                                                         : JsonSyntaxHighlighter::Mode::None;
     const auto rawHighlightMode =
-        CodeFormatter::looksLikeJson(_rawView->toPlainText()) ? JsonSyntaxHighlighter::Mode::Json
-        : CodeFormatter::looksLikeSql(_rawView->toPlainText())  ? JsonSyntaxHighlighter::Mode::Sql
-        : html_utils::looksLikeHtml(_rawView->toPlainText())     ? JsonSyntaxHighlighter::Mode::Html
-        : CodeFormatter::looksLikeXml(_rawView->toPlainText())  ? JsonSyntaxHighlighter::Mode::Xml
+        CodeFormatter::looksLikeJson(rawDisplayText) ? JsonSyntaxHighlighter::Mode::Json
+        : CodeFormatter::looksLikeSql(rawDisplayText)  ? JsonSyntaxHighlighter::Mode::Sql
+        : html_utils::looksLikeHtml(rawDisplayText)     ? JsonSyntaxHighlighter::Mode::Html
+        : CodeFormatter::looksLikeXml(rawDisplayText)  ? JsonSyntaxHighlighter::Mode::Xml
                                                                 : JsonSyntaxHighlighter::Mode::None;
     _cellJsonHighlighter->setMode(cellHighlightMode);
     _rawJsonHighlighter->setMode(rawHighlightMode);
@@ -924,6 +985,13 @@ MainWindow::copyActiveCellValue()
 void
 MainWindow::copyFormattedCellValue()
 {
+    if (_formattedCellValue.isEmpty()) {
+        bool changed = false;
+        const QString formatted = CodeFormatter::formatFragments(_activeCellValue, changed);
+        QApplication::clipboard()->setText(changed ? formatted : _activeCellValue);
+        return;
+    }
+
     QApplication::clipboard()->setText(_formattedCellValue);
 }
 //-------------------------------------------------------------------------------------------------
@@ -936,6 +1004,13 @@ MainWindow::copyRawCellValue()
 void
 MainWindow::copyFormattedRawCellValue()
 {
+    if (_formattedRawCellValue.isEmpty()) {
+        bool changed = false;
+        const QString formatted = CodeFormatter::formatFragments(_rawCellValue, changed);
+        QApplication::clipboard()->setText(changed ? formatted : _rawCellValue);
+        return;
+    }
+
     QApplication::clipboard()->setText(_formattedRawCellValue);
 }
 //-------------------------------------------------------------------------------------------------
@@ -988,6 +1063,7 @@ MainWindow::addRecentFile(
 
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("recentFiles"), _recentFiles);
+    syncSettings(&settings);
     updateRecentFilesMenu();
 }
 //-------------------------------------------------------------------------------------------------
@@ -1029,6 +1105,7 @@ MainWindow::updateRecentFilesMenu()
         _recentFiles.clear();
         QSettings settings(settingsFileName(), QSettings::IniFormat);
         settings.setValue(QStringLiteral("recentFiles"), _recentFiles);
+        syncSettings(&settings);
         updateRecentFilesMenu();
     });
 }
@@ -1037,10 +1114,10 @@ MainWindow::updateRecentFilesMenu()
 // Table filters and filter panel geometry
 //-------------------------------------------------------------------------------------------------
 void
-MainWindow::updateColumnFilterItems(
+MainWindow::setColumnFilterItems(
     QComboBox     *filter,
-    const QString &columnName,
-    const QString &allLabel
+    const QString &allLabel,
+    const QStringList &values
 )
 {
     if (filter == nullptr) {
@@ -1048,23 +1125,6 @@ MainWindow::updateColumnFilterItems(
     }
 
     const QString selectedValue = filter_utils::selectedFilterValue(filter);
-    QStringList values;
-
-    for (int row = 0; row < _model->rowCount(); ++row) {
-        const auto *record = _model->recordAt(row);
-
-        if (record == nullptr) {
-            continue;
-        }
-
-        const QString value = record->value(columnName);
-
-        if (!value.isEmpty() && !values.contains(value, Qt::CaseInsensitive)) {
-            values.push_back(value);
-        }
-    }
-
-    values.sort(Qt::CaseInsensitive);
 
     QSignalBlocker blocker(filter);
     filter->clear();
@@ -1076,7 +1136,6 @@ MainWindow::updateColumnFilterItems(
 
     const int selectedIndex = filter->findData(selectedValue);
     filter->setCurrentIndex(selectedIndex >= 0 ? selectedIndex : 0);
-    applyFilters();
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1159,8 +1218,8 @@ MainWindow::updateFilterGeometry()
         const int sectionX = _table->horizontalHeader()->sectionViewportPosition(column);
         const int sectionWidth = _table->horizontalHeader()->sectionSize(column);
         const int x = viewportRect.x() + sectionX;
-        const int left = qMax(x, viewportRect.left());
-        const int right = qMin(x + sectionWidth, viewportRect.right() + 1);
+        const int left = (std::max)(x, viewportRect.left());
+        const int right = (std::min)(x + sectionWidth, viewportRect.right() + 1);
         const int width = right - left;
 
         if (width <= 0) {
@@ -1217,7 +1276,7 @@ MainWindow::updateTimestampFilterBounds()
     }
 
     if (!minTimestamp.isValid() || !maxTimestamp.isValid()) {
-        minTimestamp = QDateTime::currentDateTime();
+        minTimestamp = QDateTime::currentDateTimeUtc();
         maxTimestamp = minTimestamp;
     }
 
@@ -1262,6 +1321,7 @@ MainWindow::saveColumnWidths() const
     }
 
     settings.endGroup();
+    syncSettings(&settings);
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1291,6 +1351,7 @@ MainWindow::saveColumnOrder() const
         QStringLiteral("columns/order"),
         table_header_utils::columnOrder(_table->horizontalHeader(), _table->model())
     );
+    syncSettings(&settings);
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1309,6 +1370,7 @@ MainWindow::saveColumnVisibility() const
         QStringLiteral("columns/hidden"),
         table_header_utils::hiddenColumns(_table->horizontalHeader(), _table->model())
     );
+    syncSettings(&settings);
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1348,11 +1410,14 @@ MainWindow::loadTableSessions()
     if (_tableSessions.activeLayout().columnOrder.isEmpty()) {
         _tableSessions.setActiveLayout(table_header_utils::captureLayout(_table));
         _tableSessions.save(&settings);
+        syncSettings(&settings);
     } else {
         applyActiveTableSession();
     }
 
-    rebuildTableSessionsMenu();
+    QTimer::singleShot(0, this, [this] {
+        rebuildTableSessionsMenu();
+    });
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1361,6 +1426,7 @@ MainWindow::saveTableSessions()
     _tableSessions.setActiveLayout(table_header_utils::captureLayout(_table));
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     _tableSessions.save(&settings);
+    syncSettings(&settings);
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1417,7 +1483,10 @@ MainWindow::switchTableSession(
     applyActiveTableSession();
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     _tableSessions.save(&settings);
-    rebuildTableSessionsMenu();
+    syncSettings(&settings);
+    QTimer::singleShot(0, this, [this] {
+        rebuildTableSessionsMenu();
+    });
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1447,7 +1516,10 @@ MainWindow::addTableSession()
 
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     _tableSessions.save(&settings);
-    rebuildTableSessionsMenu();
+    syncSettings(&settings);
+    QTimer::singleShot(0, this, [this] {
+        rebuildTableSessionsMenu();
+    });
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1475,7 +1547,10 @@ MainWindow::renameTableSession()
 
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     _tableSessions.save(&settings);
-    rebuildTableSessionsMenu();
+    syncSettings(&settings);
+    QTimer::singleShot(0, this, [this] {
+        rebuildTableSessionsMenu();
+    });
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1500,7 +1575,10 @@ MainWindow::removeTableSession()
     applyActiveTableSession();
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     _tableSessions.save(&settings);
-    rebuildTableSessionsMenu();
+    syncSettings(&settings);
+    QTimer::singleShot(0, this, [this] {
+        rebuildTableSessionsMenu();
+    });
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1535,6 +1613,7 @@ MainWindow::savePanelLayout() const
     QSettings settings(settingsFileName(), QSettings::IniFormat);
     settings.setValue(QStringLiteral("splitters/main"), _mainSplitter->saveState());
     settings.setValue(QStringLiteral("splitters/details"), _detailsSplitter->saveState());
+    syncSettings(&settings);
 }
 //-------------------------------------------------------------------------------------------------
 void
@@ -1562,7 +1641,7 @@ MainWindow::updateStatus()
 
     QString levelsText = QStringLiteral("-");
     QString levelsHtml;
-    const QMap<QString, int> levelCounts = _model->levelCounts();
+    const QHash<QString, int> levelCounts = _model->levelCounts();
 
     if (!levelCounts.isEmpty()) {
         QStringList levelParts;

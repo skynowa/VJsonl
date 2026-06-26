@@ -7,6 +7,9 @@
 #pragma once
 
 #include <QString>
+
+class QSettings;
 //-------------------------------------------------------------------------------------------------
 QString settingsFileName();
+bool    syncSettings(QSettings *settings, QString *outError = nullptr);
 //-------------------------------------------------------------------------------------------------

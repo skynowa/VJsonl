@@ -43,6 +43,7 @@ class MainWindow final :
 public:
     // Construction
     explicit MainWindow(QWidget *parent = nullptr);
+    Q_DISABLE_COPY_MOVE(MainWindow)
 
 protected:
     // Lifecycle and event handling
@@ -71,8 +72,7 @@ private:
     void findInRawView();
 
     // Table filters and filter panel geometry
-    void updateColumnFilterItems(QComboBox *filter, const QString &columnName,
-            const QString &allLabel);
+    void setColumnFilterItems(QComboBox *filter, const QString &allLabel, const QStringList &values);
     void applyFilters();
     void updateTimestampFilterStatus();
     void updateFilterGeometry();

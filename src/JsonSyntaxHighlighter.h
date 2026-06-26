@@ -22,10 +22,11 @@ public:
         Sql,
         Xml,
         Html,
-        Backtrace
+        Backtrace,
     };
 
     explicit JsonSyntaxHighlighter(QTextDocument *parent = nullptr);
+    Q_DISABLE_COPY_MOVE(JsonSyntaxHighlighter)
 
     // Highlighter mode
     void setMode(Mode mode);

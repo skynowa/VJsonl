@@ -9,6 +9,7 @@
 #include "JsonlModel.h"
 
 #include <QJsonDocument>
+#include <QJsonParseError>
 #include <QTemporaryFile>
 #include <QTest>
 
@@ -89,8 +90,12 @@ private slots:
         QVERIFY2(ConverterCsvToJsonl::convert(csvData, &jsonlData, &error), qPrintable(error));
         const QList<QByteArray> jsonLines = jsonlData.trimmed().split('\n');
         QCOMPARE(jsonLines.size(), 2);
+        QJsonParseError parseError {};
+        const QJsonDocument firstLine = QJsonDocument::fromJson(jsonLines.at(0), &parseError);
+        QCOMPARE(parseError.error, QJsonParseError::NoError);
+        QVERIFY(firstLine.isObject());
         QCOMPARE(
-            QJsonDocument::fromJson(jsonLines.at(0)).object().value(QStringLiteral("msg")).toString(),
+            firstLine.object().value(QStringLiteral("msg")).toString(),
             QStringLiteral("Loaded hotel")
         );
 

@@ -9,6 +9,7 @@
 #include <QBuffer>
 #include <QColor>
 #include <QFont>
+#include <QHash>
 #include <QPainter>
 #include <QPixmap>
 
@@ -109,6 +110,14 @@ iconHtmlForLevel(
     const QString &level
 )
 {
+    static QHash<QString, QString> cache;
+    const QString key = level.trimmed().toLower();
+    const auto cacheIt = cache.constFind(key);
+
+    if (cacheIt != cache.cend()) {
+        return cacheIt.value();
+    }
+
     const QPixmap pixmap = iconForLevel(level).pixmap(16, 16);
 
     if (pixmap.isNull()) {
@@ -117,11 +126,15 @@ iconHtmlForLevel(
 
     QByteArray bytes;
     QBuffer buffer(&bytes);
-    buffer.open(QIODevice::WriteOnly);
-    pixmap.save(&buffer, "PNG");
 
-    return QStringLiteral("<img width=\"16\" height=\"16\" src=\"data:image/png;base64,%1\">")
+    if (!buffer.open(QIODevice::WriteOnly) || !pixmap.save(&buffer, "PNG")) {
+        return {};
+    }
+
+    const QString html = QStringLiteral("<img width=\"16\" height=\"16\" src=\"data:image/png;base64,%1\">")
         .arg(QString::fromLatin1(bytes.toBase64()));
+    cache.insert(key, html);
+    return html;
 }
 
 //-------------------------------------------------------------------------------------------------

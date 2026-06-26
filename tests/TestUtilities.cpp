@@ -61,7 +61,7 @@ private slots:
         QVERIFY(CodeFormatter::looksLikeSql(QStringLiteral("select * from hotels")));
         QVERIFY(CodeFormatter::looksLikeXml(QStringLiteral("<root><a/></root>")));
 
-        const QString formatted = CodeFormatter::formatFragments(QStringLiteral("prefix {\"a\":1,\"b\":2} suffix"), &changed);
+        const QString formatted = CodeFormatter::formatFragments(QStringLiteral("prefix {\"a\":1,\"b\":2} suffix"), changed);
         QVERIFY(changed);
         QVERIFY(formatted.contains(QStringLiteral("\n")));
         QVERIFY(formatted.contains(QStringLiteral("\"a\"")));

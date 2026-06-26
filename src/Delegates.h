@@ -17,6 +17,7 @@ class ActiveCellDelegate final :
 public:
     // Construction
     explicit ActiveCellDelegate(QTableView *table, QObject *parent = nullptr);
+    Q_DISABLE_COPY_MOVE(ActiveCellDelegate)
 
     // QStyledItemDelegate interface
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)

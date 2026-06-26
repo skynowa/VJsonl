@@ -19,6 +19,48 @@
 namespace
 {
 //-------------------------------------------------------------------------------------------------
+const QVector<std::pair<QRegularExpression, QString>> &
+sqlBreakExpressions()
+{
+    static const QVector<std::pair<QRegularExpression, QString>> expressions = [] {
+        const QStringList breakBefore {
+            QStringLiteral("SELECT"),
+            QStringLiteral("FROM"),
+            QStringLiteral("LEFT JOIN"),
+            QStringLiteral("RIGHT JOIN"),
+            QStringLiteral("INNER JOIN"),
+            QStringLiteral("OUTER JOIN"),
+            QStringLiteral("JOIN"),
+            QStringLiteral("SET"),
+            QStringLiteral("VALUES"),
+            QStringLiteral("WHERE"),
+            QStringLiteral("GROUP BY"),
+            QStringLiteral("ORDER BY"),
+            QStringLiteral("HAVING"),
+            QStringLiteral("LIMIT"),
+            QStringLiteral("OFFSET"),
+            QStringLiteral("RETURNING")
+        };
+        QVector<std::pair<QRegularExpression, QString>> result;
+        result.reserve(breakBefore.size());
+
+        for (const QString &keyword : breakBefore) {
+            const QString pattern = QStringLiteral("\\s+%1\\b").arg(
+                QString(keyword).toLower().replace(QStringLiteral(" "), QStringLiteral("\\s+"))
+            );
+            result.push_back({
+                QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption),
+                QStringLiteral("\n") + keyword
+            });
+        }
+
+        return result;
+    }();
+
+    return expressions;
+}
+
+//-------------------------------------------------------------------------------------------------
 // Format detection helpers
 //-------------------------------------------------------------------------------------------------
 QString
@@ -105,38 +147,23 @@ formatSql(
         return {};
     }
 
-    const QStringList breakBefore {
-        QStringLiteral("SELECT"),
-        QStringLiteral("FROM"),
-        QStringLiteral("LEFT JOIN"),
-        QStringLiteral("RIGHT JOIN"),
-        QStringLiteral("INNER JOIN"),
-        QStringLiteral("OUTER JOIN"),
-        QStringLiteral("JOIN"),
-        QStringLiteral("SET"),
-        QStringLiteral("VALUES"),
-        QStringLiteral("WHERE"),
-        QStringLiteral("GROUP BY"),
-        QStringLiteral("ORDER BY"),
-        QStringLiteral("HAVING"),
-        QStringLiteral("LIMIT"),
-        QStringLiteral("OFFSET"),
-        QStringLiteral("RETURNING")
-    };
+    static const QRegularExpression andExpression(
+        QStringLiteral("\\s+AND\\s+"),
+        QRegularExpression::CaseInsensitiveOption
+    );
+    static const QRegularExpression orExpression(
+        QStringLiteral("\\s+OR\\s+"),
+        QRegularExpression::CaseInsensitiveOption
+    );
+    static const QRegularExpression commaExpression(QStringLiteral(",\\s*"));
 
-    for (const QString &keyword : breakBefore) {
-        const QString pattern = QStringLiteral("\\s+%1\\b").arg(
-            keyword.toLower().replace(QStringLiteral(" "), QStringLiteral("\\s+"))
-        );
-        sql.replace(
-            QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption),
-            QStringLiteral("\n") + keyword
-        );
+    for (const auto &expression : sqlBreakExpressions()) {
+        sql.replace(expression.first, expression.second);
     }
 
-    sql.replace(QRegularExpression(QStringLiteral("\\s+AND\\s+"), QRegularExpression::CaseInsensitiveOption), QStringLiteral("\n    AND "));
-    sql.replace(QRegularExpression(QStringLiteral("\\s+OR\\s+"), QRegularExpression::CaseInsensitiveOption), QStringLiteral("\n    OR "));
-    sql.replace(QRegularExpression(QStringLiteral(",\\s*")), QStringLiteral(",\n    "));
+    sql.replace(andExpression, QStringLiteral("\n    AND "));
+    sql.replace(orExpression, QStringLiteral("\n    OR "));
+    sql.replace(commaExpression, QStringLiteral(",\n    "));
 
     return sql.trimmed();
 }
@@ -187,37 +214,37 @@ findJsonEnd(
     qsizetype     start
 )
 {
-    const QChar open = text.at(start);
-    const QChar close = open == QLatin1Char('{') ? QLatin1Char('}') : QLatin1Char(']');
-    QVector<QChar> stack;
+    const char16_t open = text.at(start).unicode();
+    const char16_t close = open == u'{' ? u'}' : u']';
+    QVector<char16_t> stack;
     bool inString = false;
     bool escaped = false;
 
     for (qsizetype i = start; i < text.size(); ++i) {
-        const QChar ch = text.at(i);
+        const char16_t ch = text.at(i).unicode();
 
         if (inString) {
             if (escaped) {
                 escaped = false;
-            } else if (ch == QLatin1Char('\\')) {
+            } else if (ch == u'\\') {
                 escaped = true;
-            } else if (ch == QLatin1Char('"')) {
+            } else if (ch == u'"') {
                 inString = false;
             }
 
             continue;
         }
 
-        if (ch == QLatin1Char('"')) {
+        if (ch == u'"') {
             inString = true;
-        } else if (ch == QLatin1Char('{') || ch == QLatin1Char('[')) {
+        } else if (ch == u'{' || ch == u'[') {
             stack.push_back(ch);
-        } else if (ch == QLatin1Char('}') || ch == QLatin1Char(']')) {
+        } else if (ch == u'}' || ch == u']') {
             if (stack.isEmpty()) {
                 return -1;
             }
 
-            const QChar expected = stack.back() == QLatin1Char('{') ? QLatin1Char('}') : QLatin1Char(']');
+            const char16_t expected = stack.back() == u'{' ? u'}' : u']';
 
             if (ch != expected) {
                 return -1;
@@ -241,7 +268,7 @@ formatJsonFragments(
 )
 {
     for (qsizetype start = 0; start < text.size(); ++start) {
-        const QChar ch = text.at(start);
+        const auto ch = text.at(start);
 
         if (ch != QLatin1Char('{') && ch != QLatin1Char('[')) {
             continue;
@@ -386,29 +413,29 @@ looksLikeXml(
 QString
 formatFragments(
     QString text,
-    bool    *changed
+    bool    &changed
 )
 {
-    *changed = false;
+    changed = false;
 
     if (isSqlText(text)) {
-        *changed = true;
+        changed = true;
         return formatSql(text);
     }
 
     if (isJsonText(text)) {
-        *changed = true;
+        changed = true;
         return formatJson(text);
     }
 
     if (isXmlText(text)) {
-        *changed = true;
+        changed = true;
         return formatXml(text);
     }
 
-    text = formatJsonFragments(std::move(text), changed);
-    text = formatXmlFragments(std::move(text), changed);
-    text = formatSqlFragment(text, changed);
+    text = formatJsonFragments(std::move(text), &changed);
+    text = formatXmlFragments(std::move(text), &changed);
+    text = formatSqlFragment(text, &changed);
     return text;
 }
 }

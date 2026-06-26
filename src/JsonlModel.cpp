@@ -15,9 +15,11 @@
 #include <QBrush>
 #include <QColor>
 #include <QFile>
+#include <QFileDevice>
 #include <QIcon>
 #include <QJsonParseError>
 
+#include <algorithm>
 #include <utility>
 
 //-------------------------------------------------------------------------------------------------
@@ -57,52 +59,66 @@ JsonlModel::data(
     int               role
 ) const
 {
-    if (!index.isValid()) {
+    if (
+        !index.isValid()
+        || index.model() != this
+        || index.row() < 0
+        || index.row() >= _records.size()
+        || index.column() < 0
+        || index.column() >= _columns.size()
+    ) {
         return {};
     }
 
     const auto &record = _records.at(index.row());
     const QString &column = _columns.at(index.column());
-    const QString level = record.value(QStringLiteral("level"));
-    const bool rowIsFatal = level.compare(QStringLiteral("fatal"), Qt::CaseInsensitive) == 0;
-    const bool rowHasError =
-        level.compare(QStringLiteral("error"), Qt::CaseInsensitive) == 0
-        || !record.value(QStringLiteral("error")).isEmpty();
-    const bool rowIsDebug = level.compare(QStringLiteral("debug"), Qt::CaseInsensitive) == 0;
 
-    if (role == Qt::BackgroundRole && rowIsFatal) {
-        return QBrush(QColor(170, 0, 255));
+    if (role == Qt::UserRole && column == QStringLiteral("ts")) {
+        return record.timestamp;
     }
 
-    if (role == Qt::BackgroundRole && rowHasError) {
-        return QBrush(QColor(200, 0, 0));
-    }
+    if (role == Qt::BackgroundRole || role == Qt::ForegroundRole || role == Qt::DecorationRole) {
+        const QString level = record.value(QStringLiteral("level"));
+        const bool rowIsFatal = level.compare(QStringLiteral("fatal"), Qt::CaseInsensitive) == 0;
+        const bool rowHasError =
+            level.compare(QStringLiteral("error"), Qt::CaseInsensitive) == 0
+            || !record.value(QStringLiteral("error")).isEmpty();
+        const bool rowIsDebug = level.compare(QStringLiteral("debug"), Qt::CaseInsensitive) == 0;
 
-    if (role == Qt::BackgroundRole && rowIsDebug) {
-        return QBrush(QColor(215, 245, 215));
-    }
+        if (role == Qt::BackgroundRole && rowIsFatal) {
+            return QBrush(QColor(170, 0, 255));
+        }
 
-    if (role == Qt::ForegroundRole && (rowIsFatal || rowHasError)) {
-        return QBrush(Qt::white);
-    }
+        if (role == Qt::BackgroundRole && rowHasError) {
+            return QBrush(QColor(200, 0, 0));
+        }
 
-    if (
-        role == Qt::ForegroundRole
-        && (
-            column == QStringLiteral("app")
-            || column == QStringLiteral("proc_name")
-            || column == QStringLiteral("module")
-        )
-    ) {
-        return QBrush(QColor(80, 170, 80));
-    }
+        if (role == Qt::BackgroundRole && rowIsDebug) {
+            return QBrush(QColor(215, 245, 215));
+        }
 
-    if (role == Qt::DecorationRole && column == QStringLiteral("level")) {
-        return LogLevelStyle::iconForLevel(level);
-    }
+        if (role == Qt::ForegroundRole && (rowIsFatal || rowHasError)) {
+            return QBrush(Qt::white);
+        }
 
-    if (role == Qt::DecorationRole && column == QStringLiteral("valid") && !record.valid) {
-        return icon_utils::invalidRowIcon();
+        if (
+            role == Qt::ForegroundRole
+            && (
+                column == QStringLiteral("app")
+                || column == QStringLiteral("proc_name")
+                || column == QStringLiteral("module")
+            )
+        ) {
+            return QBrush(QColor(80, 170, 80));
+        }
+
+        if (role == Qt::DecorationRole && column == QStringLiteral("level")) {
+            return LogLevelStyle::iconForLevel(level);
+        }
+
+        if (role == Qt::DecorationRole && column == QStringLiteral("valid") && !record.valid) {
+            return icon_utils::invalidRowIcon();
+        }
     }
 
     auto cellText = [&record, &column]() -> QString {
@@ -221,7 +237,7 @@ JsonlModel::loadFile(
         return false;
     }
 
-    return loadDevice(&file, fileName, progressCallback);
+    return loadDevice(&file, fileName, outError, progressCallback);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -248,7 +264,7 @@ JsonlModel::loadJsonlData(
         return false;
     }
 
-    return loadDevice(&buffer, sourceFileName, progressCallback);
+    return loadDevice(&buffer, sourceFileName, outError, progressCallback);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -256,6 +272,7 @@ bool
 JsonlModel::loadDevice(
     QIODevice              *device,
     const QString          &sourceFileName,
+    QString                *outError,
     const ProgressCallback &progressCallback
 )
 {
@@ -263,14 +280,11 @@ JsonlModel::loadDevice(
         return false;
     }
 
-    beginResetModel();
-
-    _records.clear();
-    _fileName = sourceFileName;
-    _invalidRowsCount = 0;
-    _levelCounts.clear();
-    _memoryStats = {};
-    _memoryUsageTotalKb = 0.0;
+    QVector<JsonlRecord> records;
+    QHash<QString, int> levelCounts;
+    MemoryStats memoryStats;
+    double memoryUsageTotalKb = 0.0;
+    int invalidRowsCount = 0;
 
     const qint64 totalBytes = device->size();
     qint64 readBytes = 0;
@@ -300,15 +314,15 @@ JsonlModel::loadDevice(
         }
 
         if (progressCallback && readBytes >= nextProgressBytes) {
-            progressCallback(qMin(readBytes, totalBytes), totalBytes);
+            progressCallback((std::min)(readBytes, totalBytes), totalBytes);
             nextProgressBytes = readBytes + 1024 * 1024;
         }
 
         if (record.raw.trimmed().isEmpty()) {
             record.valid = false;
             record.error = QStringLiteral("empty line");
-            ++_invalidRowsCount;
-            _records.push_back(std::move(record));
+            ++invalidRowsCount;
+            records.push_back(std::move(record));
             continue;
         }
 
@@ -316,46 +330,66 @@ JsonlModel::loadDevice(
 
         if (!trimmed.startsWith(QLatin1Char('{')) && !trimmed.startsWith(QLatin1Char('['))) {
             record.valid = true;
-            _records.push_back(std::move(record));
+            records.push_back(std::move(record));
             continue;
         }
 
         QJsonParseError parseError {};
         record.doc = QJsonDocument::fromJson(record.raw.toUtf8(), &parseError);
-        record.valid = parseError.error == QJsonParseError::NoError;
+        record.valid = parseError.error == QJsonParseError::NoError && record.doc.isObject();
 
         if (!record.valid) {
-            record.error = parseError.errorString();
-            ++_invalidRowsCount;
+            record.error = parseError.error == QJsonParseError::NoError
+                ? QStringLiteral("JSON row is not an object")
+                : parseError.errorString();
+            ++invalidRowsCount;
         } else {
             const QString level = record.value(QStringLiteral("level")).trimmed().toLower();
+            record.timestamp = datetime_utils::parseTimestamp(record.value(QStringLiteral("ts")));
 
             if (!level.isEmpty()) {
-                ++_levelCounts[level];
+                ++levelCounts[level];
             }
 
             bool memoryOk = false;
             const qint64 memoryKb = record.value(QStringLiteral("mem_usage_kb")).trimmed().toLongLong(&memoryOk);
 
             if (memoryOk && memoryKb >= 0) {
-                if (!_memoryStats.hasValues) {
-                    _memoryStats.minKb = memoryKb;
-                    _memoryStats.maxKb = memoryKb;
-                    _memoryStats.hasValues = true;
+                if (!memoryStats.hasValues) {
+                    memoryStats.minKb = memoryKb;
+                    memoryStats.maxKb = memoryKb;
+                    memoryStats.hasValues = true;
                 } else {
-                    _memoryStats.minKb = qMin(_memoryStats.minKb, memoryKb);
-                    _memoryStats.maxKb = qMax(_memoryStats.maxKb, memoryKb);
+                    memoryStats.minKb = (std::min)(memoryStats.minKb, memoryKb);
+                    memoryStats.maxKb = (std::max)(memoryStats.maxKb, memoryKb);
                 }
 
-                ++_memoryStats.count;
-                _memoryUsageTotalKb += static_cast<double>(memoryKb);
-                _memoryStats.averageKb = _memoryUsageTotalKb / _memoryStats.count;
+                ++memoryStats.count;
+                memoryUsageTotalKb += static_cast<double>(memoryKb);
+                memoryStats.averageKb = memoryUsageTotalKb / memoryStats.count;
             }
         }
 
-        _records.push_back(std::move(record));
+        records.push_back(std::move(record));
     }
 
+    auto *fileDevice = qobject_cast<QFileDevice *>(device);
+
+    if (fileDevice != nullptr && fileDevice->error() != QFileDevice::NoError) {
+        if (outError != nullptr) {
+            *outError = fileDevice->errorString();
+        }
+
+        return false;
+    }
+
+    beginResetModel();
+    _records = std::move(records);
+    _fileName = sourceFileName;
+    _invalidRowsCount = invalidRowsCount;
+    _levelCounts = std::move(levelCounts);
+    _memoryStats = memoryStats;
+    _memoryUsageTotalKb = memoryUsageTotalKb;
     endResetModel();
 
     if (progressCallback) {
@@ -394,7 +428,7 @@ JsonlModel::invalidRowsCount() const
     return _invalidRowsCount;
 }
 //-------------------------------------------------------------------------------------------------
-QMap<QString, int>
+QHash<QString, int>
 JsonlModel::levelCounts() const
 {
     return _levelCounts;
