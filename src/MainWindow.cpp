@@ -223,11 +223,18 @@ MainWindow::MainWindow(
     _wrapCellLine = new QCheckBox(QStringLiteral("Wrap line"), this);
     _wrapCellLine->setChecked(true);
     _cellView->setLineWrapMode(QTextEdit::WidgetWidth);
-    _rawView->setLineWrapMode(QTextEdit::WidgetWidth);
 
     _htmlPreview = new QCheckBox(QStringLiteral("HTML preview"), this);
     _htmlPreview->setEnabled(false);
     _htmlPreview->setChecked(true);
+
+    _rawFormat = new QCheckBox(QStringLiteral("Format"), this);
+    _rawFormat->setEnabled(false);
+    _rawFormat->setChecked(false);
+
+    _wrapRawLine = new QCheckBox(QStringLiteral("Wrap line"), this);
+    _wrapRawLine->setChecked(true);
+    _rawView->setLineWrapMode(QTextEdit::WidgetWidth);
 
     _cellSearch = new QLineEdit(this);
     _cellSearch->setPlaceholderText(QStringLiteral("Find in value..."));
@@ -291,6 +298,8 @@ MainWindow::MainWindow(
     auto *rawCellToolsLayout = new QHBoxLayout(rawCellTools);
     rawCellToolsLayout->setContentsMargins(0, 0, 0, 0);
     rawCellToolsLayout->addWidget(rawCellTitle);
+    rawCellToolsLayout->addWidget(_rawFormat);
+    rawCellToolsLayout->addWidget(_wrapRawLine);
     rawCellToolsLayout->addWidget(_rawSearch, 1);
     rawCellToolsLayout->addWidget(_copyRawValueButton);
     rawCellToolsLayout->addWidget(_copyFormattedRawValueButton);
@@ -600,6 +609,13 @@ MainWindow::MainWindow(
 
     connect(_wrapCellLine, &QCheckBox::toggled, this, [this](bool checked) {
         _cellView->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
+    });
+
+    connect(_rawFormat, &QCheckBox::toggled, this, [this] {
+        updateCellView(_table->currentIndex());
+    });
+
+    connect(_wrapRawLine, &QCheckBox::toggled, this, [this](bool checked) {
         _rawView->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
     });
 
@@ -804,6 +820,7 @@ MainWindow::openFile(
     _rawView->clear();
     _htmlPreviewView->clear();
     _format->setEnabled(false);
+    _rawFormat->setEnabled(false);
     _htmlPreview->setEnabled(false);
 
     for (const ColumnFilterTarget &target : columnFilterTargets) {
@@ -878,6 +895,7 @@ MainWindow::onCurrentChanged(
         _rawJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
         _htmlPreviewView->clear();
         _format->setEnabled(false);
+        _rawFormat->setEnabled(false);
         _htmlPreview->setEnabled(false);
         _copyValueButton->setEnabled(false);
         _copyFormattedValueButton->setEnabled(false);
@@ -907,6 +925,7 @@ MainWindow::updateCellView(
         _rawJsonHighlighter->setMode(JsonSyntaxHighlighter::Mode::None);
         _htmlPreviewView->clear();
         _format->setEnabled(false);
+        _rawFormat->setEnabled(false);
         _htmlPreview->setEnabled(false);
         _copyValueButton->setEnabled(false);
         _copyFormattedValueButton->setEnabled(false);
@@ -938,13 +957,12 @@ MainWindow::updateCellView(
     _rawCellValue = rawText;
     _formattedRawCellValue.clear();
 
-    if (_format->isChecked()) {
-        const QString formattedRaw = CodeFormatter::formatFragments(rawText, canFormatRaw);
-        _formattedRawCellValue = canFormatRaw ? formattedRaw : QString();
-        rawDisplayText = canFormatRaw ? formattedRaw : rawText;
-    }
+    const QString formattedRaw = CodeFormatter::formatFragments(rawText, canFormatRaw);
+    _formattedRawCellValue = canFormatRaw ? formattedRaw : QString();
+    rawDisplayText = canFormatRaw && _rawFormat->isChecked() ? formattedRaw : rawText;
 
     _format->setEnabled(canFormat);
+    _rawFormat->setEnabled(canFormatRaw);
     _htmlPreview->setEnabled(canPreviewHtml);
     _copyValueButton->setEnabled(true);
     _copyFormattedValueButton->setEnabled(canFormat);

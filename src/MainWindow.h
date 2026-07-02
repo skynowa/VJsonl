@@ -119,6 +119,8 @@ private:
     QCheckBox             *_format {};
     QCheckBox             *_wrapCellLine {};
     QCheckBox             *_htmlPreview {};
+    QCheckBox             *_rawFormat {};
+    QCheckBox             *_wrapRawLine {};
     QLineEdit             *_cellSearch {};
     QLineEdit             *_rawSearch {};
     QToolButton           *_copyValueButton {};
